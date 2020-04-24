@@ -17,8 +17,10 @@ import React from 'react'
 import { OceanProvider } from '@oceanprotocol/react'
 
 export default function MyApp({ children }: { children: any }) {
+    // TODO: setup web3 first
+
     return (
-        <OceanProvider>
+        <OceanProvider web3={web3}>
             <h1>My App</h1>
             {children}
         </OceanProvider>
@@ -39,17 +41,15 @@ const oceanConfig: OceanConfig = {
 }
 
 export default function MyComponent() {
-  // TODO: setup web3 first
-  
   // Initialize, get existing, or reinitalize Ocean
-  const { ocean, account } = useOcean(web3, oceanConfig)
+  const { ocean, account } = useOcean(oceanConfig)
 
   // consume asset
-  const { consumeAsset, isLoading, step } = useConsume(ocean, account)
+  const { consumeAsset, isLoading, step } = useConsume(ocean)
 
   async function handleClick() {
       const ddo = 'did:op:0x000000000'
-      await consumeAsset(ddo)
+      await consumeAsset(ddo, account)
   }
 
   return (
