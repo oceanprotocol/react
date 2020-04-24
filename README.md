@@ -18,6 +18,8 @@ import { OceanProvider } from '@oceanprotocol/react'
 
 export default function MyApp({ children }: { children: any }) {
     // TODO: setup web3 first
+    // or fallback to injected providers by default
+    // so it works with any browser wallet out of the box
 
     return (
         <OceanProvider web3={web3}>
@@ -41,7 +43,7 @@ const oceanConfig: OceanConfig = {
 }
 
 export default function MyComponent() {
-  // Initialize, get existing, or reinitalize Ocean
+  // Initialize, get existing, or reinitialize Ocean
   const { ocean, account } = useOcean(oceanConfig)
 
   // consume asset
@@ -62,4 +64,37 @@ export default function MyComponent() {
     </div>
   )
 }
+```
+
+### Specs
+
+#### `useOcean()`
+
+```tsx
+interface UseOcean {
+    ocean: Ocean
+    account: string
+    balance: { ocean: string, eth: string }
+    status: OceanConnectionStatus
+}
+
+const result: UseOcean = useOcean(config: OceanConfig)
+```
+
+
+#### `useConsume()`
+
+```tsx
+interface ConsumeOptions {
+    ocean: Ocean
+}
+
+interface UseConsume {
+    consumeAsset: (ddo: DDO, account: string) => void
+    isLoading: boolean
+    step: number
+    error: string | undefined
+}
+
+const result: UseConsume = useConsume(options: ConsumeOptions)
 ```
