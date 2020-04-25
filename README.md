@@ -53,18 +53,18 @@ Then within your component use the provided hooks to interact with Ocean's funct
 
 ```tsx
 import React from 'react'
-import { useOcean, OceanConfig, useConsume } from '@oceanprotocol/react'
+import { useOcean, useConsume } from '@oceanprotocol/react'
 
 export default function MyComponent() {
   // Initialize, get existing, or reinitialize Ocean
-  const { ocean, account } = useOcean(oceanConfig)
+  const { ocean, account } = useOcean()
 
   // consume asset
-  const { consumeAsset, isLoading, step } = useConsume(ocean)
+  const { consume, isLoading, step } = useConsume()
 
   async function handleClick() {
     const ddo = 'did:op:0x000000000'
-    await consumeAsset(ddo, account)
+    await consume(ddo)
   }
 
   return (

@@ -3,8 +3,7 @@ import React, {
   useContext,
   useState,
   useEffect,
-  createContext,
-  FunctionComponent
+  createContext
 } from 'react'
 import { Ocean, Config } from '@oceanprotocol/squid'
 import Balance from '@oceanprotocol/squid/dist/node/models/Balance'
