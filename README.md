@@ -1,33 +1,51 @@
-# @oceanprotocol/react
+[![banner](https://raw.githubusercontent.com/oceanprotocol/art/master/github/repo-banner%402x.png)](https://oceanprotocol.com)
+
+<h1 align="center">react</h1>
 
 > React hooks & components on top of squid.js
 
-## Installation
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-7b1173.svg?style=flat-square)](https://github.com/prettier/prettier)
+[![js oceanprotocol](https://img.shields.io/badge/js-oceanprotocol-7b1173.svg)](https://github.com/oceanprotocol/eslint-config-oceanprotocol)
+
+**Table of Contents**
+
+- [🏗 Installation](#-installation)
+- [🏄 Usage](#-usage)
+- [🦑 Development](#-development)
+- [✨ Code Style](#-code-style)
+- [👩‍🔬 Testing](#-testing)
+- [🛳 Production](#-production)
+- [⬆️ Releases](#️-releases)
+- [📜 Changelog](#-changelog)
+- [🎁 Contribute](#-contribute)
+- [🏛 License](#-license)
+
+## 🏗 Installation
 
 ```bash
 npm install @oceanprotocol/react
 ```
 
-## Usage
+## 🏄 Usage
 
-First, wrap your App with the `OceanProvider`:
+First, wrap your App with the `OceanProvider` and provide its config object:
 
 ```tsx
 import React from 'react'
-import { OceanProvider } from '@oceanprotocol/react'
+import { OceanProvider, Config } from '@oceanprotocol/react'
 
-export default function MyApp({ children }: { children: any }) {
-    // TODO: setup web3 first
-    // or fallback to injected providers by default
-    // so it works with any browser wallet out of the box
+const config: Config = {
+    nodeUri: '',
+    ...
+}
 
-    return (
-        <OceanProvider web3={web3}>
-            <h1>My App</h1>
-            {children}
-        </OceanProvider>
-        
-    )
+export default function MyApp({ children }: { children: React.ReactNode }): React.ReactNode {
+  return (
+    <OceanProvider config={config}>
+      <h1>My App</h1>
+      {children}
+    </OceanProvider>
+  )
 }
 ```
 
@@ -37,11 +55,6 @@ Then within your component use the provided hooks to interact with Ocean's funct
 import React from 'react'
 import { useOcean, OceanConfig, useConsume } from '@oceanprotocol/react'
 
-const oceanConfig: OceanConfig = {
-    nodeUri: '',
-    ...
-}
-
 export default function MyComponent() {
   // Initialize, get existing, or reinitialize Ocean
   const { ocean, account } = useOcean(oceanConfig)
@@ -50,51 +63,80 @@ export default function MyComponent() {
   const { consumeAsset, isLoading, step } = useConsume(ocean)
 
   async function handleClick() {
-      const ddo = 'did:op:0x000000000'
-      await consumeAsset(ddo, account)
+    const ddo = 'did:op:0x000000000'
+    await consumeAsset(ddo, account)
   }
 
   return (
     <div>
-        Your account: {account}
-
-        <button onClick={handleClick}>
-            {isLoading ? step : 'Download Asset' }
-        </button>
+      Your account: {account}
+      <button onClick={handleClick}>
+        {isLoading ? step : 'Download Asset'}
+      </button>
     </div>
   )
 }
 ```
 
-### Specs
+## 🦑 Development
 
-#### `useOcean()`
+The project is authored with TypeScript and compiled with `tsc`.
 
-```tsx
-interface UseOcean {
-    ocean: Ocean
-    account: string
-    balance: { ocean: string, eth: string }
-    status: OceanConnectionStatus
-}
+To start compiler in watch mode:
 
-const result: UseOcean = useOcean(config: OceanConfig)
+```bash
+npm start
 ```
 
+## ✨ Code Style
 
-#### `useConsume()`
+For linting and auto-formatting you can use from the root of the project:
 
-```tsx
-interface ConsumeOptions {
-    ocean: Ocean
-}
+```bash
+# auto format all ts & css with eslint & stylelint
+npm run lint
 
-interface UseConsume {
-    consumeAsset: (ddo: DDO, account: string) => void
-    isLoading: boolean
-    step: number
-    error: string | undefined
-}
+# auto format all ts & css with prettier, taking all configs into account
+npm run format
+```
 
-const result: UseConsume = useConsume(options: ConsumeOptions)
+## 👩‍🔬 Testing
+
+## 🛳 Production
+
+The build script will compile `src/` with `tsc` into:
+
+1. CommonJS module with ES5 syntax
+2. ES module with ES5 syntax
+
+```bash
+npm run build
+```
+
+## ⬆️ Releases
+
+## 📜 Changelog
+
+See the [CHANGELOG.md](./CHANGELOG.md) file.
+
+## 🎁 Contribute
+
+See the page titled "[Ways to Contribute](https://docs.oceanprotocol.com/concepts/contributing/)" in the Ocean Protocol documentation.
+
+## 🏛 License
+
+```text
+Copyright 2020 Ocean Protocol Foundation Ltd.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 ```

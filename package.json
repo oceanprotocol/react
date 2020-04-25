@@ -1,0 +1,48 @@
+{
+  "name": "@oceanprotocol/react",
+  "version": "0.0.1",
+  "description": "React hooks & components on top of squid.js",
+  "main": "dist/index.js",
+  "module": "dist/esm/index.js",
+  "scripts": {
+    "start": "tsc --watch",
+    "build": "tsc && tsc -m es6 --outDir dist/esm",
+    "test": "npm run lint",
+    "lint": "eslint --ignore-path .gitignore --ext .js --ext .ts --ext .tsx .",
+    "format": "prettier --ignore-path .gitignore './**/*.{css,yml,js,ts,tsx,json}' --write"
+  },
+  "files": [
+    "LICENSE",
+    "README.md",
+    "dist/"
+  ],
+  "dependencies": {
+    "@oceanprotocol/squid": "^2.1.1",
+    "react": "^16.13.1"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.34",
+    "@typescript-eslint/eslint-plugin": "^2.29.0",
+    "@typescript-eslint/parser": "^2.29.0",
+    "eslint": "^6.8.0",
+    "eslint-config-oceanprotocol": "^1.5.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.3",
+    "eslint-plugin-react": "^7.19.0",
+    "prettier": "^2.0.5",
+    "typescript": "^3.8.3"
+  },
+  "peerDependencies": {
+    "react": "^16.8.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oceanprotocol/react.git"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/oceanprotocol/react/issues"
+  },
+  "homepage": "https://github.com/oceanprotocol/react#readme"
+}
