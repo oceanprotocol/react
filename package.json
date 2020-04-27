@@ -9,7 +9,10 @@
     "build": "tsc && tsc -m es6 --outDir dist/esm",
     "test": "npm run lint",
     "lint": "eslint --ignore-path .gitignore --ext .js --ext .ts --ext .tsx .",
-    "format": "prettier --ignore-path .gitignore './**/*.{css,yml,js,ts,tsx,json}' --write"
+    "format": "prettier --ignore-path .gitignore './**/*.{css,yml,js,ts,tsx,json}' --write",
+    "release": "release-it --non-interactive",
+    "changelog": "auto-changelog -p",
+    "prepublishOnly": "npm run build"
   },
   "files": [
     "LICENSE",
@@ -22,15 +25,18 @@
     "react": "^16.13.1"
   },
   "devDependencies": {
+    "@release-it/bumper": "^1.1.0",
     "@types/react": "^16.9.34",
     "@typescript-eslint/eslint-plugin": "^2.29.0",
     "@typescript-eslint/parser": "^2.29.0",
+    "auto-changelog": "^2.0.0",
     "eslint": "^6.8.0",
     "eslint-config-oceanprotocol": "^1.5.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.3",
     "eslint-plugin-react": "^7.19.0",
     "prettier": "^2.0.5",
+    "release-it": "^13.5.6",
     "typescript": "^3.8.3"
   },
   "peerDependencies": {
@@ -45,5 +51,27 @@
   "bugs": {
     "url": "https://github.com/oceanprotocol/react/issues"
   },
-  "homepage": "https://github.com/oceanprotocol/react#readme"
+  "homepage": "https://github.com/oceanprotocol/react#readme",
+  "release-it": {
+    "hooks": {
+      "after:bump": "npm run changelog"
+    },
+    "plugins": {
+      "@release-it/bumper": {
+        "out": [
+          "package.json",
+          "package-lock.json"
+        ]
+      }
+    },
+    "git": {
+      "tagName": "v${version}"
+    },
+    "github": {
+      "release": true
+    },
+    "npm": {
+      "publish": false
+    }
+  }
 }
