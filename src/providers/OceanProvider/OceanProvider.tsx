@@ -22,6 +22,7 @@ interface OceanProviderValue {
   accountId: string
   balance: Balance
   status: OceanConnectionStatus
+  config: Config
 }
 
 const OceanContext = createContext(null)
@@ -92,7 +93,8 @@ function OceanProvider({
           account,
           accountId,
           balance,
-          status
+          status,
+          config
         } as OceanProviderValue
       }
     >

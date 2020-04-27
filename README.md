@@ -8,12 +8,12 @@
 [![js oceanprotocol](https://img.shields.io/badge/js-oceanprotocol-7b1173.svg)](https://github.com/oceanprotocol/eslint-config-oceanprotocol)
 
 ---
+
 ![iu](https://user-images.githubusercontent.com/90316/80356686-1650c080-887a-11ea-854e-bdc2bbdb0c20.jpeg)
 
 **WE ARE IN HARDWARE MODE. This project is in a conceptual phase and nothing works.**
 
 ---
-
 
 **Table of Contents**
 
@@ -58,15 +58,20 @@ export default function MyApp({ children }: { children: React.ReactNode }): Reac
 }
 ```
 
-Then within your component use the provided hooks to interact with Ocean's functionality:
+Then within your component use the provided hooks to interact with Ocean's functionality. Each hook can be used independently:
 
 ```tsx
 import React from 'react'
-import { useOcean, useConsume } from '@oceanprotocol/react'
+import { useOcean, useMetadata, useConsume } from '@oceanprotocol/react'
+
+const did = 'did:op:0x000000000'
 
 export default function MyComponent() {
   // Initialize, get existing, or reinitialize Ocean
   const { ocean, account } = useOcean()
+
+  // Get metadata for this asset
+  const { title } = useMetadata(did)
 
   // publish asset
   const { publish, publishStep } = usePublish()
@@ -75,12 +80,12 @@ export default function MyComponent() {
   const { consume, consumeStep } = useConsume()
 
   async function handleClick() {
-    const ddo = 'did:op:0x000000000'
-    await consume(ddo)
+    await consume(did)
   }
 
   return (
     <div>
+      <h1>{title}</h1>
       Your account: {account}
       <button onClick={handleClick}>{consumeStep || 'Download Asset'}</button>
     </div>
