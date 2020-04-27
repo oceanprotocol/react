@@ -50,7 +50,6 @@ First, wrap your App with the `Web3Provider` and the `OceanProvider`.
 
 ```tsx
 import React, { ReactNode } from 'react'
-import Web3 from 'web3'
 import { Web3Provider, OceanProvider, Config } from '@oceanprotocol/react'
 
 const config: Config = {
@@ -65,7 +64,7 @@ export default function MyApp({
 }): ReactNode {
   return (
     <Web3Provider>
-      {(web3: Web3) => (
+      {({ web3 }) => (
         <OceanProvider config={config} web3={web3}>
           <h1>My App</h1>
           {children}
@@ -76,7 +75,7 @@ export default function MyApp({
 }
 ```
 
-The `OceanProvider` requires a Web3 instance to be passed as prop. To get you started, we added a basic `Web3Provider` which assumes an injected provider (like MetaMask), and will ask for permissions automatically on first mount.
+The `OceanProvider` requires a Web3 instance to be passed as prop so you can replace the builtin `Web3Provider` with whatever library which returns a Web3 instance. To get you started, we added a basic `Web3Provider` which assumes an injected provider (like MetaMask), and will ask for user permissions automatically on first mount.
 
 We suggest you replace this provider with a more complete solution, since there are many UX considerations not handled in that basic provider, like activate only on user intent, listen for account & network changes, display connection instructions and errors, etc.
 
@@ -91,12 +90,20 @@ Then within your component use the provided hooks to interact with Ocean's funct
 
 ```tsx
 import React from 'react'
-import { useOcean, useMetadata, useConsume } from '@oceanprotocol/react'
+import {
+  useWeb3,
+  useOcean,
+  useMetadata,
+  useConsume
+} from '@oceanprotocol/react'
 
 const did = 'did:op:0x000000000'
 
 export default function MyComponent() {
-  // Initialize, get existing, or reinitialize Ocean
+  // Get web3 from built-in Web3Provider context
+  const { web3 } = useWeb3()
+
+  // Get Ocean instance from built-in OceanProvider context
   const { ocean, account } = useOcean()
 
   // Get metadata for this asset
@@ -108,17 +115,19 @@ export default function MyComponent() {
   // consume asset
   const { consume, consumeStep } = useConsume()
 
-  async function handleClick() {
+  async function handleDownload() {
     await consume(did)
   }
 
   return (
     <div>
       <h1>{title}</h1>
-      <p>Price: {metadata.main.price}</p>
+      <p>Price: {web3.utils.fromWei(metadata.main.price)}</p>
 
       <p>Your account: {account}</p>
-      <button onClick={handleClick}>{consumeStep || 'Download Asset'}</button>
+      <button onClick={handleDownload}>
+        {consumeStep || 'Download Asset'}
+      </button>
     </div>
   )
 }
