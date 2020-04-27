@@ -45,12 +45,17 @@ function OceanProvider({
     OceanConnectionStatus.NOT_CONNECTED
   )
 
+  // -------------------------------------------------------------
+  // 1. On mount, connect to Aquarius instance right away
+  // -------------------------------------------------------------
   useEffect(() => {
-    // on mount, connect to Aquarius instance right away
     const aquarius = new Aquarius(config.aquariusUri, Logger)
     setAquarius(aquarius)
   }, [])
 
+  // -------------------------------------------------------------
+  // 2. Once `web3` becomes available, connect to the whole network
+  // -------------------------------------------------------------
   useEffect(() => {
     async function init(): Promise<void> {
       const { ocean, account, accountId, balance } = await connectOcean(
@@ -73,6 +78,9 @@ function OceanProvider({
     }
   }, [web3])
 
+  // -------------------------------------------------------------
+  // 3. Once `ocean` becomes available, spit out some info about it
+  // -------------------------------------------------------------
   useEffect(() => {
     async function debug(): Promise<void> {
       if (!ocean) return
@@ -103,7 +111,8 @@ function OceanProvider({
   )
 }
 
-const useOcean = () => useContext(OceanContext)
+// Helper hook to access the provider values
+const useOcean = (): OceanProviderValue => useContext(OceanContext)
 
 export {
   OceanProvider,

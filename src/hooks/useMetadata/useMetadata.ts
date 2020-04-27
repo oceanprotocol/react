@@ -42,9 +42,12 @@ function useMetadata(did?: DID | string): UseMetadata {
 
   useEffect(() => {
     async function init(): Promise<void> {
-      setDDO(await getDDO(did))
-      setMetadata(await getMetadata(did))
-      setTitle(await getTitle(did))
+      const ddo = await getDDO(did)
+      setDDO(ddo)
+
+      const metadata = await getMetadata(did)
+      setMetadata(metadata)
+      setTitle(metadata.main.name)
     }
     init()
   }, [])

@@ -71,7 +71,7 @@ export default function MyComponent() {
   const { ocean, account } = useOcean()
 
   // Get metadata for this asset
-  const { title } = useMetadata(did)
+  const { title, metadata } = useMetadata(did)
 
   // publish asset
   const { publish, publishStep } = usePublish()
@@ -86,7 +86,9 @@ export default function MyComponent() {
   return (
     <div>
       <h1>{title}</h1>
-      Your account: {account}
+      <p>Price: {metadata.main.price}</p>
+
+      <p>Your account: {account}</p>
       <button onClick={handleClick}>{consumeStep || 'Download Asset'}</button>
     </div>
   )
