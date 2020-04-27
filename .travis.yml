@@ -1,0 +1,14 @@
+dist: xenial
+language: node_js
+node_js: node
+
+cache:
+  npm: true
+
+script:
+  # will run `npm ci` automatically here
+  - npm test
+  # - npm run build
+
+notifications:
+  email: false

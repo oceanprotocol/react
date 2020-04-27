@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { DID } from '@oceanprotocol/squid'
 import { useOcean } from '../../providers'
-import { AgreementData } from '@oceanprotocol/squid/dist/node/keeper/contracts/managers'
 
 interface UseConsume {
   consume: (did: DID) => Promise<void>
