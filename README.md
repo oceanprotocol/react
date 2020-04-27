@@ -18,6 +18,7 @@
 - [⬆️ Releases](#️-releases)
 - [📜 Changelog](#-changelog)
 - [🎁 Contribute](#-contribute)
+- [🧜 Authors](#-authors)
 - [🏛 License](#-license)
 
 ## 🏗 Installation
@@ -59,8 +60,11 @@ export default function MyComponent() {
   // Initialize, get existing, or reinitialize Ocean
   const { ocean, account } = useOcean()
 
+  // publish asset
+  const { publish, publishStep } = usePublish()
+
   // consume asset
-  const { consume, isLoading, step } = useConsume()
+  const { consume, consumeStep } = useConsume()
 
   async function handleClick() {
     const ddo = 'did:op:0x000000000'
@@ -70,9 +74,7 @@ export default function MyComponent() {
   return (
     <div>
       Your account: {account}
-      <button onClick={handleClick}>
-        {isLoading ? step : 'Download Asset'}
-      </button>
+      <button onClick={handleClick}>{consumeStep || 'Download Asset'}</button>
     </div>
   )
 }
@@ -122,6 +124,16 @@ See the [CHANGELOG.md](./CHANGELOG.md) file.
 ## 🎁 Contribute
 
 See the page titled "[Ways to Contribute](https://docs.oceanprotocol.com/concepts/contributing/)" in the Ocean Protocol documentation.
+
+## 🧜 Authors
+
+Created based on the work and learnings of the Ocean Protocol marketplace team:
+
+- [@kremalicious](https://github.com/kremalicious)
+- [@maxieprotocol](https://github.com/maxieprotocol)
+- [@unjapones](https://github.com/unjapones)
+- [@pfmescher](https://github.com/pfmescher)
+- [@mihaisc](https://github.com/mihaisc)
 
 ## 🏛 License
 

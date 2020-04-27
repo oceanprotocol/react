@@ -5,8 +5,9 @@ import React, {
   useEffect,
   createContext
 } from 'react'
-import { Ocean, Config } from '@oceanprotocol/squid'
+import { Ocean, Config, Account, Aquarius, Logger } from '@oceanprotocol/squid'
 import Balance from '@oceanprotocol/squid/dist/node/models/Balance'
+import { connectOcean } from './utils'
 
 enum OceanConnectionStatus {
   OCEAN_CONNECTION_ERROR = -1,
@@ -15,8 +16,10 @@ enum OceanConnectionStatus {
 }
 
 interface OceanProviderValue {
+  aquarius: Aquarius
   ocean: Ocean
-  account: string
+  account: Account
+  accountId: string
   balance: Balance
   status: OceanConnectionStatus
 }
@@ -33,26 +36,30 @@ function OceanProvider({
   // TODO: handle web3
   const { web3 } = useWeb3()
   const [ocean, setOcean] = useState<Ocean | undefined>()
-  const [account, setAccount] = useState<string | undefined>()
+  const [aquarius, setAquarius] = useState<Aquarius | undefined>()
+  const [account, setAccount] = useState<Account | undefined>()
+  const [accountId, setAccountId] = useState<string | undefined>()
   const [balance, setBalance] = useState<Balance | undefined>()
   const [status, setStatus] = useState<OceanConnectionStatus>(
     OceanConnectionStatus.NOT_CONNECTED
   )
 
   useEffect(() => {
-    async function init(): Promise<void> {
-      console.debug('Connecting to Ocean...')
-      const oceanInstance = await Ocean.getInstance({
-        web3Provider: web3.currentProvider,
-        ...config
-      })
-      console.debug('Ocean instance ready.')
-      setOcean(oceanInstance)
-      setStatus(OceanConnectionStatus.CONNECTED)
+    // on mount, connect to Aquarius instance right away
+    const aquarius = new Aquarius(config.aquariusUri, Logger)
+    setAquarius(aquarius)
+  }, [])
 
-      const oceanAccounts = await oceanInstance.accounts.list()
-      oceanAccounts && setAccount(oceanAccounts[0].getId())
-      const { eth, ocn } = await oceanAccounts[0].getBalance()
+  useEffect(() => {
+    async function init(): Promise<void> {
+      const { ocean, account, accountId, balance } = await connectOcean(
+        web3,
+        config
+      )
+      setOcean(ocean)
+      setStatus(OceanConnectionStatus.CONNECTED)
+      setAccount(account)
+      setAccountId(accountId)
       setBalance(balance)
     }
 
@@ -78,7 +85,16 @@ function OceanProvider({
 
   return (
     <OceanContext.Provider
-      value={{ ocean, account, balance, status } as OceanProviderValue}
+      value={
+        {
+          ocean,
+          aquarius,
+          account,
+          accountId,
+          balance,
+          status
+        } as OceanProviderValue
+      }
     >
       {children}
     </OceanContext.Provider>
