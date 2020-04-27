@@ -1,4 +1,4 @@
-import { Ocean, Config, Account } from '@oceanprotocol/squid'
+import { Ocean, Config, Account, Logger } from '@oceanprotocol/squid'
 import Balance from '@oceanprotocol/squid/dist/node/models/Balance'
 import Web3 from 'web3'
 
@@ -11,12 +11,12 @@ export async function connectOcean(
   accountId: string
   balance: Balance
 }> {
-  console.debug('Connecting to Ocean...')
+  Logger.debug('Connecting to Ocean...')
   const ocean = await Ocean.getInstance({
     web3Provider: web3.currentProvider,
     ...config
   })
-  console.debug('Ocean instance ready.')
+  Logger.debug('Ocean instance ready.')
 
   const oceanAccounts = await ocean.accounts.list()
   const account = oceanAccounts[0]

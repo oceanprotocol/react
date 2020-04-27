@@ -20,6 +20,8 @@
 
 - [🏗 Installation](#-installation)
 - [🏄 Usage](#-usage)
+  - [Providers](#providers)
+  - [Hooks](#hooks)
 - [🦑 Development](#-development)
 - [✨ Code Style](#-code-style)
 - [👩‍🔬 Testing](#-testing)
@@ -38,26 +40,48 @@ npm install @oceanprotocol/react
 
 ## 🏄 Usage
 
-First, wrap your App with the `OceanProvider` and provide its config object:
+First, wrap your App with the `Web3Provider` and the `OceanProvider`.
+
+### Providers
 
 ```tsx
-import React from 'react'
-import { OceanProvider, Config } from '@oceanprotocol/react'
+import React, { ReactNode } from 'react'
+import Web3 from 'web3'
+import { Web3Provider, OceanProvider, Config } from '@oceanprotocol/react'
 
 const config: Config = {
-    nodeUri: '',
-    ...
+  nodeUri: '',
+  aquariusUri: ''
 }
 
-export default function MyApp({ children }: { children: React.ReactNode }): React.ReactNode {
+export default function MyApp({
+  children
+}: {
+  children: ReactNode
+}): ReactNode {
   return (
-    <OceanProvider config={config}>
-      <h1>My App</h1>
-      {children}
-    </OceanProvider>
+    <Web3Provider>
+      {(web3: Web3) => (
+        <OceanProvider config={config} web3={web3}>
+          <h1>My App</h1>
+          {children}
+        </OceanProvider>
+      )}
+    </Web3Provider>
   )
 }
 ```
+
+The `OceanProvider` requires a Web3 instance to be passed as prop. To get you started, we added a basic `Web3Provider` which assumes an injected provider (like MetaMask), and will ask for permissions automatically on first mount.
+
+We suggest you replace this provider with a more complete solution, since there are many UX considerations not handled in that basic provider, like activate only on user intent, listen for account & network changes, display connection instructions and errors, etc.
+
+Some great solutions we liked to work with:
+
+- [web3-react](https://github.com/NoahZinsmeister/web3-react)
+- [web3modal](https://github.com/web3modal/web3modal)
+
+### Hooks
 
 Then within your component use the provided hooks to interact with Ocean's functionality. Each hook can be used independently:
 

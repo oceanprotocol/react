@@ -6,6 +6,7 @@ import React, {
   createContext
 } from 'react'
 import { Ocean, Config, Account, Aquarius, Logger } from '@oceanprotocol/squid'
+import Web3 from 'web3'
 import Balance from '@oceanprotocol/squid/dist/node/models/Balance'
 import { connectOcean } from './utils'
 
@@ -29,13 +30,13 @@ const OceanContext = createContext(null)
 
 function OceanProvider({
   config,
+  web3,
   children
 }: {
   config: Config
+  web3: Web3
   children: ReactNode
 }): ReactNode {
-  // TODO: handle web3
-  const { web3 } = useWeb3()
   const [ocean, setOcean] = useState<Ocean | undefined>()
   const [aquarius, setAquarius] = useState<Aquarius | undefined>()
   const [account, setAccount] = useState<Account | undefined>()
@@ -84,10 +85,10 @@ function OceanProvider({
   useEffect(() => {
     async function debug(): Promise<void> {
       if (!ocean) return
-      console.debug(
+      Logger.debug(
         `Ocean instance initiated with:\n ${JSON.stringify(config, null, 2)}`
       )
-      console.debug(await ocean.versions.get())
+      Logger.debug(await ocean.versions.get())
     }
     debug()
   }, [ocean])
