@@ -34,7 +34,7 @@ function OceanProvider({
   children
 }: {
   config: Config
-  web3: Web3
+  web3: Web3 | undefined
   children: ReactNode
 }): ReactNode {
   const [ocean, setOcean] = useState<Ocean | undefined>()
@@ -58,6 +58,8 @@ function OceanProvider({
   // 2. Once `web3` becomes available, connect to the whole network
   // -------------------------------------------------------------
   useEffect(() => {
+    if (!web3) return
+
     async function init(): Promise<void> {
       const { ocean, account, accountId, balance } = await connectOcean(
         web3,
