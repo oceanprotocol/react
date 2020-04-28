@@ -44,7 +44,7 @@ npm install @oceanprotocol/react
 
 ## 🏄 Usage
 
-First, wrap your App with the `Web3Provider` and the `OceanProvider`.
+First, wrap your whole app with the `Web3Provider` and the `OceanProvider`.
 
 ### Providers
 
@@ -54,7 +54,8 @@ import { Web3Provider, OceanProvider, Config } from '@oceanprotocol/react'
 
 const config: Config = {
   nodeUri: '',
-  aquariusUri: ''
+  aquariusUri: '',
+  ...
 }
 
 export default function MyApp({
@@ -75,14 +76,7 @@ export default function MyApp({
 }
 ```
 
-The `OceanProvider` requires a Web3 instance to be passed as prop so you can replace the builtin `Web3Provider` with whatever library which returns a Web3 instance. To get you started, we added a basic `Web3Provider` which assumes an injected provider (like MetaMask), and will ask for user permissions automatically on first mount.
-
-We suggest you replace this provider with a more complete solution, since there are many UX considerations not handled in that basic provider, like activate only on user intent, listen for account & network changes, display connection instructions and errors, etc.
-
-Some great solutions we liked to work with:
-
-- [web3-react](https://github.com/NoahZinsmeister/web3-react)
-- [web3modal](https://github.com/web3modal/web3modal)
+The `OceanProvider` requires a Web3 instance to be passed as prop so you can replace the basic [`Web3Provider`](src/providers/Web3Provider) with whatever component/library/provider returning a Web3 instance.
 
 ### Hooks
 
