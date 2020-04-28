@@ -3,11 +3,11 @@ import Web3 from 'web3'
 async function getWeb3(): Promise<Web3> {
   let web3: Web3
 
-  // modern dapp browsers
+  // modern dapp browser
   if (window.ethereum) {
-    web3 = new Web3(window.ethereum as any)
+    web3 = new Web3(window.ethereum)
   }
-  // legacy dapp browsers
+  // legacy dapp browser
   else if (window.web3) {
     web3 = new Web3(window.web3.currentProvider)
   }

@@ -22,8 +22,8 @@
 
 - [🏗 Installation](#-installation)
 - [🏄 Usage](#-usage)
-  - [Providers](#providers)
-  - [Hooks](#hooks)
+  - [1. Providers](#1-providers)
+  - [2. Hooks](#2-hooks)
 - [🦑 Development](#-development)
 - [✨ Code Style](#-code-style)
 - [👩‍🔬 Testing](#-testing)
@@ -44,9 +44,9 @@ npm install @oceanprotocol/react
 
 ## 🏄 Usage
 
-First, wrap your whole app with the `Web3Provider` and the `OceanProvider`.
+First, wrap your whole app with the [`Web3Provider`](src/providers/Web3Provider) and the [`OceanProvider`](src/providers/OceanProvider).
 
-### Providers
+### 1. Providers
 
 ```tsx
 import React, { ReactNode } from 'react'
@@ -78,9 +78,9 @@ export default function MyApp({
 
 The `OceanProvider` requires a Web3 instance to be passed as prop so you can replace the basic [`Web3Provider`](src/providers/Web3Provider) with whatever component/library/provider returning a Web3 instance.
 
-### Hooks
+### 2. Hooks
 
-Then within your component use the provided hooks to interact with Ocean's functionality. Each hook can be used independently:
+Then within your component use the included hooks to interact with Ocean's functionality. Each hook can be used independently:
 
 ```tsx
 import React from 'react'
@@ -156,7 +156,7 @@ npm run format
 The build script will compile `src/` with `tsc` into:
 
 1. CommonJS module with ES5 syntax
-2. ES module with ES5 syntax
+2. ES module with ES6 syntax
 
 ```bash
 npm run build
