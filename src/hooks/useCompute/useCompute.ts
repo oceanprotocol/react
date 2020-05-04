@@ -14,7 +14,7 @@ interface UseCompute {
 }
 
 // TODO: customize for compute
-export const feedback: { [key in number]: string } = {
+export const computeFeedback: { [key in number]: string } = {
   99: 'Decrypting file URL...',
   0: '1/3 Asking for agreement signature...',
   1: '1/3 Agreement initialized.',
