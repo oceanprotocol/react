@@ -22,8 +22,8 @@
 
 - [🏗 Installation](#-installation)
 - [🏄 Usage](#-usage)
-  - [Providers](#providers)
-  - [Hooks](#hooks)
+  - [1. Providers](#1-providers)
+  - [2. Hooks](#2-hooks)
 - [🦑 Development](#-development)
 - [✨ Code Style](#-code-style)
 - [👩‍🔬 Testing](#-testing)
@@ -44,9 +44,9 @@ npm install @oceanprotocol/react
 
 ## 🏄 Usage
 
-First, wrap your App with the `Web3Provider` and the `OceanProvider`.
+First, wrap your whole app with the [`Web3Provider`](src/providers/Web3Provider) and the [`OceanProvider`](src/providers/OceanProvider).
 
-### Providers
+### 1. Providers
 
 ```tsx
 import React, { ReactNode } from 'react'
@@ -54,7 +54,8 @@ import { Web3Provider, OceanProvider, Config } from '@oceanprotocol/react'
 
 const config: Config = {
   nodeUri: '',
-  aquariusUri: ''
+  aquariusUri: '',
+  ...
 }
 
 export default function MyApp({
@@ -75,18 +76,11 @@ export default function MyApp({
 }
 ```
 
-The `OceanProvider` requires a Web3 instance to be passed as prop so you can replace the builtin `Web3Provider` with whatever library which returns a Web3 instance. To get you started, we added a basic `Web3Provider` which assumes an injected provider (like MetaMask), and will ask for user permissions automatically on first mount.
+The `OceanProvider` requires a Web3 instance to be passed as prop so you can replace the basic [`Web3Provider`](src/providers/Web3Provider) with whatever component/library/provider returning a Web3 instance.
 
-We suggest you replace this provider with a more complete solution, since there are many UX considerations not handled in that basic provider, like activate only on user intent, listen for account & network changes, display connection instructions and errors, etc.
+### 2. Hooks
 
-Some great solutions we liked to work with:
-
-- [web3-react](https://github.com/NoahZinsmeister/web3-react)
-- [web3modal](https://github.com/web3modal/web3modal)
-
-### Hooks
-
-Then within your component use the provided hooks to interact with Ocean's functionality. Each hook can be used independently:
+Then within your component use the included hooks to interact with Ocean's functionality. Each hook can be used independently:
 
 ```tsx
 import React from 'react'
@@ -162,7 +156,7 @@ npm run format
 The build script will compile `src/` with `tsc` into:
 
 1. CommonJS module with ES5 syntax
-2. ES module with ES5 syntax
+2. ES module with ES6 syntax
 
 ```bash
 npm run build

@@ -14,7 +14,7 @@ script:
   # will run `npm ci` automatically here
   - npm test
   # - './cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT'
-  # - npm run build
+  - npm run build
 
 notifications:
   email: false
