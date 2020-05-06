@@ -45,7 +45,7 @@ function useSearch(): UseSearch {
     setSearchError(undefined)
 
     try {
-      const searchQuery = {
+      const query = {
         page,
         offset,
         query: {
@@ -55,8 +55,8 @@ function useSearch(): UseSearch {
           created: -1
         }
       } as SearchQuery
-      const aquarius = new Aquarius(config.aquariusUri as string, Logger)
-      return await aquarius.queryMetadata(searchQuery)
+     
+      return await searchQuery(query)
     } catch (error) {
       setSearchError(error.message)
     }
