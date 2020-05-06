@@ -55,7 +55,7 @@ function useSearch(): UseSearch {
           created: -1
         }
       } as SearchQuery
-     
+
       return await searchQuery(query)
     } catch (error) {
       setSearchError(error.message)
