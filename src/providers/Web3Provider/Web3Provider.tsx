@@ -1,10 +1,4 @@
-import React, {
-  ReactNode,
-  useContext,
-  useState,
-  createContext,
-  useEffect
-} from 'react'
+import React, { useContext, useState, createContext, useEffect } from 'react'
 import Web3 from 'web3'
 import { getWeb3 } from './utils'
 
