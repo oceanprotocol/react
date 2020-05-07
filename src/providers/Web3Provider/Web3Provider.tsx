@@ -18,7 +18,7 @@ interface Web3ProviderValue {
 
 const Web3Context = createContext(null)
 
-function Web3Provider({ children }: { children: ReactNode }): ReactNode {
+function Web3Provider({ children }: { children: any }): any {
   const [web3, setWeb3] = useState<Web3 | undefined>()
   const [chainId, setChainId] = useState<number | undefined>()
   const [account, setAccount] = useState<string | undefined>()

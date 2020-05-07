@@ -35,8 +35,8 @@ function OceanProvider({
 }: {
   config: Config
   web3: Web3 | undefined
-  children: ReactNode
-}): ReactNode {
+  children: any
+}): any {
   const [ocean, setOcean] = useState<Ocean | undefined>()
   const [aquarius, setAquarius] = useState<Aquarius | undefined>()
   const [account, setAccount] = useState<Account | undefined>()
