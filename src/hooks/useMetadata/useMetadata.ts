@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import { DID, DDO, MetaData } from '@oceanprotocol/squid'
+import { DID, DDO, MetaData, Curation } from '@oceanprotocol/squid'
 import { useOcean } from '../../providers'
 
 interface UseMetadata {
@@ -9,6 +9,7 @@ interface UseMetadata {
   title: string
   getDDO: (did: DID | string) => Promise<DDO>
   getMetadata: (did: DID | string) => Promise<MetaData>
+  getCuration: (did: DID | string) => Promise<Curation>
   getTitle: (did: DID | string) => Promise<string>
   getAllDIDs: () => Promise<DID[]>
 }
@@ -28,6 +29,11 @@ function useMetadata(did?: DID | string): UseMetadata {
     const ddo = await getDDO(did)
     const metadata = ddo.findServiceByType('metadata')
     return metadata.attributes
+  }
+
+  async function getCuration(did: DID | string): Promise<Curation> {
+    const metadata = await getMetadata(did)
+    return metadata.curation
   }
 
   async function getTitle(did: DID | string): Promise<string> {
@@ -52,7 +58,16 @@ function useMetadata(did?: DID | string): UseMetadata {
     init()
   }, [])
 
-  return { ddo, metadata, title, getDDO, getMetadata, getTitle, getAllDIDs }
+  return {
+    ddo,
+    metadata,
+    title,
+    getDDO,
+    getMetadata,
+    getCuration,
+    getTitle,
+    getAllDIDs
+  }
 }
 
 export { useMetadata, UseMetadata }
