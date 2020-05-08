@@ -65,8 +65,7 @@ export default function MyApp({
 }): ReactNode {
   return (
     <Web3Provider>
-      {({ web3 }) => (
-        <OceanProvider config={config} web3={web3}>
+        <OceanProvider config={config}>
           <h1>My App</h1>
           {children}
         </OceanProvider>
