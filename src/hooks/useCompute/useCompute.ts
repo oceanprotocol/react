@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { DID, MetaDataAlgorithm } from '@oceanprotocol/squid'
 import { useOcean } from '../../providers'
 import { ComputeValue } from './ComputeOptions'
-
+import { feedback } from './../../utils'
 interface UseCompute {
   compute: (
     did: DID,
@@ -10,17 +10,14 @@ interface UseCompute {
     computeContainer: ComputeValue
   ) => Promise<void>
   computeStep?: number
+  computeStepText?: string
   computeError?: string
 }
 
 // TODO: customize for compute
 export const computeFeedback: { [key in number]: string } = {
-  99: 'Decrypting file URL...',
-  0: '1/3 Asking for agreement signature...',
-  1: '1/3 Agreement initialized.',
-  2: '2/3 Asking for two payment confirmations...',
-  3: '2/3 Payment confirmed. Requesting access...',
-  4: '3/3 Access granted. Consuming file...'
+  ...feedback,
+  3: '3/3 Access granted. Starting job...',
 }
 const rawAlgorithmMeta: MetaDataAlgorithm = {
   rawcode: `console.log('Hello world'!)`,
@@ -36,6 +33,7 @@ const rawAlgorithmMeta: MetaDataAlgorithm = {
 function useCompute(): UseCompute {
   const { ocean, account, accountId, config } = useOcean()
   const [computeStep, setComputeStep] = useState<number | undefined>()
+  const [computeStepText, setComputeStepText] = useState<string | undefined>()
   const [computeError, setComputeError] = useState<string | undefined>()
 
   async function compute(
@@ -61,11 +59,12 @@ function useCompute(): UseCompute {
 
       const agreement = await ocean.compute
         .order(account, did as string)
-        .next((step: number) => setComputeStep(step))
+        .next((step: number) => { setComputeStep(step); setComputeStepText(computeFeedback[step]) })
 
       rawAlgorithmMeta.container = computeContainer
       rawAlgorithmMeta.rawcode = algorithmRawCode
-
+      setComputeStep(4)
+      setComputeStepText(computeFeedback[4])
       await ocean.compute.start(
         account,
         agreement,
@@ -73,6 +72,7 @@ function useCompute(): UseCompute {
         rawAlgorithmMeta,
         computeOutput
       )
+
     } catch (error) {
       setComputeError(error.message)
     } finally {
@@ -80,7 +80,7 @@ function useCompute(): UseCompute {
     }
   }
 
-  return { compute, computeStep, computeError }
+  return { compute, computeStep, computeStepText, computeError }
 }
 
 export { useCompute, UseCompute }

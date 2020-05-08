@@ -1,5 +1,4 @@
 import React, {
-  ReactNode,
   useContext,
   useState,
   useEffect,
@@ -9,6 +8,7 @@ import { Ocean, Config, Account, Aquarius, Logger } from '@oceanprotocol/squid'
 import Web3 from 'web3'
 import Balance from '@oceanprotocol/squid/dist/node/models/Balance'
 import { connectOcean } from './utils'
+import { useWeb3 } from '../Web3Provider'
 
 enum OceanConnectionStatus {
   OCEAN_CONNECTION_ERROR = -1,
@@ -30,11 +30,9 @@ const OceanContext = createContext(null)
 
 function OceanProvider({
   config,
-  web3,
   children
 }: {
   config: Config
-  web3: Web3 | undefined
   children: any
 }): any {
   const [ocean, setOcean] = useState<Ocean | undefined>()
@@ -45,6 +43,7 @@ function OceanProvider({
   const [status, setStatus] = useState<OceanConnectionStatus>(
     OceanConnectionStatus.NOT_CONNECTED
   )
+  const { web3 } = useWeb3()
 
   // -------------------------------------------------------------
   // 1. On mount, connect to Aquarius instance right away
@@ -58,6 +57,7 @@ function OceanProvider({
   // 2. Once `web3` becomes available, connect to the whole network
   // -------------------------------------------------------------
   useEffect(() => {
+    console.log('ocean', web3)
     if (!web3) return
 
     async function init(): Promise<void> {

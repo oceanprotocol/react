@@ -1,22 +1,20 @@
 import { useState } from 'react'
 import { DID } from '@oceanprotocol/squid'
 import { useOcean } from '../../providers'
+import { feedback } from '../../utils'
 
 interface UseConsume {
   consume: (did: DID) => Promise<void>
   consumeStep?: number
+  consumeStepText?: string
   consumeError?: string
 }
 
 // TODO: do something with this object,
 // consumeStep should probably return one of those strings
 // instead of just a number
-export const feedback: { [key in number]: string } = {
-  99: 'Decrypting file URL...',
-  0: '1/3 Asking for agreement signature...',
-  1: '1/3 Agreement initialized.',
-  2: '2/3 Asking for two payment confirmations...',
-  3: '2/3 Payment confirmed. Requesting access...',
+export const consumeFeedback: { [key in number]: string } = {
+  ...feedback,
   4: '3/3 Access granted. Consuming file...'
 }
 
@@ -25,6 +23,7 @@ function useConsume(): UseConsume {
   // Otherwise we could just require `ocean` to be passed to `useConsume()`
   const { ocean, account, accountId } = useOcean()
   const [consumeStep, setConsumeStep] = useState<number | undefined>()
+  const [consumeStepText, setConsumeStepText] = useState<string | undefined>()
   const [consumeError, setConsumeError] = useState<string | undefined>()
 
   async function consume(did: DID | string): Promise<void> {
@@ -37,15 +36,18 @@ function useConsume(): UseConsume {
         accountId
       )
       const agreement = agreements.find((el: { did: string }) => el.did === did)
+      console.log('existing agre',agreement)
       const agreementId = agreement
         ? agreement.agreementId
         : await ocean.assets
-            .order(did as string, account)
-            .next((step: number) => setConsumeStep(step))
-
+          .order(did as string, account)
+          .next((step: number) => { setConsumeStep(step); setConsumeStepText(consumeFeedback[step]) })
+      console.log('aggrement ok', agreementId)
       // manually add another step here for better UX
       setConsumeStep(4)
+      setConsumeStepText(consumeFeedback[4])
       await ocean.assets.consume(agreementId, did as string, account, '')
+      console.log('consume ok')
     } catch (error) {
       setConsumeError(error.message)
     } finally {
@@ -53,7 +55,7 @@ function useConsume(): UseConsume {
     }
   }
 
-  return { consume, consumeStep, consumeError }
+  return { consume, consumeStep, consumeStepText, consumeError }
 }
 
 export { useConsume, UseConsume }

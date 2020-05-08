@@ -22,7 +22,7 @@ function Web3Provider({ children }: { children: any }): any {
     async function initWeb3(): Promise<void> {
       const web3 = await getWeb3()
       setWeb3(web3)
-
+    
       const chainId = web3 && (await web3.eth.getChainId())
       setChainId(chainId)
     }
@@ -35,7 +35,7 @@ function Web3Provider({ children }: { children: any }): any {
     async function initUser(): Promise<void> {
       const account = await web3.eth.getAccounts()[0]
       setAccount(account)
-
+      if(!account) return
       const balance = await web3.eth.getBalance(account)
       setBalance(balance)
     }
@@ -66,5 +66,5 @@ function Web3Provider({ children }: { children: any }): any {
 // Helper hook to access the provider values
 const useWeb3 = (): Web3ProviderValue => useContext(Web3Context)
 
-export { Web3Provider, useWeb3 }
+export { Web3Provider, useWeb3,Web3ProviderValue }
 export default Web3Provider
