@@ -19,8 +19,6 @@ export const consumeFeedback: { [key in number]: string } = {
 }
 
 function useConsume(): UseConsume {
-  // TODO: figure out if a hook within a hook could lead to problems.
-  // Otherwise we could just require `ocean` to be passed to `useConsume()`
   const { ocean, account, accountId } = useOcean()
   const [consumeStep, setConsumeStep] = useState<number | undefined>()
   const [consumeStepText, setConsumeStepText] = useState<string | undefined>()
@@ -36,19 +34,20 @@ function useConsume(): UseConsume {
         accountId
       )
       const agreement = agreements.find((el: { did: string }) => el.did === did)
-      console.log('existing agre',agreement)
+      console.log('existing agre', agreements)
       const agreementId = agreement
         ? agreement.agreementId
         : await ocean.assets
           .order(did as string, account)
-          .next((step: number) => { setConsumeStep(step); setConsumeStepText(consumeFeedback[step]) })
-      console.log('aggrement ok', agreementId)
+          .next((step: number) => { setConsumeStep(step); setConsumeStepText(consumeFeedback[step]); })
+     
       // manually add another step here for better UX
       setConsumeStep(4)
       setConsumeStepText(consumeFeedback[4])
       await ocean.assets.consume(agreementId, did as string, account, '')
       console.log('consume ok')
     } catch (error) {
+      console.log(error)
       setConsumeError(error.message)
     } finally {
       setConsumeStep(undefined)

@@ -57,7 +57,7 @@ function OceanProvider({
   // 2. Once `web3` becomes available, connect to the whole network
   // -------------------------------------------------------------
   useEffect(() => {
-    console.log('ocean', web3)
+
     if (!web3) return
 
     async function init(): Promise<void> {
