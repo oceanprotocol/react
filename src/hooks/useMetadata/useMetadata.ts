@@ -71,4 +71,4 @@ function useMetadata(did?: DID | string): UseMetadata {
 }
 
 export { useMetadata, UseMetadata }
-export default useConsume
+export default useMetadata

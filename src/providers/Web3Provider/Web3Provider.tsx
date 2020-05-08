@@ -1,10 +1,4 @@
-import React, {
-  ReactNode,
-  useContext,
-  useState,
-  createContext,
-  useEffect
-} from 'react'
+import React, { useContext, useState, createContext, useEffect } from 'react'
 import Web3 from 'web3'
 import { getWeb3 } from './utils'
 
@@ -18,7 +12,7 @@ interface Web3ProviderValue {
 
 const Web3Context = createContext(null)
 
-function Web3Provider({ children }: { children: ReactNode }): ReactNode {
+function Web3Provider({ children }: { children: any }): any {
   const [web3, setWeb3] = useState<Web3 | undefined>()
   const [chainId, setChainId] = useState<number | undefined>()
   const [account, setAccount] = useState<string | undefined>()
