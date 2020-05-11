@@ -40,7 +40,7 @@ function OceanProvider({
   const [status, setStatus] = useState<OceanConnectionStatus>(
     OceanConnectionStatus.NOT_CONNECTED
   )
-  const { web3,ethProviderStatus  } = useWeb3()
+  const { web3, ethProviderStatus } = useWeb3()
 
   // -------------------------------------------------------------
   // 1. On mount, connect to Aquarius instance right away
@@ -54,8 +54,7 @@ function OceanProvider({
   // 2. Once `web3` becomes available, connect to the whole network
   // -------------------------------------------------------------
   useEffect(() => {
-    if (!web3 || ethProviderStatus!= InjectedProviderStatus.CONNECTED ) return
-    console.log(ethProviderStatus)
+    if (!web3 || ethProviderStatus !== InjectedProviderStatus.CONNECTED) return
     async function init(): Promise<void> {
       const { ocean, account, accountId, balance } = await connectOcean(
         web3,

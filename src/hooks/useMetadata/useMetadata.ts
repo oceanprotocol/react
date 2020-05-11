@@ -21,15 +21,15 @@ function useMetadata(did?: DID | string): UseMetadata {
   const [title, setTitle] = useState<string | undefined>()
 
   async function getDDO(did: DID | string): Promise<DDO> {
-    if(status!=OceanConnectionStatus.CONNECTED) return
-    
+    if (status !== OceanConnectionStatus.CONNECTED) return
+
     const ddo = await aquarius.retrieveDDO(did)
     return ddo
   }
 
   async function getMetadata(did: DID | string): Promise<MetaData> {
     const ddo = await getDDO(did)
-    if(!ddo) return
+    if (!ddo) return
     const metadata = ddo.findServiceByType('metadata')
     return metadata.attributes
   }
@@ -41,7 +41,6 @@ function useMetadata(did?: DID | string): UseMetadata {
 
   async function getTitle(did: DID | string): Promise<string> {
     const metadata = await getMetadata(did)
-    console.log(metadata)
     return metadata.main.name
   }
 
@@ -52,7 +51,7 @@ function useMetadata(did?: DID | string): UseMetadata {
 
   useEffect(() => {
     async function init(): Promise<void> {
-      if(!did) return
+      if (!did) return
       const ddo = await getDDO(did)
       setDDO(ddo)
 
