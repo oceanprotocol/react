@@ -3,7 +3,7 @@ import { Ocean, Config, Account, Aquarius, Logger } from '@oceanprotocol/squid'
 import Web3 from 'web3'
 import Balance from '@oceanprotocol/squid/dist/node/models/Balance'
 import { connectOcean } from './utils'
-import { useWeb3 } from '../Web3Provider'
+import { useWeb3, InjectedProviderStatus } from '../Web3Provider'
 
 enum OceanConnectionStatus {
   OCEAN_CONNECTION_ERROR = -1,
@@ -40,7 +40,7 @@ function OceanProvider({
   const [status, setStatus] = useState<OceanConnectionStatus>(
     OceanConnectionStatus.NOT_CONNECTED
   )
-  const { web3 } = useWeb3()
+  const { web3,ethProviderStatus  } = useWeb3()
 
   // -------------------------------------------------------------
   // 1. On mount, connect to Aquarius instance right away
@@ -54,8 +54,8 @@ function OceanProvider({
   // 2. Once `web3` becomes available, connect to the whole network
   // -------------------------------------------------------------
   useEffect(() => {
-    if (!web3) return
-
+    if (!web3 || ethProviderStatus!= InjectedProviderStatus.CONNECTED ) return
+    console.log(ethProviderStatus)
     async function init(): Promise<void> {
       const { ocean, account, accountId, balance } = await connectOcean(
         web3,

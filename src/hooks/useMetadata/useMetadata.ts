@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { DID, DDO, MetaData, Curation } from '@oceanprotocol/squid'
-import { useOcean } from '../../providers'
+import { useOcean, OceanConnectionStatus } from '../../providers'
 
 interface UseMetadata {
   ddo: DDO
@@ -15,18 +15,21 @@ interface UseMetadata {
 }
 
 function useMetadata(did?: DID | string): UseMetadata {
-  const { aquarius, config } = useOcean()
+  const { aquarius, config, status } = useOcean()
   const [ddo, setDDO] = useState<DDO | undefined>()
   const [metadata, setMetadata] = useState<MetaData | undefined>()
   const [title, setTitle] = useState<string | undefined>()
 
   async function getDDO(did: DID | string): Promise<DDO> {
+    if(status!=OceanConnectionStatus.CONNECTED) return
+    
     const ddo = await aquarius.retrieveDDO(did)
     return ddo
   }
 
   async function getMetadata(did: DID | string): Promise<MetaData> {
     const ddo = await getDDO(did)
+    if(!ddo) return
     const metadata = ddo.findServiceByType('metadata')
     return metadata.attributes
   }
@@ -38,6 +41,7 @@ function useMetadata(did?: DID | string): UseMetadata {
 
   async function getTitle(did: DID | string): Promise<string> {
     const metadata = await getMetadata(did)
+    console.log(metadata)
     return metadata.main.name
   }
 
@@ -48,6 +52,7 @@ function useMetadata(did?: DID | string): UseMetadata {
 
   useEffect(() => {
     async function init(): Promise<void> {
+      if(!did) return
       const ddo = await getDDO(did)
       setDDO(ddo)
 
