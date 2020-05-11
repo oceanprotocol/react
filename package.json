@@ -6,7 +6,7 @@
   "module": "dist/esm/index.js",
   "scripts": {
     "start": "tsc --watch",
-    "build": "tsc && tsc -m es6 --outDir dist/esm",
+    "build": "tsc",
     "test": "npm run lint",
     "lint": "eslint --ignore-path .gitignore --ext .js --ext .ts --ext .tsx .",
     "format": "prettier --ignore-path .gitignore './**/*.{css,yml,js,ts,tsx,json}' --write",
@@ -22,7 +22,8 @@
   "dependencies": {
     "@oceanprotocol/squid": "^2.1.1",
     "axios": "^0.19.2",
-    "react": "^16.13.1"
+    "react": "^16.13.1",
+    "web3connect": "^1.0.0-beta.33"
   },
   "devDependencies": {
     "@release-it/bumper": "^1.1.0",

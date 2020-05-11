@@ -17,7 +17,7 @@ export async function connectOcean(
     ...config
   })
   Logger.debug('Ocean instance ready.')
-
+  // TODO : ocean was not connected and yet i got here and account was undefined so getId() threw an unmanaged error
   const oceanAccounts = await ocean.accounts.list()
   const account = oceanAccounts[0]
   const accountId = account.getId()

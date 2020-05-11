@@ -4,10 +4,11 @@ import { useOcean } from '../../providers'
 import { feedback } from '../../utils'
 
 interface UseConsume {
-  consume: (did: DID) => Promise<void>
+  consume: (did: DID | string) => Promise<void>
   consumeStep?: number
   consumeStepText?: string
   consumeError?: string
+  isLoading: boolean
 }
 
 // TODO: do something with this object,
@@ -20,13 +21,14 @@ export const consumeFeedback: { [key in number]: string } = {
 
 function useConsume(): UseConsume {
   const { ocean, account, accountId } = useOcean()
+  const [isLoading, setIsLoading] = useState(false)
   const [consumeStep, setConsumeStep] = useState<number | undefined>()
   const [consumeStepText, setConsumeStepText] = useState<string | undefined>()
   const [consumeError, setConsumeError] = useState<string | undefined>()
 
   async function consume(did: DID | string): Promise<void> {
     if (!ocean || !account) return
-
+    setIsLoading(true)
     setConsumeError(undefined)
 
     try {
@@ -38,23 +40,26 @@ function useConsume(): UseConsume {
       const agreementId = agreement
         ? agreement.agreementId
         : await ocean.assets
-          .order(did as string, account)
-          .next((step: number) => { setConsumeStep(step); setConsumeStepText(consumeFeedback[step]); })
-     
+            .order(did as string, account)
+            .next((step: number) => {
+              setConsumeStep(step)
+              setConsumeStepText(consumeFeedback[step])
+            })
+
       // manually add another step here for better UX
       setConsumeStep(4)
       setConsumeStepText(consumeFeedback[4])
       await ocean.assets.consume(agreementId, did as string, account, '')
-      console.log('consume ok')
     } catch (error) {
       console.log(error)
       setConsumeError(error.message)
     } finally {
       setConsumeStep(undefined)
+      setIsLoading(false)
     }
   }
 
-  return { consume, consumeStep, consumeStepText, consumeError }
+  return { consume, consumeStep, consumeStepText, consumeError, isLoading }
 }
 
 export { useConsume, UseConsume }

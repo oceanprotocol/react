@@ -9,7 +9,7 @@ import {
 
 // TODO searchText
 interface UseSearch {
-  searchQuery: (query: SearchQuery) => Promise<QueryResult>
+  searchWithQuery: (query: SearchQuery) => Promise<QueryResult>
   getPublishedList: (
     account: string,
     page: number,
@@ -22,7 +22,7 @@ function useSearch(): UseSearch {
   const { ocean, account, config } = useOcean()
   const [searchError, setSearchError] = useState<string | undefined>()
 
-  async function searchQuery(query: SearchQuery): Promise<QueryResult> {
+  async function searchWithQuery(query: SearchQuery): Promise<QueryResult> {
     if (!ocean || !account) return
 
     setSearchError(undefined)
@@ -56,13 +56,13 @@ function useSearch(): UseSearch {
         }
       } as SearchQuery
 
-      return await searchQuery(query)
+      return await searchWithQuery(query)
     } catch (error) {
       setSearchError(error.message)
     }
   }
 
-  return { searchQuery, getPublishedList, searchError }
+  return { searchWithQuery, getPublishedList, searchError }
 }
 
 export { useSearch, UseSearch }

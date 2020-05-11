@@ -1,9 +1,4 @@
-import React, {
-  useContext,
-  useState,
-  useEffect,
-  createContext
-} from 'react'
+import React, { useContext, useState, useEffect, createContext } from 'react'
 import { Ocean, Config, Account, Aquarius, Logger } from '@oceanprotocol/squid'
 import Web3 from 'web3'
 import Balance from '@oceanprotocol/squid/dist/node/models/Balance'
@@ -22,6 +17,7 @@ interface OceanProviderValue {
   account: Account
   accountId: string
   balance: Balance
+  balanceInOcean: string
   status: OceanConnectionStatus
   config: Config
 }
@@ -40,6 +36,7 @@ function OceanProvider({
   const [account, setAccount] = useState<Account | undefined>()
   const [accountId, setAccountId] = useState<string | undefined>()
   const [balance, setBalance] = useState<Balance | undefined>()
+  const [balanceInOcean, setBalanceInOcean] = useState<string | undefined>()
   const [status, setStatus] = useState<OceanConnectionStatus>(
     OceanConnectionStatus.NOT_CONNECTED
   )
@@ -57,7 +54,6 @@ function OceanProvider({
   // 2. Once `web3` becomes available, connect to the whole network
   // -------------------------------------------------------------
   useEffect(() => {
-
     if (!web3) return
 
     async function init(): Promise<void> {
@@ -70,6 +66,7 @@ function OceanProvider({
       setAccount(account)
       setAccountId(accountId)
       setBalance(balance)
+      setBalanceInOcean(`${balance?.ocn}`)
     }
 
     try {
@@ -104,6 +101,7 @@ function OceanProvider({
           account,
           accountId,
           balance,
+          balanceInOcean,
           status,
           config
         } as OceanProviderValue
