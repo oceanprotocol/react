@@ -5,7 +5,7 @@ import { ComputeValue } from './ComputeOptions'
 import { feedback } from './../../utils'
 interface UseCompute {
   compute: (
-    did:  DID | string,
+    did: DID | string,
     algorithmRawCode: string,
     computeContainer: ComputeValue
   ) => Promise<void>
