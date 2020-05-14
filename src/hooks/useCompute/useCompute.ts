@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { DID, MetaDataAlgorithm } from '@oceanprotocol/squid'
+import { DID, MetaDataAlgorithm, Logger } from '@oceanprotocol/squid'
 import { useOcean } from '../../providers'
 import { ComputeValue } from './ComputeOptions'
 import { feedback } from './../../utils'
@@ -12,6 +12,7 @@ interface UseCompute {
   computeStep?: number
   computeStepText?: string
   computeError?: string
+  isLoading: boolean
 }
 
 // TODO: customize for compute
@@ -35,6 +36,7 @@ function useCompute(): UseCompute {
   const [computeStep, setComputeStep] = useState<number | undefined>()
   const [computeStepText, setComputeStepText] = useState<string | undefined>()
   const [computeError, setComputeError] = useState<string | undefined>()
+  const [isLoading, setIsLoading] = useState(false)
 
   async function compute(
     did: DID | string,
@@ -46,6 +48,7 @@ function useCompute(): UseCompute {
     setComputeError(undefined)
 
     try {
+      setIsLoading(true)
       const computeOutput = {
         publishAlgorithmLog: false,
         publishOutput: false,
@@ -76,13 +79,15 @@ function useCompute(): UseCompute {
         computeOutput
       )
     } catch (error) {
+      Logger.log(error)
       setComputeError(error.message)
     } finally {
       setComputeStep(undefined)
+      setIsLoading(false)
     }
   }
 
-  return { compute, computeStep, computeStepText, computeError }
+  return { compute, computeStep, computeStepText, computeError, isLoading }
 }
 
 export { useCompute, UseCompute }

@@ -51,7 +51,6 @@ function useConsume(): UseConsume {
       setConsumeStepText(consumeFeedback[4])
       await ocean.assets.consume(agreementId, did as string, account, '')
     } catch (error) {
-      console.log(error)
       setConsumeError(error.message)
     } finally {
       setConsumeStep(undefined)
