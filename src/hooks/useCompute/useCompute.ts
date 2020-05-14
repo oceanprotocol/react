@@ -18,7 +18,7 @@ interface UseCompute {
 // TODO: customize for compute
 export const computeFeedback: { [key in number]: string } = {
   ...feedback,
-  3: '3/3 Access granted. Starting job...'
+  4: '3/3 Access granted. Starting job...'
 }
 const rawAlgorithmMeta: MetaDataAlgorithm = {
   rawcode: `console.log('Hello world'!)`,
@@ -59,6 +59,7 @@ function useCompute(): UseCompute {
         owner: accountId,
         secretStoreUri: config.secretStoreUri
       }
+      Logger.debug('useCompute computeOutput', computeOutput)
 
       const agreement = await ocean.compute
         .order(account, did as string)
@@ -66,7 +67,7 @@ function useCompute(): UseCompute {
           setComputeStep(step)
           setComputeStepText(computeFeedback[step])
         })
-
+      Logger.debug('useCompute agreement', agreement)
       rawAlgorithmMeta.container = computeContainer
       rawAlgorithmMeta.rawcode = algorithmRawCode
       setComputeStep(4)
@@ -79,7 +80,7 @@ function useCompute(): UseCompute {
         computeOutput
       )
     } catch (error) {
-      Logger.log(error)
+      Logger.error(error)
       setComputeError(error.message)
     } finally {
       setComputeStep(undefined)
