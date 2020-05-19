@@ -1,12 +1,6 @@
 # `useCompute`
 
-The `OceanProvider` maintains a connection to the Ocean Protocol network in multiple steps:
-
-1. On mount, connect to Aquarius instance right away so any asset metadata can be retrieved before, and independent of any Web3 connections.
-2. Once Web3 becomes available, a connection to all Ocean Protocol network components is established.
-3. Once Ocean becomes available, spits out some info about it.
-
-Also provides a `useOcean` helper hook to access its context values from any component.
+Start a compute job on a data asset and retrieve its status.
 
 ## Usage
 
@@ -14,7 +8,6 @@ Also provides a `useOcean` helper hook to access its context values from any com
 import React from 'react'
 import {
   useWeb3,
-  useOcean,
   useMetadata,
   useCompute,
   computeOptions,
@@ -25,18 +18,15 @@ import {
 const did = 'did:op:0x000000000'
 
 export default function MyComponent() {
-  // Get web3 from built-in Web3Provider context
-  const { web3 } = useWeb3()
-
-  // Get Ocean instance from built-in OceanProvider context
-  const { ocean, account } = useOcean()
+  // Get web3 from Web3Provider context
+  const { web3, account } = useWeb3()
 
   // Get metadata for this asset
   const { title, metadata } = useMetadata(did)
 
-
   // compute asset
   const { compute, computeStep } = useCompute()
+
   // raw code text
   const [algorithmRawCode, setAlgorithmRawCode] = useState('')
   const [computeContainer, setComputeContainer] = useState<ComputeValue>()
@@ -48,6 +38,7 @@ export default function MyComponent() {
     const fileText = await readFileContent(files[0])
     setAlgorithmRawCode(fileText)
   }
+
   async function handleSelectChange(event: any)  {
     const comType = event.target.value
     setComputeContainer(comType)
