@@ -7,14 +7,11 @@ import {
   QueryResult
 } from '@oceanprotocol/squid/dist/node/aquarius/Aquarius'
 
-// TODO searchText, 
+// TODO searchText,
 interface UseSearch {
   searchWithQuery: (query: SearchQuery) => Promise<QueryResult>
-  getPublishedList: (
-    page: number,
-    offset: number
-  ) => Promise<QueryResult>
-  getConsumedList: () =>  Promise<(DDO[] | undefined)>
+  getPublishedList: (page: number, offset: number) => Promise<QueryResult>
+  getConsumedList: () => Promise<DDO[] | undefined>
   searchError?: string
 }
 
@@ -62,7 +59,7 @@ function useSearch(): UseSearch {
     }
   }
 
-  async function getConsumedList() :  Promise<(DDO []| undefined)>{
+  async function getConsumedList(): Promise<DDO[] | undefined> {
     const consumed = await ocean.assets.consumerAssets(accountId)
     const consumedItems = await Promise.all(
       consumed.map(async (did) => {
@@ -76,11 +73,11 @@ function useSearch(): UseSearch {
         }
       })
     )
-  
+
     return consumedItems
   }
 
-  return { searchWithQuery, getPublishedList,getConsumedList, searchError }
+  return { searchWithQuery, getPublishedList, getConsumedList, searchError }
 }
 
 export { useSearch, UseSearch }
