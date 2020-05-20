@@ -1,6 +1,6 @@
 {
   "name": "@oceanprotocol/react",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "React hooks & components on top of squid.js",
   "main": "dist/index.js",
   "module": "dist/esm/index.js",
