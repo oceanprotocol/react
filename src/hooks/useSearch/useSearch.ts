@@ -1,17 +1,19 @@
 import { useState } from 'react'
-import { Logger, DDO } from '@oceanprotocol/squid'
+import { Logger, DDO, ComputeJob } from '@oceanprotocol/squid'
 import { useOcean } from '../../providers'
 import {
   SearchQuery,
   Aquarius,
   QueryResult
 } from '@oceanprotocol/squid/dist/node/aquarius/Aquarius'
+import { ComputeItem } from './ComputeItem'
 
 // TODO searchText,
 interface UseSearch {
   searchWithQuery: (query: SearchQuery) => Promise<QueryResult>
   getPublishedList: (page: number, offset: number) => Promise<QueryResult>
   getConsumedList: () => Promise<DDO[] | undefined>
+  getComputeItems: () => Promise<ComputeItem[]>
   searchError?: string
 }
 
@@ -77,7 +79,37 @@ function useSearch(): UseSearch {
     return consumedItems
   }
 
-  return { searchWithQuery, getPublishedList, getConsumedList, searchError }
+  async function getComputeItems(): Promise<ComputeItem[]> {
+    const jobList = await ocean.compute.status(account)
+    return Promise.all(
+      jobList.map(async (job) => {
+        if (!job) return
+        const { did } = await ocean.keeper.agreementStoreManager.getAgreement(
+          job.agreementId
+        )
+
+        const ddo = await ocean.assets.resolve(did)
+
+        if (ddo) {
+          // Since we are getting assets from chain there might be
+          // assets from other marketplaces. So return only those assets
+          // whose serviceEndpoint contains the configured Aquarius URI.
+          const { serviceEndpoint } = ddo.findServiceByType('metadata')
+          if (serviceEndpoint?.includes(config.aquariusUri)) {
+            return { job, ddo }
+          }
+        }
+      })
+    )
+  }
+
+  return {
+    searchWithQuery,
+    getPublishedList,
+    getConsumedList,
+    getComputeItems,
+    searchError
+  }
 }
 
 export { useSearch, UseSearch }
