@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Logger } from '@oceanprotocol/squid'
+import { Logger, DDO } from '@oceanprotocol/squid'
 import { useOcean } from '../../providers'
 import {
   SearchQuery,
@@ -7,19 +7,20 @@ import {
   QueryResult
 } from '@oceanprotocol/squid/dist/node/aquarius/Aquarius'
 
-// TODO searchText
+// TODO searchText, 
 interface UseSearch {
   searchWithQuery: (query: SearchQuery) => Promise<QueryResult>
   getPublishedList: (
-    account: string,
     page: number,
     offset: number
   ) => Promise<QueryResult>
+  getConsumedList: () =>  Promise<(DDO[] | undefined)>
   searchError?: string
 }
 
 function useSearch(): UseSearch {
-  const { ocean, account, config } = useOcean()
+  // should we call the useOcean hook in useSearch or in each function?
+  const { ocean, account, config, accountId } = useOcean()
   const [searchError, setSearchError] = useState<string | undefined>()
 
   async function searchWithQuery(query: SearchQuery): Promise<QueryResult> {
@@ -36,7 +37,6 @@ function useSearch(): UseSearch {
   }
 
   async function getPublishedList(
-    account: string,
     page: number,
     offset: number
   ): Promise<QueryResult> {
@@ -49,7 +49,7 @@ function useSearch(): UseSearch {
         page,
         offset,
         query: {
-          'publicKey.owner': [account]
+          'publicKey.owner': [accountId]
         },
         sort: {
           created: -1
@@ -62,7 +62,25 @@ function useSearch(): UseSearch {
     }
   }
 
-  return { searchWithQuery, getPublishedList, searchError }
+  async function getConsumedList() :  Promise<(DDO []| undefined)>{
+    const consumed = await ocean.assets.consumerAssets(accountId)
+    const consumedItems = await Promise.all(
+      consumed.map(async (did) => {
+        const ddo = await ocean.assets.resolve(did)
+        if (ddo) {
+          // Since we are getting assets from chain there might be
+          // assets from other marketplaces. So return only those assets
+          // whose serviceEndpoint contains the configured Aquarius URI.
+          const { serviceEndpoint } = ddo.findServiceByType('metadata')
+          if (serviceEndpoint?.includes(config.aquariusUri)) return ddo
+        }
+      })
+    )
+  
+    return consumedItems
+  }
+
+  return { searchWithQuery, getPublishedList,getConsumedList, searchError }
 }
 
 export { useSearch, UseSearch }
