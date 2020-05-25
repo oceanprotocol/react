@@ -13,7 +13,7 @@ interface UseSearch {
   searchWithQuery: (query: SearchQuery) => Promise<QueryResult>
   getPublishedList: (page: number, offset: number) => Promise<QueryResult>
   getConsumedList: () => Promise<DDO[] | undefined>
-  getComputeItems: () => Promise<ComputeItem[]>
+  getComputeItems: () => Promise<ComputeItem[] | undefined>
   searchError?: string
 }
 
@@ -75,13 +75,16 @@ function useSearch(): UseSearch {
         }
       })
     )
-
-    return consumedItems
+    const filteredConsumedItems = consumedItems.filter(
+      (value) => typeof value !== 'undefined'
+    )
+    return filteredConsumedItems
   }
 
-  async function getComputeItems(): Promise<ComputeItem[]> {
+  async function getComputeItems(): Promise<ComputeItem[] | undefined> {
+    if (!ocean || !account) return
     const jobList = await ocean.compute.status(account)
-    return Promise.all(
+    const computeItems = await Promise.all(
       jobList.map(async (job) => {
         if (!job) return
         const { did } = await ocean.keeper.agreementStoreManager.getAgreement(
@@ -101,6 +104,10 @@ function useSearch(): UseSearch {
         }
       })
     )
+    const filteredComputeItems = computeItems.filter(
+      (value) => typeof value.ddo !== 'undefined'
+    )
+    return filteredComputeItems
   }
 
   return {
