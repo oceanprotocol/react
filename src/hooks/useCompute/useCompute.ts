@@ -3,6 +3,7 @@ import { DID, MetaDataAlgorithm, Logger } from '@oceanprotocol/squid'
 import { useOcean } from '../../providers'
 import { ComputeValue } from './ComputeOptions'
 import { feedback } from './../../utils'
+import { LoggerInstance } from '@oceanprotocol/squid/dist/node/utils/Logger'
 interface UseCompute {
   compute: (
     did: DID | string,
@@ -59,15 +60,13 @@ function useCompute(): UseCompute {
         owner: accountId,
         secretStoreUri: config.secretStoreUri
       }
-      Logger.debug('useCompute computeOutput', computeOutput)
-
       const agreement = await ocean.compute
         .order(account, did as string)
         .next((step: number) => {
           setComputeStep(step)
           setComputeStepText(computeFeedback[step])
         })
-      Logger.debug('useCompute agreement', agreement)
+
       rawAlgorithmMeta.container = computeContainer
       rawAlgorithmMeta.rawcode = algorithmRawCode
       setComputeStep(4)

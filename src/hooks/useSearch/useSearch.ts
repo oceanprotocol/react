@@ -65,13 +65,17 @@ function useSearch(): UseSearch {
     const consumed = await ocean.assets.consumerAssets(accountId)
     const consumedItems = await Promise.all(
       consumed.map(async (did) => {
-        const ddo = await ocean.assets.resolve(did)
-        if (ddo) {
-          // Since we are getting assets from chain there might be
-          // assets from other marketplaces. So return only those assets
-          // whose serviceEndpoint contains the configured Aquarius URI.
-          const { serviceEndpoint } = ddo.findServiceByType('metadata')
-          if (serviceEndpoint?.includes(config.aquariusUri)) return ddo
+        try {
+          const ddo = await ocean.assets.resolve(did)
+          if (ddo) {
+            // Since we are getting assets from chain there might be
+            // assets from other marketplaces. So return only those assets
+            // whose serviceEndpoint contains the configured Aquarius URI.
+            const { serviceEndpoint } = ddo.findServiceByType('metadata')
+            if (serviceEndpoint?.includes(config.aquariusUri)) return ddo
+          }
+        } catch (err) {
+          Logger.error(err)
         }
       })
     )
@@ -87,25 +91,33 @@ function useSearch(): UseSearch {
     const computeItems = await Promise.all(
       jobList.map(async (job) => {
         if (!job) return
-        const { did } = await ocean.keeper.agreementStoreManager.getAgreement(
-          job.agreementId
-        )
+        try {
+          const { did } = await ocean.keeper.agreementStoreManager.getAgreement(
+            job.agreementId
+          )
 
-        const ddo = await ocean.assets.resolve(did)
-
-        if (ddo) {
-          // Since we are getting assets from chain there might be
-          // assets from other marketplaces. So return only those assets
-          // whose serviceEndpoint contains the configured Aquarius URI.
-          const { serviceEndpoint } = ddo.findServiceByType('metadata')
-          if (serviceEndpoint?.includes(config.aquariusUri)) {
-            return { job, ddo }
+          const ddo = await ocean.assets.resolve(did)
+          if (
+            did ===
+            '0x0000000000000000000000000000000000000000000000000000000000000000'
+          )
+            return
+          if (ddo) {
+            // Since we are getting assets from chain there might be
+            // assets from other marketplaces. So return only those assets
+            // whose serviceEndpoint contains the configured Aquarius URI.
+            const { serviceEndpoint } = ddo.findServiceByType('metadata')
+            if (serviceEndpoint?.includes(config.aquariusUri)) {
+              return { job, ddo }
+            }
           }
+        } catch (err) {
+          Logger.error(err)
         }
       })
     )
     const filteredComputeItems = computeItems.filter(
-      (value) => typeof value.ddo !== 'undefined'
+      (value) => value !== undefined && typeof value.ddo !== 'undefined'
     )
     return filteredComputeItems
   }
