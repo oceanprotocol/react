@@ -39,7 +39,7 @@ function useSearch(): UseSearch {
     page: number,
     offset: number
   ): Promise<QueryResult> {
-    if (!ocean || !account) return
+    if (!ocean || !accountId) return
 
     setSearchError(undefined)
 
@@ -95,13 +95,14 @@ function useSearch(): UseSearch {
           const { did } = await ocean.keeper.agreementStoreManager.getAgreement(
             job.agreementId
           )
-
-          const ddo = await ocean.assets.resolve(did)
           if (
             did ===
             '0x0000000000000000000000000000000000000000000000000000000000000000'
           )
             return
+
+          const ddo = await ocean.assets.resolve(did)
+         
           if (ddo) {
             // Since we are getting assets from chain there might be
             // assets from other marketplaces. So return only those assets
