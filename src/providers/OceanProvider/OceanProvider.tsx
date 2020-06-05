@@ -4,12 +4,8 @@ import Web3 from 'web3'
 import Balance from '@oceanprotocol/squid/dist/node/models/Balance'
 import { connectOcean } from './utils'
 import { useWeb3, InjectedProviderStatus } from '../Web3Provider'
+import OceanConnectionStatus from './OceanConnectionStatus'
 
-enum OceanConnectionStatus {
-  OCEAN_CONNECTION_ERROR = -1,
-  NOT_CONNECTED = 0,
-  CONNECTED = 1
-}
 
 interface OceanProviderValue {
   aquarius: Aquarius
@@ -118,7 +114,6 @@ export {
   OceanProvider,
   useOcean,
   OceanProviderValue,
-  OceanConnectionStatus,
   Config
 }
 export default OceanProvider
