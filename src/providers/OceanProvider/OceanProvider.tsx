@@ -1,6 +1,5 @@
 import React, { useContext, useState, useEffect, createContext } from 'react'
 import { Ocean, Config, Account, Aquarius, Logger } from '@oceanprotocol/squid'
-import Web3 from 'web3'
 import Balance from '@oceanprotocol/squid/dist/node/models/Balance'
 import { connectOcean } from './utils'
 import { useWeb3, InjectedProviderStatus } from '../Web3Provider'

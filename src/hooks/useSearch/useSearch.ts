@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Logger, DDO, ComputeJob } from '@oceanprotocol/squid'
+import { Logger, DDO } from '@oceanprotocol/squid'
 import { useOcean } from '../../providers'
 import {
   SearchQuery,
