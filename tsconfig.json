@@ -8,7 +8,9 @@
     "jsx": "react",
     "esModuleInterop": true,
     "sourceMap": true,
-    "declaration": true
+    "declaration": true,
+    "strictNullChecks": false
   },
-  "include": ["./src/@types", "./src/index.ts"]
+  "include": ["./src/@types", "./src/index.ts"],
+  "exclude": ["node_modules", "dist", "example"]
 }

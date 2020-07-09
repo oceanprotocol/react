@@ -6,6 +6,7 @@
   "module": "dist/esm/index.js",
   "scripts": {
     "start": "tsc --watch",
+    "start-example": "cd example && npm start",
     "build": "tsc",
     "test": "npm run lint",
     "lint": "eslint --ignore-path .gitignore --ext .js --ext .ts --ext .tsx .",
@@ -20,10 +21,12 @@
     "dist/"
   ],
   "dependencies": {
-    "@oceanprotocol/squid": "^2.2.0",
+    "@oceanprotocol/contracts": "^0.2.2",
+    "@oceanprotocol/lib": "../ocean-lib-js",
     "axios": "^0.19.2",
     "react": "^16.13.1",
-    "web3connect": "^1.0.0-beta.33"
+    "web3": "^1.2.9",
+    "web3modal": "^1.7.0"
   },
   "devDependencies": {
     "@release-it/bumper": "^1.1.1",
