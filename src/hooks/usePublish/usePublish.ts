@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { DDO, Metadata, DataTokens } from '@oceanprotocol/lib'
+import { DDO, Metadata, DataTokens, Logger } from '@oceanprotocol/lib'
 import { useOcean, } from '../../providers'
 import ProviderStatus from '../../providers/OceanProvider/ProviderStatus'
 import { Service } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Service'
@@ -14,20 +14,24 @@ const factory = require('@oceanprotocol/contracts/artifacts/development/Factory.
 const datatokensTemplate = require('@oceanprotocol/contracts/artifacts/development/DataTokenTemplate.json')
 
 function usePublish(): UsePublish {
-    const { web3, ocean, status, account, config } = useOcean()
+    const { web3, ocean, status, account,accountId, config } = useOcean()
 
     async function publish(asset: Metadata, price: number = 1): Promise<DDO> {
         if (status !== ProviderStatus.CONNECTED) return
 
+        Logger.log('datatokens params ',factory.abi,datatokensTemplate.abi,ocean.datatokens.factoryAddress)
         const datatoken = new DataTokens(
             ocean.datatokens.factoryAddress,
             factory.abi,
             datatokensTemplate.abi,
             web3
-        )
+        )     
+        
+        Logger.log('datatoken created', datatoken)
         const data = { t: 1, url: config.metadataStoreUri }
         const blob = JSON.stringify(data)
-        const tokenAddress = await datatoken.create(blob, account)
+        const tokenAddress = await datatoken.create(blob, accountId)
+        Logger.log('tokenAddress created', tokenAddress)
         const publishedDate = new Date(Date.now()).toISOString().split('.')[0] + 'Z'
         const timeout = 0
         let services: Service[] = []
@@ -39,6 +43,7 @@ function usePublish(): UsePublish {
                     publishedDate,
                     timeout
                 )
+                Logger.log('access service created', accessService)
                 services = [accessService]
                 break;
             }

@@ -24,7 +24,7 @@
     "@oceanprotocol/contracts": "^0.2.2",
     "@oceanprotocol/lib": "../ocean-lib-js",
     "axios": "^0.19.2",
-    "react": "^16.13.1",
+    "react": "^16.9.41",
     "web3": "^1.2.9",
     "web3modal": "^1.7.0"
   },

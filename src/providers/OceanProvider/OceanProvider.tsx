@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect, createContext } from 'react'
 import Web3 from 'web3'
 import ProviderStatus from './ProviderStatus'
 import { Ocean, Logger, Account, Config } from '@oceanprotocol/lib'
-import Web3Modal, { IProviderOptions } from 'web3modal'
+import Web3Modal, { IProviderOptions, ICoreOptions } from 'web3modal'
 import { LogLevel } from '@oceanprotocol/lib/dist/node/utils/Logger'
 
 const factory = require('@oceanprotocol/contracts/artifacts/development/Factory.json')
@@ -19,15 +19,10 @@ interface OceanProviderValue {
   balance: string
   chainId: number | undefined
   status: ProviderStatus
-  connect: () => void
+  connect: (opts?: Partial<ICoreOptions>) => void
   logout: () => void
 }
 
-interface OceanProviderConfig {
-  providerOptions?: IProviderOptions,
-  cacheProvider?: boolean,
-  oceanConfig: Config
-}
 
 const OceanContext = createContext(null)
 
@@ -35,9 +30,9 @@ function OceanProvider({
   config,
   children
 }: {
-  config: OceanProviderConfig
+  config: Config
   children: any
-}): any {
+}) {
   const [web3, setWeb3] = useState<Web3 | undefined>()
   const [web3Provider, setWeb3Provider] = useState<any | undefined>()
   const [ocean, setOcean] = useState<Ocean | undefined>()
@@ -52,12 +47,7 @@ function OceanProvider({
 
 
   function init() {
-    const instance = new Web3Modal({
-      cacheProvider: false, // optional,
-      providerOptions: config.providerOptions ? config.providerOptions : {}
-    });
-    setWeb3Modal(instance)
-
+   Logger.log("Ocean Provider init")
   }
 
   // On mount setup Web3Modal instance 
@@ -65,13 +55,39 @@ function OceanProvider({
     init()
   }, [])
 
-  async function connect() {
-    const provider = await web3Modal.connect()
+  async function connect(opts?: Partial<ICoreOptions>) {
+    Logger.log("Connecting ....")
+    const instance = new Web3Modal(opts);
+    setWeb3Modal(instance)
+    Logger.log("Web3Modal instance created", instance)
+    const provider = await instance.connect()
     setWeb3Provider(provider)
 
     const web3 = new Web3(provider)
     setWeb3(web3)
 
+    config.factoryABI = config.factoryABI? config.factoryABI : factory.abi
+    config.datatokensABI= config.datatokensABI? config.datatokensABI: datatokensTemplate.abi
+    config.web3Provider = web3
+    const ocean = await Ocean.getInstance(config)
+
+    setOcean(ocean)
+    Logger.log('Ocean instance created ', ocean)
+    Logger.log('Web3 created ', web3)
+    setStatus(ProviderStatus.CONNECTED)
+    const account = (await ocean.accounts.list())[0]
+    setAccount(account)
+    Logger.log('Account ', account)
+
+    const accountId = await getAccount(web3)
+    setAccountId(accountId)
+    Logger.log('account id', accountId)
+    const balance = await getBalance(web3, accountId)
+    setBalance(balance)
+    Logger.log('balance', accountId)
+    const chainId = web3 && (await web3.eth.getChainId())
+    setChainId(chainId)
+    Logger.log('chain id ', chainId)
   }
 
   async function logout() {
@@ -97,26 +113,8 @@ function OceanProvider({
   //
   const handleConnect = async (provider: any) => {
     Logger.debug("Handling 'connect' event with payload", provider)
-    setStatus(ProviderStatus.CONNECTED)
+   
 
-    config.oceanConfig.factoryABI = config.oceanConfig.factoryABI? config.oceanConfig.factoryABI : factory.abi
-    config.oceanConfig.datatokensABI= config.oceanConfig.datatokensABI? config.oceanConfig.datatokensABI: datatokensTemplate.abi
-
-    const ocean = await Ocean.getInstance(config.oceanConfig)
-
-    setOcean(ocean)
-
-    const account = await ocean.accounts[0];
-    setAccount(account)
-
-    const accountId = await getAccount(web3)
-    setAccountId(accountId)
-
-    const balance = await getBalance(web3, account)
-    setBalance(balance)
-
-    const chainId = web3 && (await web3.eth.getChainId())
-    setChainId(chainId)
   }
 
   const handleAccountsChanged = async (accounts: string[]) => {
@@ -170,7 +168,7 @@ function OceanProvider({
           balance,
           chainId,
           status,
-          config: config.oceanConfig,
+          config,
           connect,
           logout,
         } as OceanProviderValue
@@ -187,7 +185,6 @@ const useOcean = (): OceanProviderValue => useContext(OceanContext)
 export {
   OceanProvider,
   useOcean,
-  OceanProviderValue,
-  Config
+  OceanProviderValue
 }
 export default OceanProvider
