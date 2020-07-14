@@ -9,7 +9,7 @@ export declare type GetRatingResponse = {
   vote: number
 }
 
-export function gethash(message: string) {
+export function gethash(message: string): string {
   let hex = ''
   for (let i = 0; i < message.length; i++) {
     hex += '' + message.charCodeAt(i).toString(16)
