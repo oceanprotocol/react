@@ -1,14 +1,15 @@
 
 import React from 'react';
 import { useOcean, usePublish } from '@oceanprotocol/react'
-import { Metadata } from '@oceanprotocol/lib';
+import { Metadata, DDO } from '@oceanprotocol/lib';
+import { useState } from 'react';
 
 
 export function Publish() {
 
     const { accountId } = useOcean()
     const { publish } = usePublish()
-
+    const [ddo, setDdo] = useState<DDO|undefined>()
 
     const asset =  {
         main: {
@@ -32,14 +33,15 @@ export function Publish() {
     }
 
     const publishAsset = async ()=>{
-       const ddo = await publish(asset as Metadata)
+       const ddo = await publish(asset as Metadata,4)
        console.log(ddo)
+       setDdo(ddo)
     }
     return (
         <>
             <div>Publish</div>
             <div><button onClick={publishAsset}>Publish</button></div>
-
+            <div>DID: {ddo && ddo.id} </div>
         </>
     )
 }

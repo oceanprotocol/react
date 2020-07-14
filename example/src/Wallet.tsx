@@ -1,16 +1,12 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useOcean } from '@oceanprotocol/react'
-import Web3Modal from "web3modal"
-import Web3 from '@oceanprotocol/lib/node_modules/web3';
-import { LogLevel } from '@oceanprotocol/lib/dist/node/utils';
-import { Ocean, Config } from '@oceanprotocol/lib';
 import { useEffect } from 'react';
 
 
 export function Wallet() {
 
-  const { ocean, connect, logout, accountId, account } = useOcean()
+  const { ocean, connect, logout, accountId } = useOcean()
   const conn = async () => {
     const { default: WalletConnectProvider } = await import('@walletconnect/web3-provider')
     const { default: Torus } = await import("@toruslabs/torus-embed")
