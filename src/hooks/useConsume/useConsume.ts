@@ -44,10 +44,10 @@ function useConsume(): UseConsume {
       setConsumeStepText(consumeFeedback[2])
       const res = JSON.parse(order)
       const tokenTransfer = await ocean.datatokens.transfer(
-        res['dataToken'],
-        res['to'],
-        res['numTokens'],
-        res['from']
+        res.dataToken,
+        res.to,
+        res.numTokens,
+        res.from
       )
       setConsumeStep(3)
       setConsumeStepText(consumeFeedback[3])

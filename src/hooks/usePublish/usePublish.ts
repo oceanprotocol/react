@@ -12,8 +12,6 @@ interface UsePublish {
   ) => Promise<DDO>
   mint: (tokenAddress: string, tokensToMint: number) => void
 }
-const factory = require('@oceanprotocol/contracts/artifacts/development/Factory.json')
-const datatokensTemplate = require('@oceanprotocol/contracts/artifacts/development/DataTokenTemplate.json')
 
 function usePublish(): UsePublish {
   const { web3, ocean, status, account, accountId, config } = useOcean()
@@ -21,14 +19,14 @@ function usePublish(): UsePublish {
   async function publish(
     asset: Metadata,
     tokensToMint: number,
-    price: number = 1
+    price = 1
   ): Promise<DDO> {
     if (status !== ProviderStatus.CONNECTED) return
 
     const datatoken = new DataTokens(
       ocean.datatokens.factoryAddress,
-      factory.abi,
-      datatokensTemplate.abi,
+      ocean.datatokens.factoryABI,
+      ocean.datatokens.datatokensABI,
       web3
     )
 
@@ -80,8 +78,8 @@ function usePublish(): UsePublish {
     if (datatoken === undefined)
       datatoken = new DataTokens(
         ocean.datatokens.factoryAddress,
-        factory.abi,
-        datatokensTemplate.abi,
+        ocean.datatokens.factoryABI,
+        ocean.datatokens.datatokensABI,
         web3
       )
 
@@ -97,8 +95,8 @@ function usePublish(): UsePublish {
     if (datatoken === undefined)
       datatoken = new DataTokens(
         ocean.datatokens.factoryAddress,
-        factory.abi,
-        datatokensTemplate.abi,
+        ocean.datatokens.factoryABI,
+        ocean.datatokens.datatokensABI,
         web3
       )
 
@@ -116,11 +114,6 @@ function usePublish(): UsePublish {
       marketAddress
     )
   }
-
-  useEffect(() => {
-    async function init(): Promise<void> {}
-    init()
-  }, [])
 
   return {
     publish,

@@ -4,9 +4,6 @@ import ProviderStatus from './ProviderStatus'
 import { Ocean, Logger, Account, Config } from '@oceanprotocol/lib'
 import Web3Modal, { ICoreOptions } from 'web3modal'
 
-const factory = require('@oceanprotocol/contracts/artifacts/development/Factory.json')
-const datatokensTemplate = require('@oceanprotocol/contracts/artifacts/development/DataTokenTemplate.json')
-
 interface OceanProviderValue {
   web3: Web3 | undefined
   web3Provider: any
@@ -61,10 +58,6 @@ function OceanProvider({
     const web3 = new Web3(provider)
     setWeb3(web3)
 
-    config.factoryABI = config.factoryABI ? config.factoryABI : factory.abi
-    config.datatokensABI = config.datatokensABI
-      ? config.datatokensABI
-      : datatokensTemplate.abi
     config.web3Provider = web3
     const ocean = await Ocean.getInstance(config)
 
