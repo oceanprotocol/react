@@ -6,32 +6,32 @@ import { Service } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Service'
 
 interface UsePublish {
 
-    publish: (asset: Metadata,tokensToMint: number, price?: number) => Promise<DDO>
-    mint:(did: string, tokenAddress: string, tokensToMint:number)=>void
+    publish: (asset: Metadata, tokensToMint: number, price?: number) => Promise<DDO>
+    mint: (tokenAddress: string, tokensToMint: number) => void
 }
 const factory = require('@oceanprotocol/contracts/artifacts/development/Factory.json')
 const datatokensTemplate = require('@oceanprotocol/contracts/artifacts/development/DataTokenTemplate.json')
 
 function usePublish(): UsePublish {
-    const { web3, ocean, status, account,accountId, config } = useOcean()
+    const { web3, ocean, status, account, accountId, config } = useOcean()
 
-    async function publish(asset: Metadata,tokensToMint: number, price: number = 1): Promise<DDO> {
+    async function publish(asset: Metadata, tokensToMint: number, price: number = 1): Promise<DDO> {
         if (status !== ProviderStatus.CONNECTED) return
-       
+
         const datatoken = new DataTokens(
             ocean.datatokens.factoryAddress,
             factory.abi,
             datatokensTemplate.abi,
             web3
-        )     
+        )
 
         Logger.log('datatoken created', datatoken)
         const data = { t: 1, url: config.metadataStoreUri }
         const blob = JSON.stringify(data)
         const tokenAddress = await datatoken.create(blob, accountId)
 
-        Logger.log('tokensto mint',tokensToMint)
-       
+        Logger.log('tokensto mint', tokensToMint)
+
         await datatoken.mint(tokenAddress, accountId, tokensToMint)
 
         Logger.log('tokenAddress created', tokenAddress)
@@ -61,9 +61,43 @@ function usePublish(): UsePublish {
 
         return ddo
     }
-    // WIP
-    async function mint(did: string, tokenAddress: string, tokensToMint: number){
-        //await datatoken.mint(tokenAddress, accountId, tokensToMint)
+
+    async function mint(tokenAddress: string, tokensToMint: number, datatoken?: DataTokens) {
+        if (datatoken === undefined)
+            datatoken = new DataTokens(
+                ocean.datatokens.factoryAddress,
+                factory.abi,
+                datatokensTemplate.abi,
+                web3
+            )
+
+        await datatoken.mint(tokenAddress, accountId, tokensToMint)
+    }
+
+    async function giveMarketAllowance(tokenAddress: string, marketAddress: string, tokens: number, datatoken?: DataTokens) {
+        if (datatoken === undefined)
+            datatoken = new DataTokens(
+                ocean.datatokens.factoryAddress,
+                factory.abi,
+                datatokensTemplate.abi,
+                web3
+            )
+
+        await datatoken
+            .approve(
+                tokenAddress,
+                marketAddress,
+                tokens,
+                accountId
+            )
+        const allowance = await datatoken.allowance(
+            tokenAddress,
+            accountId,
+            marketAddress
+        )
+        await datatoken
+        .transferFrom(tokenAddress, accountId, allowance, marketAddress)
+
     }
 
 

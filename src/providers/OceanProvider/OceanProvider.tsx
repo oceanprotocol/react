@@ -2,8 +2,7 @@ import React, { useContext, useState, useEffect, createContext } from 'react'
 import Web3 from 'web3'
 import ProviderStatus from './ProviderStatus'
 import { Ocean, Logger, Account, Config } from '@oceanprotocol/lib'
-import Web3Modal, { IProviderOptions, ICoreOptions } from 'web3modal'
-import { LogLevel } from '@oceanprotocol/lib/dist/node/utils/Logger'
+import Web3Modal, { ICoreOptions } from 'web3modal'
 
 const factory = require('@oceanprotocol/contracts/artifacts/development/Factory.json')
 const datatokensTemplate = require('@oceanprotocol/contracts/artifacts/development/DataTokenTemplate.json')
