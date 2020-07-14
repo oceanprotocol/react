@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { DID, DDO, Metadata } from '@oceanprotocol/lib'
-import { useOcean, } from '../../providers'
+import { useOcean } from '../../providers'
 import ProviderStatus from '../../providers/OceanProvider/ProviderStatus'
 
 interface UseMetadata {
@@ -33,7 +33,6 @@ function useMetadata(did?: DID | string): UseMetadata {
     return metadata.attributes
   }
 
-
   async function getTitle(did: DID | string): Promise<string> {
     const metadata = await getMetadata(did)
     return metadata.main.name
@@ -58,7 +57,7 @@ function useMetadata(did?: DID | string): UseMetadata {
     title,
     getDDO,
     getMetadata,
-    getTitle,
+    getTitle
   }
 }
 

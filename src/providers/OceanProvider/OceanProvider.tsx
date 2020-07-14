@@ -22,7 +22,6 @@ interface OceanProviderValue {
   logout: () => void
 }
 
-
 const OceanContext = createContext(null)
 
 function OceanProvider({
@@ -40,33 +39,32 @@ function OceanProvider({
   const [account, setAccount] = useState<Account | undefined>()
   const [accountId, setAccountId] = useState<string | undefined>()
   const [balance, setBalance] = useState<string | undefined>()
-  const [status, setStatus] = useState(
-    ProviderStatus.NOT_AVAILABLE
-  )
-
+  const [status, setStatus] = useState(ProviderStatus.NOT_AVAILABLE)
 
   function init() {
-   Logger.log("Ocean Provider init")
+    Logger.log('Ocean Provider init')
   }
 
-  // On mount setup Web3Modal instance 
+  // On mount setup Web3Modal instance
   useEffect(() => {
     init()
   }, [])
 
   async function connect(opts?: Partial<ICoreOptions>) {
-    Logger.log("Connecting ....")
-    const instance = new Web3Modal(opts);
+    Logger.log('Connecting ....')
+    const instance = new Web3Modal(opts)
     setWeb3Modal(instance)
-    Logger.log("Web3Modal instance created", instance)
+    Logger.log('Web3Modal instance created', instance)
     const provider = await instance.connect()
     setWeb3Provider(provider)
 
     const web3 = new Web3(provider)
     setWeb3(web3)
 
-    config.factoryABI = config.factoryABI? config.factoryABI : factory.abi
-    config.datatokensABI= config.datatokensABI? config.datatokensABI: datatokensTemplate.abi
+    config.factoryABI = config.factoryABI ? config.factoryABI : factory.abi
+    config.datatokensABI = config.datatokensABI
+      ? config.datatokensABI
+      : datatokensTemplate.abi
     config.web3Provider = web3
     const ocean = await Ocean.getInstance(config)
 
@@ -90,10 +88,8 @@ function OceanProvider({
   }
 
   async function logout() {
-
     // ToDo check how is the proper way to logout
     web3Modal.clearCachedProvider()
-
   }
 
   async function getAccount(web3: Web3) {
@@ -112,8 +108,6 @@ function OceanProvider({
   //
   const handleConnect = async (provider: any) => {
     Logger.debug("Handling 'connect' event with payload", provider)
-   
-
   }
 
   const handleAccountsChanged = async (accounts: string[]) => {
@@ -136,12 +130,10 @@ function OceanProvider({
     // handleConnect(ethProvider)
   }
 
-
   useEffect(() => {
     web3Modal && web3Modal.on('connect', handleConnect)
 
     if (web3Provider !== undefined && web3Provider !== null) {
-
       web3Provider.on('accountsChanged', handleAccountsChanged)
       web3Provider.on('networkChanged', handleNetworkChanged)
 
@@ -151,8 +143,6 @@ function OceanProvider({
       }
     }
   }, [web3, web3Modal, web3Provider])
-
-
 
   return (
     <OceanContext.Provider
@@ -169,7 +159,7 @@ function OceanProvider({
           status,
           config,
           connect,
-          logout,
+          logout
         } as OceanProviderValue
       }
     >
@@ -181,9 +171,5 @@ function OceanProvider({
 // Helper hook to access the provider values
 const useOcean = (): OceanProviderValue => useContext(OceanContext)
 
-export {
-  OceanProvider,
-  useOcean,
-  OceanProviderValue
-}
+export { OceanProvider, useOcean, OceanProviderValue }
 export default OceanProvider

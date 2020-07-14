@@ -33,15 +33,13 @@ function useConsume(): UseConsume {
     setConsumeError(undefined)
 
     try {
-
       setConsumeStep(0)
       setConsumeStepText(consumeFeedback[0])
       const ddo = await ocean.metadatastore.retrieveDDO(did)
 
       setConsumeStep(1)
       setConsumeStepText(consumeFeedback[1])
-      const order = await ocean.assets
-        .order(did, serviceType, accountId)
+      const order = await ocean.assets.order(did, serviceType, accountId)
       setConsumeStep(2)
       setConsumeStepText(consumeFeedback[2])
       const res = JSON.parse(order)
@@ -63,7 +61,6 @@ function useConsume(): UseConsume {
 
       setConsumeStep(4)
       setConsumeStepText(consumeFeedback[4])
-
     } catch (error) {
       setConsumeError(error.message)
     } finally {
