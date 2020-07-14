@@ -1,2 +1,2 @@
 export * from './OceanProvider'
-export * from './OceanConnectionStatus'
+export * from './ProviderStatus'

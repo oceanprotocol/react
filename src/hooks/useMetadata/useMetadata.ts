@@ -1,52 +1,41 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import { DID, DDO, MetaData, Curation } from '@oceanprotocol/squid'
-import { useOcean, OceanConnectionStatus } from '../../providers'
+import { DID, DDO, Metadata } from '@oceanprotocol/lib'
+import { useOcean } from '../../providers'
+import ProviderStatus from '../../providers/OceanProvider/ProviderStatus'
 
 interface UseMetadata {
   ddo: DDO
-  metadata: MetaData
+  metadata: Metadata
   title: string
   getDDO: (did: DID | string) => Promise<DDO>
-  getMetadata: (did: DID | string) => Promise<MetaData>
-  getCuration: (did: DID | string) => Promise<Curation>
+  getMetadata: (did: DID | string) => Promise<Metadata>
   getTitle: (did: DID | string) => Promise<string>
-  getAllDIDs: () => Promise<DID[]>
 }
 
 function useMetadata(did?: DID | string): UseMetadata {
-  const { aquarius, config, status } = useOcean()
+  const { ocean, status } = useOcean()
   const [ddo, setDDO] = useState<DDO | undefined>()
-  const [metadata, setMetadata] = useState<MetaData | undefined>()
+  const [metadata, setMetadata] = useState<Metadata | undefined>()
   const [title, setTitle] = useState<string | undefined>()
 
   async function getDDO(did: DID | string): Promise<DDO> {
-    if (status !== OceanConnectionStatus.CONNECTED) return
+    if (status !== ProviderStatus.CONNECTED) return
 
-    const ddo = await aquarius.retrieveDDO(did)
+    const ddo = await ocean.metadatastore.retrieveDDO(did)
     return ddo
   }
 
-  async function getMetadata(did: DID | string): Promise<MetaData> {
+  async function getMetadata(did: DID | string): Promise<Metadata> {
     const ddo = await getDDO(did)
     if (!ddo) return
     const metadata = ddo.findServiceByType('metadata')
     return metadata.attributes
   }
 
-  async function getCuration(did: DID | string): Promise<Curation> {
-    const metadata = await getMetadata(did)
-    return metadata.curation
-  }
-
   async function getTitle(did: DID | string): Promise<string> {
     const metadata = await getMetadata(did)
     return metadata.main.name
-  }
-
-  async function getAllDIDs(): Promise<DID[]> {
-    const assets = await axios(`${config.aquariusUri}/api/v1/aquarius/assets`)
-    return assets.data
   }
 
   useEffect(() => {
@@ -68,9 +57,7 @@ function useMetadata(did?: DID | string): UseMetadata {
     title,
     getDDO,
     getMetadata,
-    getCuration,
-    getTitle,
-    getAllDIDs
+    getTitle
   }
 }
 

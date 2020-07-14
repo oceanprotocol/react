@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { DID } from '@oceanprotocol/squid'
 import { useOcean } from '../../providers'
 import { feedback } from '../../utils'
+import { DID } from '@oceanprotocol/lib'
+import { ServiceType } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Service'
 
 interface UseConsume {
-  consume: (did: DID | string) => Promise<void>
+  consume: (did: DID | string, serviceType: ServiceType) => Promise<void>
   consumeStep?: number
   consumeStepText?: string
   consumeError?: string
@@ -16,7 +17,7 @@ interface UseConsume {
 // instead of just a number
 export const consumeFeedback: { [key in number]: string } = {
   ...feedback,
-  4: '3/3 Access granted. Consuming file...'
+  3: '3/3 Access granted. Consuming file...'
 }
 
 function useConsume(): UseConsume {
@@ -26,30 +27,40 @@ function useConsume(): UseConsume {
   const [consumeStepText, setConsumeStepText] = useState<string | undefined>()
   const [consumeError, setConsumeError] = useState<string | undefined>()
 
-  async function consume(did: DID | string): Promise<void> {
+  async function consume(did: string, serviceType: ServiceType): Promise<void> {
     if (!ocean || !account) return
     setIsLoading(true)
     setConsumeError(undefined)
 
     try {
-      const agreements = await ocean.keeper.conditions.accessSecretStoreCondition.getGrantedDidByConsumer(
-        accountId
-      )
-      const agreement = agreements.find((el: { did: string }) => el.did === did)
-      console.log('existing agre', agreements)
-      const agreementId = agreement
-        ? agreement.agreementId
-        : await ocean.assets
-            .order(did as string, account)
-            .next((step: number) => {
-              setConsumeStep(step)
-              setConsumeStepText(consumeFeedback[step])
-            })
+      setConsumeStep(0)
+      setConsumeStepText(consumeFeedback[0])
+      const ddo = await ocean.metadatastore.retrieveDDO(did)
 
-      // manually add another step here for better UX
+      setConsumeStep(1)
+      setConsumeStepText(consumeFeedback[1])
+      const order = await ocean.assets.order(did, serviceType, accountId)
+      setConsumeStep(2)
+      setConsumeStepText(consumeFeedback[2])
+      const res = JSON.parse(order)
+      const tokenTransfer = await ocean.datatokens.transfer(
+        res.dataToken,
+        res.to,
+        res.numTokens,
+        res.from
+      )
+      setConsumeStep(3)
+      setConsumeStepText(consumeFeedback[3])
+      await ocean.assets.download(
+        did,
+        (tokenTransfer as any).transactionHash,
+        ddo.dataToken,
+        account,
+        ''
+      )
+
       setConsumeStep(4)
       setConsumeStepText(consumeFeedback[4])
-      await ocean.assets.consume(agreementId, did as string, account, '')
     } catch (error) {
       setConsumeError(error.message)
     } finally {

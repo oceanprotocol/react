@@ -1,20 +1,22 @@
 import React, { useContext, useState, useEffect, createContext } from 'react'
-import { Ocean, Config, Account, Aquarius, Logger } from '@oceanprotocol/squid'
-import Balance from '@oceanprotocol/squid/dist/node/models/Balance'
-import { connectOcean } from './utils'
-import { useWeb3, InjectedProviderStatus } from '../Web3Provider'
-import OceanConnectionStatus from './OceanConnectionStatus'
-
+import Web3 from 'web3'
+import ProviderStatus from './ProviderStatus'
+import { Ocean, Logger, Account, Config } from '@oceanprotocol/lib'
+import Web3Modal, { ICoreOptions } from 'web3modal'
 
 interface OceanProviderValue {
-  aquarius: Aquarius
+  web3: Web3 | undefined
+  web3Provider: any
+  web3Modal: Web3Modal
   ocean: Ocean
+  config: Config
   account: Account
   accountId: string
-  balance: Balance
-  balanceInOcean: string
-  status: OceanConnectionStatus
-  config: Config
+  balance: string
+  chainId: number | undefined
+  status: ProviderStatus
+  connect: (opts?: Partial<ICoreOptions>) => void
+  logout: () => void
 }
 
 const OceanContext = createContext(null)
@@ -25,79 +27,132 @@ function OceanProvider({
 }: {
   config: Config
   children: any
-}): any {
+}) {
+  const [web3, setWeb3] = useState<Web3 | undefined>()
+  const [web3Provider, setWeb3Provider] = useState<any | undefined>()
   const [ocean, setOcean] = useState<Ocean | undefined>()
-  const [aquarius, setAquarius] = useState<Aquarius | undefined>()
+  const [web3Modal, setWeb3Modal] = useState<Web3Modal>(null)
+  const [chainId, setChainId] = useState<number | undefined>()
   const [account, setAccount] = useState<Account | undefined>()
   const [accountId, setAccountId] = useState<string | undefined>()
-  const [balance, setBalance] = useState<Balance | undefined>()
-  const [balanceInOcean, setBalanceInOcean] = useState<string | undefined>()
-  const [status, setStatus] = useState<OceanConnectionStatus>(
-    OceanConnectionStatus.NOT_CONNECTED
-  )
-  const { web3, ethProviderStatus } = useWeb3()
+  const [balance, setBalance] = useState<string | undefined>()
+  const [status, setStatus] = useState(ProviderStatus.NOT_AVAILABLE)
 
-  // -------------------------------------------------------------
-  // 1. On mount, connect to Aquarius instance right away
-  // -------------------------------------------------------------
+  function init() {
+    Logger.log('Ocean Provider init')
+  }
+
+  // On mount setup Web3Modal instance
   useEffect(() => {
-    const aquarius = new Aquarius(config.aquariusUri, Logger)
-    setAquarius(aquarius)
+    init()
   }, [])
 
-  // -------------------------------------------------------------
-  // 2. Once `web3` becomes available, connect to the whole network
-  // -------------------------------------------------------------
-  useEffect(() => {
-    if (!web3 || ethProviderStatus !== InjectedProviderStatus.CONNECTED) return
-    async function init(): Promise<void> {
-      const { ocean, account, accountId, balance } = await connectOcean(
-        web3,
-        config
-      )
-      setOcean(ocean)
-      setStatus(OceanConnectionStatus.CONNECTED)
-      setAccount(account)
-      setAccountId(accountId)
-      setBalance(balance)
-      setBalanceInOcean(`${balance?.ocn}`)
-    }
+  async function connect(opts?: Partial<ICoreOptions>) {
+    Logger.log('Connecting ....')
+    const instance = new Web3Modal(opts)
+    setWeb3Modal(instance)
+    Logger.log('Web3Modal instance created', instance)
+    const provider = await instance.connect()
+    setWeb3Provider(provider)
 
-    try {
-      init()
-    } catch (error) {
-      console.error(error.message)
-      setStatus(OceanConnectionStatus.OCEAN_CONNECTION_ERROR)
-      throw error.message
-    }
-  }, [web3])
+    const web3 = new Web3(provider)
+    setWeb3(web3)
 
-  // -------------------------------------------------------------
-  // 3. Once `ocean` becomes available, spit out some info about it
-  // -------------------------------------------------------------
-  useEffect(() => {
-    async function debug(): Promise<void> {
-      if (!ocean) return
-      Logger.debug(
-        `Ocean instance initiated with:\n ${JSON.stringify(config, null, 2)}`
-      )
-      Logger.debug(await ocean.versions.get())
+    config.web3Provider = web3
+    const ocean = await Ocean.getInstance(config)
+
+    setOcean(ocean)
+    Logger.log('Ocean instance created ', ocean)
+    Logger.log('Web3 created ', web3)
+    setStatus(ProviderStatus.CONNECTED)
+    const account = (await ocean.accounts.list())[0]
+    setAccount(account)
+    Logger.log('Account ', account)
+
+    const accountId = await getAccount(web3)
+    setAccountId(accountId)
+    Logger.log('account id', accountId)
+    const balance = await getBalance(web3, accountId)
+    setBalance(balance)
+    Logger.log('balance', accountId)
+    const chainId = web3 && (await web3.eth.getChainId())
+    setChainId(chainId)
+    Logger.log('chain id ', chainId)
+  }
+
+  async function logout() {
+    // ToDo check how is the proper way to logout
+    web3Modal.clearCachedProvider()
+  }
+
+  async function getAccount(web3: Web3) {
+    const accounts = await web3.eth.getAccounts()
+    return accounts[0]
+  }
+
+  async function getBalance(web3: Web3, address: string) {
+    const balance = await web3.eth.getBalance(address)
+    return Web3.utils.fromWei(balance)
+  }
+
+  //
+  // Listen for provider, account & network changes
+  // and react to it
+  //
+  const handleConnect = async (provider: any) => {
+    Logger.debug("Handling 'connect' event with payload", provider)
+  }
+
+  const handleAccountsChanged = async (accounts: string[]) => {
+    console.debug("Handling 'accountsChanged' event with payload", accounts)
+    if (accounts.length > 0) {
+      setAccountId(accounts[0])
+
+      if (web3) {
+        const balance = await getBalance(web3, accounts[0])
+        setBalance(balance)
+      }
     }
-    debug()
-  }, [ocean])
+  }
+
+  // ToDo need to handle this, it's not implemented
+  const handleNetworkChanged = async (networkId: string | number) => {
+    console.debug("Handling 'networkChanged' event with payload", networkId)
+    web3Provider.autoRefreshOnNetworkChange = false
+    // init(networkId)
+    // handleConnect(ethProvider)
+  }
+
+  useEffect(() => {
+    web3Modal && web3Modal.on('connect', handleConnect)
+
+    if (web3Provider !== undefined && web3Provider !== null) {
+      web3Provider.on('accountsChanged', handleAccountsChanged)
+      web3Provider.on('networkChanged', handleNetworkChanged)
+
+      return () => {
+        web3Provider.removeListener('accountsChanged', handleAccountsChanged)
+        web3Provider.removeListener('networkChanged', handleNetworkChanged)
+      }
+    }
+  }, [web3, web3Modal, web3Provider])
 
   return (
     <OceanContext.Provider
       value={
         {
+          web3,
+          web3Provider,
+          web3Modal,
           ocean,
-          aquarius,
           account,
           accountId,
           balance,
-          balanceInOcean,
+          chainId,
           status,
-          config
+          config,
+          connect,
+          logout
         } as OceanProviderValue
       }
     >
@@ -109,10 +164,5 @@ function OceanProvider({
 // Helper hook to access the provider values
 const useOcean = (): OceanProviderValue => useContext(OceanContext)
 
-export {
-  OceanProvider,
-  useOcean,
-  OceanProviderValue,
-  Config
-}
+export { OceanProvider, useOcean, OceanProviderValue }
 export default OceanProvider
