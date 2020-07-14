@@ -32,9 +32,6 @@ function App() {
 
           <div><Publish /></div>
 
-
-          <div>comp2</div>
-
         </div>
       </OceanProvider>
 
