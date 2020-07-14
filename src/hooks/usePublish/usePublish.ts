@@ -25,8 +25,8 @@ function usePublish(): UsePublish {
 
     const datatoken = new DataTokens(
       ocean.datatokens.factoryAddress,
-      ocean.datatokens.factoryABI,
-      ocean.datatokens.datatokensABI,
+      (ocean.datatokens.factoryABI as any).abi,
+      (ocean.datatokens.datatokensABI as any).abi,
       web3
     )
 
@@ -78,8 +78,8 @@ function usePublish(): UsePublish {
     if (datatoken === undefined)
       datatoken = new DataTokens(
         ocean.datatokens.factoryAddress,
-        ocean.datatokens.factoryABI,
-        ocean.datatokens.datatokensABI,
+        (ocean.datatokens.factoryABI as any).abi,
+        (ocean.datatokens.datatokensABI as any).abi,
         web3
       )
 
@@ -95,8 +95,8 @@ function usePublish(): UsePublish {
     if (datatoken === undefined)
       datatoken = new DataTokens(
         ocean.datatokens.factoryAddress,
-        ocean.datatokens.factoryABI,
-        ocean.datatokens.datatokensABI,
+        (ocean.datatokens.factoryABI as any).abi,
+        (ocean.datatokens.datatokensABI as any).abi,
         web3
       )
 
