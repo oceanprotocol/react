@@ -27,22 +27,24 @@ function useConsume(): UseConsume {
   const [consumeStepText, setConsumeStepText] = useState<string | undefined>()
   const [consumeError, setConsumeError] = useState<string | undefined>()
 
+
+  function setStep(index: number) {
+    setConsumeStep(index)
+    setConsumeStepText(consumeFeedback[index])
+  }
   async function consume(did: string, serviceType: ServiceType): Promise<void> {
     if (!ocean || !account) return
     setIsLoading(true)
     setConsumeError(undefined)
 
     try {
-      setConsumeStep(0)
-      setConsumeStepText(consumeFeedback[0])
+      setStep(0)
       const ddo = await ocean.metadatastore.retrieveDDO(did)
       Logger.log('ddo retrieved', ddo)
-      setConsumeStep(1)
-      setConsumeStepText(consumeFeedback[1])
+      setStep(1)
       const order = await ocean.assets.order(did, serviceType, accountId)
       Logger.log('order created', order)
-      setConsumeStep(2)
-      setConsumeStepText(consumeFeedback[2])
+      setStep(2)
       const res = JSON.parse(order)
       Logger.log('order parsed', res)
       const tokenTransfer = await ocean.datatokens.transfer(
@@ -52,8 +54,7 @@ function useConsume(): UseConsume {
         res.from
       )
       Logger.log('token transfered', tokenTransfer)
-      setConsumeStep(3)
-      setConsumeStepText(consumeFeedback[3])
+      setStep(3)
       await ocean.assets.download(
         did,
         (tokenTransfer as any).transactionHash,
@@ -62,12 +63,12 @@ function useConsume(): UseConsume {
         ''
       )
 
-      setConsumeStep(4)
-      setConsumeStepText(consumeFeedback[4])
+      setStep(4)
     } catch (error) {
       setConsumeError(error.message)
     } finally {
       setConsumeStep(undefined)
+      setConsumeStepText(undefined)
       setIsLoading(false)
     }
   }
