@@ -106,18 +106,6 @@ function usePublish(): UsePublish {
       )
     await datatoken.approve(tokenAddress, marketAddress, tokens, accountId)
 
-    const allowance = await datatoken.allowance(
-      tokenAddress,
-      accountId,
-      marketAddress
-    )
-    // allowance should be string not number, so this is a temp hack
-    await datatoken.transferFrom(
-      tokenAddress,
-      accountId,
-      (allowance as unknown) as number,
-      marketAddress
-    )
   }
 
   return {

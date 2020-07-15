@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useOcean } from '../../providers'
 import { feedback } from '../../utils'
-import { DID } from '@oceanprotocol/lib'
+import { DID, Logger } from '@oceanprotocol/lib'
 import { ServiceType } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Service'
 
 interface UseConsume {
@@ -36,19 +36,22 @@ function useConsume(): UseConsume {
       setConsumeStep(0)
       setConsumeStepText(consumeFeedback[0])
       const ddo = await ocean.metadatastore.retrieveDDO(did)
-
+      Logger.log('ddo retrieved', ddo)
       setConsumeStep(1)
       setConsumeStepText(consumeFeedback[1])
       const order = await ocean.assets.order(did, serviceType, accountId)
+      Logger.log('order created', order)
       setConsumeStep(2)
       setConsumeStepText(consumeFeedback[2])
       const res = JSON.parse(order)
+      Logger.log('order parsed', res)
       const tokenTransfer = await ocean.datatokens.transfer(
         res.dataToken,
         res.to,
         res.numTokens,
         res.from
       )
+      Logger.log('token transfered', tokenTransfer)
       setConsumeStep(3)
       setConsumeStepText(consumeFeedback[3])
       await ocean.assets.download(

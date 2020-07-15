@@ -3,13 +3,11 @@ import { useOcean } from '@oceanprotocol/react'
 import { useEffect } from 'react'
 
 export function Wallet() {
-  const { ocean, connect, logout, accountId } = useOcean()
+  const {web3, ocean, connect, logout, accountId } = useOcean()
   const conn = async () => {
     const { default: WalletConnectProvider } = await import(
       '@walletconnect/web3-provider'
     )
-    const { default: Torus } = await import('@toruslabs/torus-embed')
-
     const providerOptions = {
 
       /* See Provider Options Section */
@@ -18,9 +16,6 @@ export function Wallet() {
         options: {
           infuraId: 'INFURA_ID' // required
         }
-      },
-      torus: {
-        package: Torus // required
       }
     }
 
@@ -28,15 +23,15 @@ export function Wallet() {
    await connect()
   }
   const init = async () => {
-    if (ocean === undefined) return
-    console.log(ocean.datatokens.factoryAddress)
+    if (ocean === undefined || accountId ===undefined) return
+   
 
-    const accs = await ocean.accounts.list()
-    console.log(accs)
+    const assets = await ocean.assets.ownerAssets(accountId)
+    console.log(assets)
   }
   useEffect(() => {
     init()
-  }, [ocean])
+  }, [ocean,accountId])
 
   const disc = async () => {
     await logout()

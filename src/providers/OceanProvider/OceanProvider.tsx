@@ -40,6 +40,7 @@ function OceanProvider({
 
   function init() {
     Logger.log('Ocean Provider init')
+    window.ethereum.autoRefreshOnNetworkChange = false
   }
 
   // On mount setup Web3Modal instance

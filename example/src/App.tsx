@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react'
 import './App.css'
 import { OceanProvider } from '@oceanprotocol/react'
-import { LogLevel } from '@oceanprotocol/lib/dist/node/utils/Logger'
 import { Wallet } from './Wallet'
 import { Publish } from './Publish'
 import { Config } from '@oceanprotocol/lib'
+import { AllDdos } from './AllDdos'
+import { ConsumeDdo } from './ConsumeDdo'
 
 function App() {
   // factory Address needs to be updated each time you deploy the contract on local network
@@ -26,9 +27,16 @@ function App() {
           <div>
             <Wallet />
           </div>
+          <div>
+            <AllDdos />
+          </div>
 
           <div>
             <Publish />
+          </div>
+
+          <div>
+            <ConsumeDdo />
           </div>
         </div>
       </OceanProvider>
