@@ -47,7 +47,7 @@ function useConsume(): UseConsume {
       setStep(2)
       const res = JSON.parse(order)
       Logger.log('order parsed', res)
-      const tokenTransfer = await ocean.datatokens.transfer(
+      const tokenTransfer = await ocean.datatokens.transferWei(
         res.dataToken,
         res.to,
         res.numTokens,
@@ -66,6 +66,7 @@ function useConsume(): UseConsume {
       setStep(4)
     } catch (error) {
       setConsumeError(error.message)
+      Logger.error(error)
     } finally {
       setConsumeStep(undefined)
       setConsumeStepText(undefined)

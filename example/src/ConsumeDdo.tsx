@@ -6,7 +6,7 @@ import { useEffect } from 'react'
 
 export function ConsumeDdo() {
     const { accountId, ocean } = useOcean()
-    const { consumeStepText, consume} = useConsume()
+    const { consumeStepText, consume, consumeError} = useConsume()
     const [did, setDid]=useState<string|undefined>()
     useEffect(() => {
         async function init() {
@@ -30,6 +30,7 @@ export function ConsumeDdo() {
             <div>DID <input onChange={handleChange}></input></div>
             <div><button onClick={consumeDid}>Consume did</button></div>
             <div>{consumeStepText}</div>
+            <div>{consumeError}</div>
         </>
     )
 }
