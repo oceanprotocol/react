@@ -29,8 +29,10 @@ export function Publish() {
     }
   }
 
+  const marketAddress = '0x4D156A2ef69ffdDC55838176C6712C90f60a2285'
+
   const publishAsset = async () => {
-    const ddo = await publish(asset as Metadata, 4)
+    const ddo = await publish(asset as Metadata, 4,marketAddress)
     console.log(ddo)
     setDdo(ddo)
   }

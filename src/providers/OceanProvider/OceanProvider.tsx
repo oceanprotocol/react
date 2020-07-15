@@ -3,7 +3,7 @@ import Web3 from 'web3'
 import ProviderStatus from './ProviderStatus'
 import { Ocean, Logger, Account, Config } from '@oceanprotocol/lib'
 import Web3Modal, { ICoreOptions } from 'web3modal'
-
+import {getDefaultProviders} from './getDefaultProviders'
 interface OceanProviderValue {
   web3: Web3 | undefined
   web3Provider: any
@@ -49,6 +49,9 @@ function OceanProvider({
 
   async function connect(opts?: Partial<ICoreOptions>) {
     Logger.log('Connecting ....')
+    if(opts===undefined) {
+      opts = await getDefaultProviders()
+    }
     const instance = new Web3Modal(opts)
     setWeb3Modal(instance)
     Logger.log('Web3Modal instance created', instance)
@@ -115,7 +118,7 @@ function OceanProvider({
     }
   }
 
-  // ToDo need to handle this, it's not implemented
+  // ToDo need to handle this, it's not implemented, need to update chainId and reinitialize ocean lib
   const handleNetworkChanged = async (networkId: string | number) => {
     console.debug("Handling 'networkChanged' event with payload", networkId)
     web3Provider.autoRefreshOnNetworkChange = false

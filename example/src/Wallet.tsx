@@ -11,6 +11,7 @@ export function Wallet() {
     const { default: Torus } = await import('@toruslabs/torus-embed')
 
     const providerOptions = {
+
       /* See Provider Options Section */
       walletconnect: {
         package: WalletConnectProvider, // required
@@ -23,7 +24,8 @@ export function Wallet() {
       }
     }
 
-    await connect({ providerOptions })
+   // await connect({ cacheProvider: true, providerOptions })
+   await connect()
   }
   const init = async () => {
     if (ocean === undefined) return

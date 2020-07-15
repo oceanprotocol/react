@@ -8,7 +8,8 @@ interface UsePublish {
   publish: (
     asset: Metadata,
     tokensToMint: number,
-    price?: number
+    marketAddress: string,
+    cost?: number
   ) => Promise<DDO>
   mint: (tokenAddress: string, tokensToMint: number) => void
 }
@@ -19,7 +20,8 @@ function usePublish(): UsePublish {
   async function publish(
     asset: Metadata,
     tokensToMint: number,
-    price = 1
+    marketAddress: string,
+    cost = 1
   ): Promise<DDO> {
     if (status !== ProviderStatus.CONNECTED) return
 
@@ -37,8 +39,11 @@ function usePublish(): UsePublish {
 
     Logger.log('tokensto mint', tokensToMint)
 
-    await datatoken.mint(tokenAddress, accountId, tokensToMint)
+   
+    await mint(tokenAddress,tokensToMint,datatoken)
 
+    Logger.log('giving allowance to ', marketAddress)
+    await giveMarketAllowance(tokenAddress,marketAddress, tokensToMint,datatoken)
     Logger.log('tokenAddress created', tokenAddress)
     const publishedDate = new Date(Date.now()).toISOString().split('.')[0] + 'Z'
     const timeout = 0
@@ -47,7 +52,7 @@ function usePublish(): UsePublish {
       case 'dataset': {
         const accessService = await ocean.assets.createAccessServiceAttributes(
           account,
-          price.toString(),
+          cost.toString(),
           publishedDate,
           timeout
         )
@@ -82,7 +87,7 @@ function usePublish(): UsePublish {
         (ocean.datatokens.datatokensABI as any).abi,
         web3
       )
-
+        Logger.log('mint function',tokenAddress, accountId)
     await datatoken.mint(tokenAddress, accountId, tokensToMint)
   }
 
@@ -99,8 +104,8 @@ function usePublish(): UsePublish {
         (ocean.datatokens.datatokensABI as any).abi,
         web3
       )
-
     await datatoken.approve(tokenAddress, marketAddress, tokens, accountId)
+
     const allowance = await datatoken.allowance(
       tokenAddress,
       accountId,
