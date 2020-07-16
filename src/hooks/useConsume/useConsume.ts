@@ -5,7 +5,11 @@ import { DID, Logger } from '@oceanprotocol/lib'
 import { ServiceType } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Service'
 
 interface UseConsume {
-  consume: (did: DID | string, serviceType: ServiceType) => Promise<void>
+  consume: (
+    did: DID | string,
+    dataTokenAddress: string,
+    serviceType: ServiceType
+  ) => Promise<void>
   consumeStep?: number
   consumeStepText?: string
   consumeError?: string
@@ -31,15 +35,17 @@ function useConsume(): UseConsume {
     setConsumeStep(index)
     setConsumeStepText(consumeFeedback[index])
   }
-  async function consume(did: string, serviceType: ServiceType): Promise<void> {
+  async function consume(
+    did: string,
+    dataTokenAddress: string,
+    serviceType: ServiceType = 'access'
+  ): Promise<void> {
     if (!ocean || !account) return
     setIsLoading(true)
     setConsumeError(undefined)
 
     try {
       setStep(0)
-      const ddo = await ocean.metadatastore.retrieveDDO(did)
-      Logger.log('ddo retrieved', ddo)
       setStep(1)
       const order = await ocean.assets.order(did, serviceType, accountId)
       Logger.log('order created', order)
@@ -58,7 +64,7 @@ function useConsume(): UseConsume {
       await ocean.assets.download(
         did,
         (tokenTransfer as any).transactionHash,
-        ddo.dataToken,
+        dataTokenAddress,
         account,
         ''
       )

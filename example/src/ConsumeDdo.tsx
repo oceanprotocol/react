@@ -15,8 +15,9 @@ export function ConsumeDdo() {
 
   const consumeDid = async () => {
     if (did === undefined) return
+    const ddo = await ocean.assets.resolve(did)
 
-    await consume(did, 'access')
+    await consume(did, ddo.dataToken, 'access')
   }
 
   const handleChange = (e: any) => {
