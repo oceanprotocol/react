@@ -3,7 +3,7 @@ import Web3 from 'web3'
 import ProviderStatus from './ProviderStatus'
 import { Ocean, Logger, Account, Config } from '@oceanprotocol/lib'
 import Web3Modal, { ICoreOptions } from 'web3modal'
-import {getDefaultProviders} from './getDefaultProviders'
+import { getDefaultProviders } from './getDefaultProviders'
 interface OceanProviderValue {
   web3: Web3 | undefined
   web3Provider: any
@@ -50,7 +50,7 @@ function OceanProvider({
 
   async function connect(opts?: Partial<ICoreOptions>) {
     Logger.log('Connecting ....')
-    if(opts===undefined) {
+    if (opts === undefined) {
       opts = await getDefaultProviders()
     }
     const instance = new Web3Modal(opts)
@@ -62,6 +62,10 @@ function OceanProvider({
     const web3 = new Web3(provider)
     setWeb3(web3)
 
+    // const factory = require('@oceanprotocol/contracts/artifacts/development/Factory.json')
+    // const datatokensTemplate = require('@oceanprotocol/contracts/artifacts/development/DataTokenTemplate.json')
+    // config.factoryABI = factory.abi
+    // config.datatokensABI = datatokensTemplate.abi
     config.web3Provider = web3
     const ocean = await Ocean.getInstance(config)
 

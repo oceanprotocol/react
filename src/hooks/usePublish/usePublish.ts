@@ -7,52 +7,62 @@ import { Service } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Service'
 interface UsePublish {
   publish: (
     asset: Metadata,
-    tokensToMint: number,
+    tokensToMint: string,
     marketAddress: string,
-    cost?: number
+    cost?: string
   ) => Promise<DDO>
-  mint: (tokenAddress: string, tokensToMint: number) => void
+  mint: (tokenAddress: string, tokensToMint: string) => void
 }
 
 function usePublish(): UsePublish {
   const { web3, ocean, status, account, accountId, config } = useOcean()
 
+  function createDataToken() {
+    return new DataTokens(
+      ocean.datatokens.factoryAddress,
+      ocean.datatokens.factoryABI.abi,
+      ocean.datatokens.datatokensABI.abi,
+      web3
+    )
+  }
+
   async function publish(
     asset: Metadata,
-    tokensToMint: number,
+    tokensToMint: string,
     marketAddress: string,
-    cost = 1
+    cost = '1'
   ): Promise<DDO> {
     if (status !== ProviderStatus.CONNECTED) return
 
-    const datatoken = new DataTokens(
-      ocean.datatokens.factoryAddress,
-      (ocean.datatokens.factoryABI as any).abi,
-      (ocean.datatokens.datatokensABI as any).abi,
-      web3
-    )
+    const datatoken = createDataToken()
 
-    Logger.log('datatoken created', datatoken)
+    Logger.log('datatokens created', datatoken)
+    Logger.log('ocean dt', ocean.datatokens)
     const data = { t: 1, url: config.metadataStoreUri }
     const blob = JSON.stringify(data)
     const tokenAddress = await datatoken.create(blob, accountId)
-
+    Logger.log('datatoken created', datatoken)
     Logger.log('tokensto mint', tokensToMint)
 
-   
-    await mint(tokenAddress,tokensToMint,datatoken)
+    await mint(tokenAddress, tokensToMint, datatoken)
 
     Logger.log('giving allowance to ', marketAddress)
-    await giveMarketAllowance(tokenAddress,marketAddress, tokensToMint,datatoken)
+    await giveMarketAllowance(
+      tokenAddress,
+      marketAddress,
+      tokensToMint,
+      datatoken
+    )
     Logger.log('tokenAddress created', tokenAddress)
     const publishedDate = new Date(Date.now()).toISOString().split('.')[0] + 'Z'
     const timeout = 0
     let services: Service[] = []
+    const price = datatoken.toWei(cost)
     switch (asset.main.type) {
       case 'dataset': {
         const accessService = await ocean.assets.createAccessServiceAttributes(
           account,
-          cost.toString(),
+          price,
           publishedDate,
           timeout
         )
@@ -77,35 +87,22 @@ function usePublish(): UsePublish {
 
   async function mint(
     tokenAddress: string,
-    tokensToMint: number,
+    tokensToMint: string,
     datatoken?: DataTokens
   ) {
-    if (datatoken === undefined)
-      datatoken = new DataTokens(
-        ocean.datatokens.factoryAddress,
-        (ocean.datatokens.factoryABI as any).abi,
-        (ocean.datatokens.datatokensABI as any).abi,
-        web3
-      )
-        Logger.log('mint function',tokenAddress, accountId)
+    if (datatoken === undefined) datatoken = createDataToken()
+    Logger.log('mint function', tokenAddress, accountId)
     await datatoken.mint(tokenAddress, accountId, tokensToMint)
   }
 
   async function giveMarketAllowance(
     tokenAddress: string,
     marketAddress: string,
-    tokens: number,
+    tokens: string,
     datatoken?: DataTokens
   ) {
-    if (datatoken === undefined)
-      datatoken = new DataTokens(
-        ocean.datatokens.factoryAddress,
-        (ocean.datatokens.factoryABI as any).abi,
-        (ocean.datatokens.datatokensABI as any).abi,
-        web3
-      )
+    if (datatoken === undefined) datatoken = createDataToken()
     await datatoken.approve(tokenAddress, marketAddress, tokens, accountId)
-
   }
 
   return {

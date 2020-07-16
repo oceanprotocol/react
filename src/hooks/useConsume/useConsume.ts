@@ -27,7 +27,6 @@ function useConsume(): UseConsume {
   const [consumeStepText, setConsumeStepText] = useState<string | undefined>()
   const [consumeError, setConsumeError] = useState<string | undefined>()
 
-
   function setStep(index: number) {
     setConsumeStep(index)
     setConsumeStepText(consumeFeedback[index])
@@ -47,10 +46,11 @@ function useConsume(): UseConsume {
       setStep(2)
       const res = JSON.parse(order)
       Logger.log('order parsed', res)
+      Logger.log('ocean.datatokens before transfer', ocean.datatokens)
       const tokenTransfer = await ocean.datatokens.transferWei(
         res.dataToken,
         res.to,
-        res.numTokens,
+        String(res.numTokens),
         res.from
       )
       Logger.log('token transfered', tokenTransfer)

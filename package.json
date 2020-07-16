@@ -21,8 +21,8 @@
     "dist/"
   ],
   "dependencies": {
-    "@oceanprotocol/contracts": "^0.2.2",
-    "@oceanprotocol/lib": "^0.1.2",
+    "@oceanprotocol/contracts": "^0.2.3",
+    "@oceanprotocol/lib": "^0.1.4",
     "@walletconnect/web3-provider": "^1.0.15",
     "axios": "^0.19.2",
     "react": "^16.9.41",

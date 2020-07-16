@@ -5,33 +5,38 @@ import { useState } from 'react'
 import { useEffect } from 'react'
 import shortid from 'shortid'
 export function AllDdos() {
-    const { accountId, ocean } = useOcean()
+  const { accountId, ocean } = useOcean()
 
-    const [ddos, setDdos] = useState<DDO[] | undefined>()
+  const [ddos, setDdos] = useState<DDO[] | undefined>()
 
+  useEffect(() => {
+    async function init() {
+      if (ocean === undefined) return
+      const assets = await ocean.assets.query({
+        page: 1,
+        offset: 10,
+        query: {},
+        sort: { created: -1 }
+      })
 
-    useEffect(() => {
-        async function init() {
-            if (ocean === undefined) return
-            const assets = await ocean.assets.query({
-                page: 1,
-                offset: 10,
-                query: {},
-                sort: { created: -1 }
-            })
+      setDdos(assets.results)
+    }
+    init()
+  }, [ocean])
 
-            setDdos(assets.results)
-        }
-        init()
-    }, [ocean])
-
-    return (
-        <>
-            <div>Assets</div> <br/>
-            <div style={{flexDirection: "column"}}>{ddos?.map((ddo) => {
-                return <div key={shortid.generate()}><span  >{ddo.id} / {ddo.dataToken }</span><br/></div>
-            })}
+  return (
+    <>
+      <div>Assets</div> <br />
+      <div style={{ flexDirection: 'column' }}>
+        {ddos?.map((ddo) => {
+          return (
+            <div key={shortid.generate()}>
+              {ddo.id}
+              <br />
             </div>
-        </>
-    )
+          )
+        })}
+      </div>
+    </>
+  )
 }

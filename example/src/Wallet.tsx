@@ -3,13 +3,12 @@ import { useOcean } from '@oceanprotocol/react'
 import { useEffect } from 'react'
 
 export function Wallet() {
-  const {web3, ocean, connect, logout, accountId } = useOcean()
+  const { web3, ocean, connect, logout, accountId } = useOcean()
   const conn = async () => {
     const { default: WalletConnectProvider } = await import(
       '@walletconnect/web3-provider'
     )
     const providerOptions = {
-
       /* See Provider Options Section */
       walletconnect: {
         package: WalletConnectProvider, // required
@@ -19,19 +18,18 @@ export function Wallet() {
       }
     }
 
-   // await connect({ cacheProvider: true, providerOptions })
-   await connect()
+    // await connect({ cacheProvider: true, providerOptions })
+    await connect()
   }
   const init = async () => {
-    if (ocean === undefined || accountId ===undefined) return
-   
+    if (ocean === undefined || accountId === undefined) return
 
     const assets = await ocean.assets.ownerAssets(accountId)
     console.log(assets)
   }
   useEffect(() => {
     init()
-  }, [ocean,accountId])
+  }, [ocean, accountId])
 
   const disc = async () => {
     await logout()
