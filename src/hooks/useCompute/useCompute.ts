@@ -4,15 +4,16 @@ import { ComputeValue } from './ComputeOptions'
 import { feedback } from './../../utils'
 import { DID, Logger } from '@oceanprotocol/lib'
 import { MetadataAlgorithm } from '@oceanprotocol/lib/dist/node/ddo/interfaces/MetadataAlgorithm'
+import { ComputeJob } from '@oceanprotocol/lib/dist/node/ocean/interfaces/ComputeJob'
 
 interface UseCompute {
   compute: (
     did: string,
-    computeServiceIndex: number,
+    computeService: any,
     dataTokenAddress: string,
     algorithmRawCode: string,
     computeContainer: ComputeValue
-  ) => Promise<void>
+  ) => Promise<ComputeJob>
   computeStep?: number
   computeStepText?: string
   computeError?: string
@@ -21,8 +22,9 @@ interface UseCompute {
 
 // TODO: customize for compute
 export const computeFeedback: { [key in number]: string } = {
-  ...feedback,
-  4: '3/3 Access granted. Starting job...'
+  0: '1/3 Ordering asset...',
+  1: '2/3 Transfering data token.',
+  2: '3/3 Access granted. Starting job...'
 }
 const rawAlgorithmMeta: MetadataAlgorithm = {
   rawcode: `console.log('Hello world'!)`,
@@ -53,7 +55,7 @@ function useCompute(): UseCompute {
     dataTokenAddress: string,
     algorithmRawCode: string,
     computeContainer: ComputeValue
-  ): Promise<void> {
+  ): Promise<ComputeJob> {
     if (!ocean || !account) return
 
     setComputeError(undefined)
@@ -65,6 +67,13 @@ function useCompute(): UseCompute {
       rawAlgorithmMeta.rawcode = algorithmRawCode
 
       const output = {}
+      Logger.log(
+        'compute order',
+        accountId,
+        did,
+        computeService,
+        rawAlgorithmMeta
+      )
       const order = await ocean.compute.order(
         accountId,
         did,
@@ -73,13 +82,16 @@ function useCompute(): UseCompute {
         rawAlgorithmMeta
       )
 
+      setStep(1)
       const computeOrder = JSON.parse(order)
-      const tokenTransfer = await ocean.datatokens.transfer(
+      Logger.log('compute order', computeOrder)
+      const tokenTransfer = await ocean.datatokens.transferWei(
         computeOrder.dataToken,
         computeOrder.to,
         String(computeOrder.numTokens),
         computeOrder.from
       )
+      setStep(2)
       const response = await ocean.compute.start(
         did,
         (tokenTransfer as any).transactionHash,
@@ -91,11 +103,12 @@ function useCompute(): UseCompute {
         computeService.index,
         computeService.type
       )
+      return response
     } catch (error) {
       Logger.error(error)
       setComputeError(error.message)
     } finally {
-      setComputeStep(undefined)
+      setStep(undefined)
       setIsLoading(false)
     }
   }

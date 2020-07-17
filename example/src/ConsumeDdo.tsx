@@ -1,5 +1,11 @@
 import React from 'react'
-import { useOcean, usePublish, useConsume } from '@oceanprotocol/react'
+import {
+  useOcean,
+  usePublish,
+  useConsume,
+  useCompute,
+  computeOptions
+} from '@oceanprotocol/react'
 import { Metadata, DDO } from '@oceanprotocol/lib'
 import { useState } from 'react'
 import { useEffect } from 'react'
@@ -7,6 +13,7 @@ import { useEffect } from 'react'
 export function ConsumeDdo() {
   const { accountId, ocean } = useOcean()
   const { consumeStepText, consume, consumeError } = useConsume()
+  const { compute, computeStepText } = useCompute()
   const [did, setDid] = useState<string | undefined>()
   useEffect(() => {
     async function init() {}
@@ -20,6 +27,25 @@ export function ConsumeDdo() {
     await consume(did, ddo.dataToken, 'access')
   }
 
+  const computeDid = async () => {
+    if (did === undefined) return
+    const ddo = await ocean.assets.resolve(did)
+    console.log(ddo)
+    console.log('ocean dt', ocean.datatokens)
+
+    const computeService = ddo.findServiceByType('compute')
+    console.log('ddo compute service', computeService)
+    const serv = ddo.findServiceById(computeService.index)
+
+    console.log('ddo compute service resolved', serv)
+    await compute(
+      did,
+      computeService,
+      ddo.dataToken,
+      "console.log('test')",
+      computeOptions[0].value
+    )
+  }
   const handleChange = (e: any) => {
     setDid(e.target.value)
   }
@@ -31,8 +57,12 @@ export function ConsumeDdo() {
       </div>
       <div>
         <button onClick={consumeDid}>Consume did</button>
+        <button onClick={computeDid}>Compute</button>
       </div>
-      <div>{consumeStepText}</div>
+      <div>
+        {consumeStepText}
+        {computeStepText}
+      </div>
       <div>{consumeError}</div>
     </>
   )

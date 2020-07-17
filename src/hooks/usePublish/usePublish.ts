@@ -2,7 +2,10 @@ import { useEffect, useState } from 'react'
 import { DDO, Metadata, DataTokens, Logger } from '@oceanprotocol/lib'
 import { useOcean } from '../../providers'
 import ProviderStatus from '../../providers/OceanProvider/ProviderStatus'
-import { Service } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Service'
+import {
+  Service,
+  ServiceComputePrivacy
+} from '@oceanprotocol/lib/dist/node/ddo/interfaces/Service'
 import { ServiceConfig } from './ServiceConfig'
 import { publishFeedback } from '../../utils'
 
@@ -72,7 +75,7 @@ function usePublish(): UsePublish {
         new Date(Date.now()).toISOString().split('.')[0] + 'Z'
       const timeout = 0
       const services: Service[] = []
-      setStep(3)
+
       serviceConfigs.forEach(async (serviceConfig) => {
         const price = ocean.datatokens.toWei(serviceConfig.cost)
         switch (serviceConfig.serviceType) {
@@ -88,11 +91,47 @@ function usePublish(): UsePublish {
             break
           }
           case 'compute': {
-            const computeService = await ocean.assets.createAccessServiceAttributes(
+            const cluster = ocean.compute.createClusterAttributes(
+              'Kubernetes',
+              'http://10.0.0.17/xxx'
+            )
+            const servers = [
+              ocean.compute.createServerAttributes(
+                '1',
+                'xlsize',
+                '50',
+                '16',
+                '0',
+                '128gb',
+                '160gb',
+                timeout
+              )
+            ]
+            const containers = [
+              ocean.compute.createContainerAttributes(
+                'tensorflow/tensorflow',
+                'latest',
+                'sha256:cb57ecfa6ebbefd8ffc7f75c0f00e57a7fa739578a429b6f72a0df19315deadc'
+              )
+            ]
+            const provider = ocean.compute.createProviderAttributes(
+              'Azure',
+              'Compute service with 16gb ram for each node.',
+              cluster,
+              containers,
+              servers
+            )
+            const origComputePrivacy = {
+              allowRawAlgorithm: true,
+              allowNetworkAccess: false,
+              trustedAlgorithms: []
+            }
+            const computeService = ocean.compute.createComputeService(
               account,
               price,
               publishedDate,
-              0
+              provider,
+              origComputePrivacy as ServiceComputePrivacy
             )
             services.push(computeService)
             break
@@ -100,14 +139,15 @@ function usePublish(): UsePublish {
         }
       })
       Logger.log('services created', services)
-      setStep(4)
+      setStep(3)
       const ddo = await ocean.assets.create(
         asset,
         account,
         services,
         tokenAddress
       )
-      setStep(5)
+      Logger.log('ddo created', ddo)
+      setStep(4)
 
       return ddo
     } catch (error) {
