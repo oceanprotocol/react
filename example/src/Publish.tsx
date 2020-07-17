@@ -5,7 +5,7 @@ import { useState } from 'react'
 
 export function Publish() {
   const { accountId } = useOcean()
-  const { publish } = usePublish()
+  const { publish, publishStepText } = usePublish()
   const [ddo, setDdo] = useState<DDO | undefined>()
 
   const asset = {
@@ -44,6 +44,7 @@ export function Publish() {
       <div>
         <button onClick={publishAsset}>Publish</button>
       </div>
+      <div>Status: {publishStepText}</div>
       <div>DID: {ddo && ddo.id} </div>
     </>
   )

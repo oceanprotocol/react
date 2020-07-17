@@ -36,7 +36,10 @@ function OceanProvider({
   const [account, setAccount] = useState<Account | undefined>()
   const [accountId, setAccountId] = useState<string | undefined>()
   const [balance, setBalance] = useState<string | undefined>()
-  const [status, setStatus] = useState(ProviderStatus.NOT_AVAILABLE)
+  const [status, setStatus] = useState<ProviderStatus>(
+    ProviderStatus.NOT_AVAILABLE
+  )
+  const [web3ModalOpts, setWeb3ModalOpts] = useState<Partial<ICoreOptions>>()
 
   function init() {
     Logger.log('Ocean Provider init')
@@ -64,10 +67,6 @@ function OceanProvider({
     const web3 = new Web3(provider)
     setWeb3(web3)
 
-    // const factory = require('@oceanprotocol/contracts/artifacts/development/Factory.json')
-    // const datatokensTemplate = require('@oceanprotocol/contracts/artifacts/development/DataTokenTemplate.json')
-    // config.factoryABI = factory.abi
-    // config.datatokensABI = datatokensTemplate.abi
     config.web3Provider = web3
     const ocean = await Ocean.getInstance(config)
 
@@ -115,22 +114,29 @@ function OceanProvider({
 
   const handleAccountsChanged = async (accounts: string[]) => {
     console.debug("Handling 'accountsChanged' event with payload", accounts)
-    if (accounts.length > 0) {
-      setAccountId(accounts[0])
-
-      if (web3) {
-        const balance = await getBalance(web3, accounts[0])
-        setBalance(balance)
-      }
+    if (status === ProviderStatus.CONNECTED) {
+      connect(web3ModalOpts)
     }
+    // if (accounts.length > 0) {
+    //   setAccountId(accounts[0])
+
+    //   if (web3) {
+    //     const balance = await getBalance(web3, accounts[0])
+    //     setBalance(balance)
+    //   }
+    // }
   }
 
   // ToDo need to handle this, it's not implemented, need to update chainId and reinitialize ocean lib
   const handleNetworkChanged = async (networkId: string | number) => {
-    console.debug("Handling 'networkChanged' event with payload", networkId)
-    web3Provider.autoRefreshOnNetworkChange = false
-    // init(networkId)
-    // handleConnect(ethProvider)
+    console.debug(
+      "Handling 'networkChanged' event with payload",
+      networkId,
+      status
+    )
+    if (status === ProviderStatus.CONNECTED) {
+      connect(web3ModalOpts)
+    }
   }
 
   useEffect(() => {
@@ -145,7 +151,7 @@ function OceanProvider({
         web3Provider.removeListener('networkChanged', handleNetworkChanged)
       }
     }
-  }, [web3, web3Modal, web3Provider])
+  }, [web3Modal, web3Provider])
 
   return (
     <OceanContext.Provider

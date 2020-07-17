@@ -18,3 +18,11 @@ export const feedback: { [key in number]: string } = {
   1: '1/3 Transfering data token.',
   2: '2/3 Payment confirmed. Requesting access...'
 }
+
+export const publishFeedback: { [key in number]: string } = {
+  0: '1/5 Creating datatoken ...',
+  1: '2/5 Minting tokens ...',
+  2: '3/5 Giving allowance to market to sell your tokens ...',
+  3: '4/5 Publishing asset ...',
+  4: '5/5 Asset published succesfully'
+}

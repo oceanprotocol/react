@@ -29,7 +29,7 @@ function App() {
 
   return (
     <div className="app">
-      <OceanProvider config={configRinkeby}>
+      <OceanProvider config={config}>
         <div className="container">
           <div>
             <Wallet />
