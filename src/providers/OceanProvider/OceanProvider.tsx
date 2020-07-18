@@ -1,4 +1,10 @@
-import React, { useContext, useState, useEffect, createContext } from 'react'
+import React, {
+  useContext,
+  useState,
+  useEffect,
+  createContext,
+  ReactElement
+} from 'react'
 import Web3 from 'web3'
 import ProviderStatus from './ProviderStatus'
 import { Ocean, Logger, Account, Config } from '@oceanprotocol/lib'
@@ -27,7 +33,7 @@ function OceanProvider({
 }: {
   config: Config
   children: any
-}) {
+}): ReactElement {
   const [web3, setWeb3] = useState<Web3 | undefined>()
   const [web3Provider, setWeb3Provider] = useState<any | undefined>()
   const [ocean, setOcean] = useState<Ocean | undefined>()
