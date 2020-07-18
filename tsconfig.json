@@ -3,15 +3,14 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "target": "es5",
-    "lib": ["es2015", "dom"],
+    "lib": ["esnext", "dom"],
     "outDir": "dist/cjs",
     "jsx": "react",
     "esModuleInterop": true,
     "sourceMap": true,
     "declaration": true,
-    "strictNullChecks": false,
-    "noEmitOnError": true
+    "strictNullChecks": false
   },
-  "include": ["src/**/*"],
+  "include": ["./src/@types", "./src/index.ts"],
   "exclude": ["node_modules", "dist", "example"]
 }
