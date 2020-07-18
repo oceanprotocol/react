@@ -153,10 +153,11 @@ npm run format
 
 ## 🛳 Production
 
-The build script will compile `src/` with `tsc` into:
+The build script will compile `src/` with [`microbundle`](https://github.com/developit/microbundle) into:
 
-1. CommonJS module with ES5 syntax
-2. ES module with ES6 syntax
+1. CommonJS module
+2. ES module
+3. UMD build
 
 ```bash
 npm run build
