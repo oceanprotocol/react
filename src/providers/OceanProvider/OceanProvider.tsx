@@ -84,6 +84,10 @@ function OceanProvider({
     const web3 = new Web3(provider)
     setWeb3(web3)
 
+    const chainId = web3 && (await web3.eth.getChainId())
+    setChainId(chainId)
+    Logger.log('chain id ', chainId)
+
     config.web3Provider = web3
     const ocean = await Ocean.getInstance(config)
 
@@ -103,10 +107,6 @@ function OceanProvider({
     const balance = await getBalance(account)
     setBalance(balance)
     Logger.log('balance', JSON.stringify(balance))
-
-    const chainId = web3 && (await web3.eth.getChainId())
-    setChainId(chainId)
-    Logger.log('chain id ', chainId)
   }
 
   async function logout() {
