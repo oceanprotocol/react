@@ -1,16 +1,17 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "ESNext",
     "moduleResolution": "node",
-    "target": "es6",
-    "lib": ["dom", "dom.iterable", "es2017"],
+    "target": "ESNext",
+    "lib": ["dom", "esnext"],
     "outDir": "dist",
     "jsx": "react",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "sourceMap": true,
     "declaration": true,
-    "strictNullChecks": false
+    "strictNullChecks": false,
+    "importHelpers": true
   },
   "include": ["./src/@types", "./src/index.ts"],
   "exclude": ["node_modules", "dist", "example"]
