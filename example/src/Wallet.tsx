@@ -18,8 +18,7 @@ export function Wallet() {
       }
     }
 
-    // await connect({ cacheProvider: true, providerOptions })
-    await connect()
+    await connect({ cacheProvider: true, providerOptions })
   }
   const init = async () => {
     if (ocean === undefined || accountId === undefined) return

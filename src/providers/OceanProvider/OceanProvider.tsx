@@ -10,6 +10,7 @@ import ProviderStatus from './ProviderStatus'
 import { Ocean, Logger, Account, Config } from '@oceanprotocol/lib'
 import Web3Modal, { ICoreOptions } from 'web3modal'
 import { getDefaultProviders } from './getDefaultProviders'
+
 interface OceanProviderValue {
   web3: Web3 | undefined
   web3Provider: any
