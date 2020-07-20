@@ -75,7 +75,6 @@ function OceanProvider({
       opts = await getDefaultProviders()
     }
 
-    setWeb3ModalOpts(opts)
     const instance = new Web3Modal(opts)
     setWeb3Modal(instance)
     Logger.log('Web3Modal instance created.', instance)
