@@ -2,7 +2,7 @@
 
 <h1 align="center">react</h1>
 
-> 🎣 React hooks & components on top of squid.js
+> 🎣 React hooks & components on top of @oceanprotocol/lib
 
 [![npm](https://img.shields.io/npm/v/@oceanprotocol/react.svg)](https://www.npmjs.com/package/@oceanprotocol/react)
 [![Build Status](https://travis-ci.com/oceanprotocol/react.svg?token=3psqw6c8KMDqfdGQ2x6d&branch=master)](https://travis-ci.com/oceanprotocol/react)
