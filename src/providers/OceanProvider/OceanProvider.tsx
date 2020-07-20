@@ -12,8 +12,8 @@ import Web3Modal, { ICoreOptions } from 'web3modal'
 import { getDefaultProviders } from './getDefaultProviders'
 
 interface Balance {
-  eth: string
-  ocean: string
+  eth: string | undefined
+  ocean: string | undefined
 }
 
 interface OceanProviderValue {
@@ -47,7 +47,10 @@ function OceanProvider({
   const [chainId, setChainId] = useState<number | undefined>()
   const [account, setAccount] = useState<Account | undefined>()
   const [accountId, setAccountId] = useState<string | undefined>()
-  const [balance, setBalance] = useState<Balance | undefined>()
+  const [balance, setBalance] = useState<Balance | undefined>({
+    eth: undefined,
+    ocean: undefined
+  })
   const [status, setStatus] = useState<ProviderStatus>(
     ProviderStatus.NOT_AVAILABLE
   )
@@ -117,12 +120,12 @@ function OceanProvider({
   }
 
   async function getBalance(web3: Web3, account: Account) {
-    const balanceEth = await web3.eth.getBalance(account.getId())
-    const balanceOcean = await account.getOceanBalance()
+    const balanceEth = await web3.eth.getBalance(await getAccountId(web3)) // returns wei
+    const balanceOcean = await account.getOceanBalance() // returns ocean
 
     return {
       eth: Web3.utils.fromWei(balanceEth),
-      ocean: Web3.utils.fromWei(balanceOcean)
+      ocean: balanceOcean
     }
   }
 
