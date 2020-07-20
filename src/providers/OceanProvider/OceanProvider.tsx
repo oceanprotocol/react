@@ -11,6 +11,11 @@ import { Ocean, Logger, Account, Config } from '@oceanprotocol/lib'
 import Web3Modal, { ICoreOptions } from 'web3modal'
 import { getDefaultProviders } from './getDefaultProviders'
 
+interface Balance {
+  eth: string
+  ocean: string
+}
+
 interface OceanProviderValue {
   web3: Web3 | undefined
   web3Provider: any
@@ -19,7 +24,7 @@ interface OceanProviderValue {
   config: Config
   account: Account
   accountId: string
-  balance: string
+  balance: Balance
   chainId: number | undefined
   status: ProviderStatus
   connect: (opts?: Partial<ICoreOptions>) => void
@@ -42,7 +47,7 @@ function OceanProvider({
   const [chainId, setChainId] = useState<number | undefined>()
   const [account, setAccount] = useState<Account | undefined>()
   const [accountId, setAccountId] = useState<string | undefined>()
-  const [balance, setBalance] = useState<string | undefined>()
+  const [balance, setBalance] = useState<Balance | undefined>()
   const [status, setStatus] = useState<ProviderStatus>(
     ProviderStatus.NOT_AVAILABLE
   )
@@ -65,9 +70,11 @@ function OceanProvider({
     if (opts === undefined) {
       opts = await getDefaultProviders()
     }
+
     const instance = new Web3Modal(opts)
     setWeb3Modal(instance)
-    Logger.log('Web3Modal instance created', instance)
+    Logger.log('Web3Modal instance created.', instance)
+
     const provider = await instance.connect()
     setWeb3Provider(provider)
 
@@ -78,19 +85,22 @@ function OceanProvider({
     const ocean = await Ocean.getInstance(config)
 
     setOcean(ocean)
-    Logger.log('Ocean instance created ', ocean)
-    Logger.log('Web3 created ', web3)
+    Logger.log('Ocean instance created.', ocean)
+    Logger.log('Web3 created.', web3)
     setStatus(ProviderStatus.CONNECTED)
+
     const account = (await ocean.accounts.list())[0]
     setAccount(account)
     Logger.log('Account ', account)
 
-    const accountId = await getAccount(web3)
+    const accountId = await getAccountId(web3)
     setAccountId(accountId)
     Logger.log('account id', accountId)
-    const balance = await getBalance(web3, accountId)
+
+    const balance = await getBalance(web3, account)
     setBalance(balance)
-    Logger.log('balance', accountId)
+    Logger.log('balance', JSON.stringify(balance))
+
     const chainId = web3 && (await web3.eth.getChainId())
     setChainId(chainId)
     Logger.log('chain id ', chainId)
@@ -101,14 +111,19 @@ function OceanProvider({
     web3Modal.clearCachedProvider()
   }
 
-  async function getAccount(web3: Web3) {
+  async function getAccountId(web3: Web3) {
     const accounts = await web3.eth.getAccounts()
     return accounts[0]
   }
 
-  async function getBalance(web3: Web3, address: string) {
-    const balance = await web3.eth.getBalance(address)
-    return Web3.utils.fromWei(balance)
+  async function getBalance(web3: Web3, account: Account) {
+    const balanceEth = await web3.eth.getBalance(account.getId())
+    const balanceOcean = await account.getOceanBalance()
+
+    return {
+      eth: Web3.utils.fromWei(balanceEth),
+      ocean: Web3.utils.fromWei(balanceOcean)
+    }
   }
 
   //
@@ -187,5 +202,5 @@ function OceanProvider({
 // Helper hook to access the provider values
 const useOcean = (): OceanProviderValue => useContext(OceanContext)
 
-export { OceanProvider, useOcean, OceanProviderValue }
+export { OceanProvider, useOcean, OceanProviderValue, Balance }
 export default OceanProvider
