@@ -70,10 +70,12 @@ function OceanProvider({
 
   async function connect(opts?: Partial<ICoreOptions>) {
     Logger.log('Connecting ....')
+
     if (opts === undefined) {
       opts = await getDefaultProviders()
     }
 
+    setWeb3ModalOpts(opts)
     const instance = new Web3Modal(opts)
     setWeb3Modal(instance)
     Logger.log('Web3Modal instance created.', instance)
@@ -83,6 +85,7 @@ function OceanProvider({
 
     const web3 = new Web3(provider)
     setWeb3(web3)
+    Logger.log('Web3 created.', web3)
 
     const chainId = web3 && (await web3.eth.getChainId())
     setChainId(chainId)
@@ -90,10 +93,9 @@ function OceanProvider({
 
     config.web3Provider = web3
     const ocean = await Ocean.getInstance(config)
-
     setOcean(ocean)
     Logger.log('Ocean instance created.', ocean)
-    Logger.log('Web3 created.', web3)
+
     setStatus(ProviderStatus.CONNECTED)
 
     const account = (await ocean.accounts.list())[0]
