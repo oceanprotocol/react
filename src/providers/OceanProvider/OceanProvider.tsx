@@ -27,8 +27,8 @@ interface OceanProviderValue {
   balance: Balance
   chainId: number | undefined
   status: ProviderStatus
-  connect: (opts?: Partial<ICoreOptions>) => void
-  logout: () => void
+  connect: (opts?: Partial<ICoreOptions>) => Promise<void>
+  logout: () => Promise<void>
 }
 
 const OceanContext = createContext(null)
