@@ -100,7 +100,7 @@ function OceanProvider({
     setAccountId(accountId)
     Logger.log('account id', accountId)
 
-    const balance = await getBalance(web3, account)
+    const balance = await getBalance(account)
     setBalance(balance)
     Logger.log('balance', JSON.stringify(balance))
 
@@ -119,14 +119,11 @@ function OceanProvider({
     return accounts[0]
   }
 
-  async function getBalance(web3: Web3, account: Account) {
-    const balanceEth = await web3.eth.getBalance(await getAccountId(web3)) // returns wei
-    const balanceOcean = await account.getOceanBalance() // returns ocean
+  async function getBalance(account: Account) {
+    const eth = await account.getEtherBalance()
+    const ocean = await account.getOceanBalance()
 
-    return {
-      eth: Web3.utils.fromWei(balanceEth),
-      ocean: balanceOcean
-    }
+    return { eth, ocean }
   }
 
   //
