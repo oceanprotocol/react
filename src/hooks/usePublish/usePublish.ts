@@ -69,8 +69,8 @@ function usePublish(): UsePublish {
       Logger.log(`minted ${tokensToMint} tokens`)
 
       setStep(2)
-      await giveMarketAllowance(tokenAddress, marketAddress, tokensToMint)
-      Logger.log('allowance to market', marketAddress)
+      // await giveMarketAllowance(tokenAddress, marketAddress, tokensToMint)
+      // Logger.log('allowance to market', marketAddress)
       const publishedDate =
         new Date(Date.now()).toISOString().split('.')[0] + 'Z'
       const timeout = 0
