@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import { useOcean } from '../../providers'
 import { feedback } from '../../utils'
-import { DID, Logger } from '@oceanprotocol/lib'
-import { ServiceType } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Service'
+import { DID, Logger, ServiceType } from '@oceanprotocol/lib'
 
 interface UseConsume {
   consume: (
