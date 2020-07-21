@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
-import { DID, DDO, Metadata } from '@oceanprotocol/lib'
+import {
+  DID,
+  DDO,
+  Metadata,
+  MetadataStore,
+  Logger,
+  ConfigHelper
+} from '@oceanprotocol/lib'
 import { useOcean } from '../../providers'
 import ProviderStatus from '../../providers/OceanProvider/ProviderStatus'
 
@@ -20,9 +26,15 @@ function useMetadata(did?: DID | string): UseMetadata {
   const [title, setTitle] = useState<string | undefined>()
 
   async function getDDO(did: DID | string): Promise<DDO> {
-    if (status !== ProviderStatus.CONNECTED) return
+    if (status === ProviderStatus.CONNECTED) {
+      const ddo = await ocean.metadatastore.retrieveDDO(did)
+      return ddo
+    }
 
-    const ddo = await ocean.metadatastore.retrieveDDO(did)
+    // fallback hitting MetadataStore directly
+    const { metadataStoreUri } = new ConfigHelper()
+    const metadataStore = new MetadataStore(metadataStoreUri, Logger)
+    const ddo = await metadataStore.retrieveDDO(did)
     return ddo
   }
 
