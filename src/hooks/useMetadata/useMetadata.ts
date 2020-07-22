@@ -20,7 +20,7 @@ interface UseMetadata {
 }
 
 function useMetadata(did?: DID | string): UseMetadata {
-  const { ocean, status } = useOcean()
+  const { ocean, status, config } = useOcean()
   const [ddo, setDDO] = useState<DDO | undefined>()
   const [metadata, setMetadata] = useState<Metadata | undefined>()
   const [title, setTitle] = useState<string | undefined>()
@@ -32,8 +32,7 @@ function useMetadata(did?: DID | string): UseMetadata {
     }
 
     // fallback hitting MetadataStore directly
-    const { metadataStoreUri } = new ConfigHelper()
-    const metadataStore = new MetadataStore(metadataStoreUri, Logger)
+    const metadataStore = new MetadataStore(config.metadataStoreUri, Logger)
     const ddo = await metadataStore.retrieveDDO(did)
     return ddo
   }
