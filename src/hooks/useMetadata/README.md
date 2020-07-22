@@ -12,7 +12,7 @@ const did = 'did:op:0x000000000'
 
 export default function MyComponent() {
   // Get metadata for this asset
-  const { title, metadata } = useMetadata(did)
+  const { ddo, title, metadata } = useMetadata(did)
 
   const { main, additionalInformation } = metadata
 
