@@ -13,15 +13,10 @@ interface UsePublish {
   publish: (
     asset: Metadata,
     tokensToMint: string,
-    marketAddress: string,
-    serviceConfigs: ServiceConfig[]
+    serviceConfigs: ServiceConfig[],
+    dtAddress?: string
   ) => Promise<DDO>
   mint: (tokenAddress: string, tokensToMint: string) => void
-  giveMarketAllowance: (
-    tokenAddress: string,
-    marketAddress: string,
-    tokens: string
-  ) => void
   publishStep?: number
   publishStepText?: string
   publishError?: string
@@ -44,33 +39,33 @@ function usePublish(): UsePublish {
    * Publish an asset.It also creates the datatoken, mints tokens and gives the market allowance
    * @param  {Metadata} asset The metadata of the asset.
    * @param  {string} tokensToMint Numer of tokens to mint and give allowance to market
-   * @param  {string} marketAddress The address of the market
    * @param  {ServiceConfig[]} serviceConfigs Desired services of the asset, ex: [{serviceType: 'access', cost:'1'}]
+   * @param  {string} dtAddress The address of the market
    * @return {Promise<DDO>} Returns the newly published ddo
    */
   async function publish(
     asset: Metadata,
     tokensToMint: string,
-    marketAddress: string,
-    serviceConfigs: ServiceConfig[]
+    serviceConfigs: ServiceConfig[],
+    dtAddress?: string
   ): Promise<DDO> {
     if (status !== ProviderStatus.CONNECTED || !ocean || !account) return
     setIsLoading(true)
     setPublishError(undefined)
     try {
-      setStep(0)
-      const data = { t: 1, url: config.metadataStoreUri }
-      const blob = JSON.stringify(data)
-      const tokenAddress = await ocean.datatokens.create(blob, accountId)
-      Logger.log('datatoken created', tokenAddress)
+      if (dtAddress) {
+        setStep(0)
+        const data = { t: 1, url: config.metadataStoreUri }
+        const blob = JSON.stringify(data)
+        dtAddress = await ocean.datatokens.create(blob, accountId)
+        Logger.log('datatoken created', dtAddress)
+      }
 
       setStep(1)
-      await mint(tokenAddress, tokensToMint)
+      await mint(dtAddress, tokensToMint)
       Logger.log(`minted ${tokensToMint} tokens`)
 
       setStep(2)
-      // await giveMarketAllowance(tokenAddress, marketAddress, tokensToMint)
-      // Logger.log('allowance to market', marketAddress)
       const publishedDate =
         new Date(Date.now()).toISOString().split('.')[0] + 'Z'
       const timeout = 0
@@ -140,12 +135,7 @@ function usePublish(): UsePublish {
       })
       Logger.log('services created', services)
       setStep(3)
-      const ddo = await ocean.assets.create(
-        asset,
-        account,
-        services,
-        tokenAddress
-      )
+      const ddo = await ocean.assets.create(asset, account, services, dtAddress)
       Logger.log('ddo created', ddo)
       setStep(4)
 
@@ -164,23 +154,9 @@ function usePublish(): UsePublish {
     await ocean.datatokens.mint(tokenAddress, accountId, tokensToMint)
   }
 
-  async function giveMarketAllowance(
-    tokenAddress: string,
-    marketAddress: string,
-    tokens: string
-  ) {
-    await ocean.datatokens.approve(
-      tokenAddress,
-      marketAddress,
-      tokens,
-      accountId
-    )
-  }
-
   return {
     publish,
     mint,
-    giveMarketAllowance,
     publishStep,
     publishStepText,
     isLoading,

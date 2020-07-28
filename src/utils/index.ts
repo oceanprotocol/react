@@ -20,9 +20,8 @@ export const feedback: { [key in number]: string } = {
 }
 
 export const publishFeedback: { [key in number]: string } = {
-  0: '1/5 Creating datatoken ...',
-  1: '2/5 Minting tokens ...',
-  2: '3/5 Giving allowance to market to sell your tokens ...',
-  3: '4/5 Publishing asset ...',
-  4: '5/5 Asset published succesfully'
+  0: '1/4 Creating datatoken ...',
+  1: '2/4 Minting tokens ...',
+  3: '3/4 Publishing asset ...',
+  4: '4/4 Asset published succesfully'
 }
