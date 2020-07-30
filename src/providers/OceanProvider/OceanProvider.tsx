@@ -85,41 +85,45 @@ function OceanProvider({
   }, [web3Modal])
 
   async function connect() {
-    Logger.log('Connecting ...')
+    try {
+      Logger.log('Connecting ...')
 
-    const provider = await web3Modal.connect()
-    setWeb3Provider(provider)
+      const provider = await web3Modal.connect()
+      setWeb3Provider(provider)
 
-    const web3 = new Web3(provider)
-    setWeb3(web3)
-    Logger.log('Web3 created.', web3)
+      const web3 = new Web3(provider)
+      setWeb3(web3)
+      Logger.log('Web3 created.', web3)
 
-    const chainId = web3 && (await web3.eth.getChainId())
-    setChainId(chainId)
-    Logger.log('chain id ', chainId)
+      const chainId = web3 && (await web3.eth.getChainId())
+      setChainId(chainId)
+      Logger.log('chain id ', chainId)
 
-    config.web3Provider = web3
-    const ocean = await Ocean.getInstance(config)
-    setOcean(ocean)
-    Logger.log('Ocean instance created.', ocean)
+      config.web3Provider = web3
+      const ocean = await Ocean.getInstance(config)
+      setOcean(ocean)
+      Logger.log('Ocean instance created.', ocean)
 
-    setStatus(ProviderStatus.CONNECTED)
+      setStatus(ProviderStatus.CONNECTED)
 
-    const account = (await ocean.accounts.list())[0]
-    setAccount(account)
-    Logger.log('Account ', account)
+      const account = (await ocean.accounts.list())[0]
+      setAccount(account)
+      Logger.log('Account ', account)
 
-    const accountId = await getAccountId(web3)
-    setAccountId(accountId)
-    Logger.log('account id', accountId)
+      const accountId = await getAccountId(web3)
+      setAccountId(accountId)
+      Logger.log('account id', accountId)
 
-    const balance = await getBalance(account)
-    setBalance(balance)
-    Logger.log('balance', JSON.stringify(balance))
+      const balance = await getBalance(account)
+      setBalance(balance)
+      Logger.log('balance', JSON.stringify(balance))
+    } catch (error) {
+      Logger.error(error)
+    }
   }
 
   async function logout() {
-    // ToDo check how is the proper way to logout
+    // TODO: check how is the proper way to logout
     web3Modal.clearCachedProvider()
   }
 
@@ -127,18 +131,18 @@ function OceanProvider({
   // Listen for provider, account & network changes
   // and react to it
   //
-  const handleConnect = async (provider: any) => {
-    Logger.debug("Handling 'connect' event with payload", provider)
-  }
+
+  // const handleConnect = async (provider: any) => {
+  //   Logger.debug("Handling 'connect' event with payload", provider)
+  // }
 
   const handleAccountsChanged = async (accounts: string[]) => {
-    console.debug("Handling 'accountsChanged' event with payload", accounts)
+    Logger.debug("Handling 'accountsChanged' event with payload", accounts)
     connect()
   }
 
-  // ToDo need to handle this, it's not implemented, need to update chainId and reinitialize ocean lib
   const handleNetworkChanged = async (networkId: string | number) => {
-    console.debug(
+    Logger.debug(
       "Handling 'networkChanged' event with payload",
       networkId,
       status
@@ -146,8 +150,10 @@ function OceanProvider({
     connect()
   }
 
+  // TODO: Refetch balance periodically, or figure out some event to subscribe to
+
   useEffect(() => {
-    web3Modal && web3Modal.on('connect', handleConnect)
+    // web3Modal && web3Modal.on('connect', handleConnect)
 
     if (web3Provider !== undefined && web3Provider !== null) {
       web3Provider.on('accountsChanged', handleAccountsChanged)
