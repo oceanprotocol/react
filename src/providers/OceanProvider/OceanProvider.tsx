@@ -10,7 +10,7 @@ import ProviderStatus from './ProviderStatus'
 import { Ocean, Logger, Account, Config } from '@oceanprotocol/lib'
 import Web3Modal, { ICoreOptions } from 'web3modal'
 import { getDefaultProviders } from './getDefaultProviders'
-import { getAccountId, getBalance } from '../..'
+import { getAccountId, getBalance } from '../../utils'
 
 interface Balance {
   eth: string | undefined
