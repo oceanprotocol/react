@@ -18,7 +18,7 @@ import { OceanProvider, Config } from '@oceanprotocol/react'
 
 const config: Config = {
   nodeUri: '',
-  aquariusUri: '',
+  metadataStoreUri: '',
   ...
 }
 
@@ -27,43 +27,11 @@ export default function MyApp({
 }: {
   children: ReactNode
 }): ReactNode {
-  const web3 = await getWeb3()
-
   return (
-    <OceanProvider config={config} web3={web3}>
+    <OceanProvider config={config} web3ModalOpts={web3ModalOpts}>
         <h1>My App</h1>
         {children}
     </OceanProvider>
-  )
-}
-```
-
-The `OceanProvider` requires a Web3 instance to be passed as prop so you can either handle this with your own `getWeb3()`, or use the basic [`Web3Provider`](../Web3Provider):
-
-```tsx
-import React, { ReactNode } from 'react'
-import { Web3Provider, OceanProvider, Config } from '@oceanprotocol/react'
-
-const config: Config = {
-  nodeUri: '',
-  aquariusUri: '',
-  ...
-}
-
-export default function MyApp({
-  children
-}: {
-  children: ReactNode
-}): ReactNode {
-  return (
-    <Web3Provider>
-      {({ web3 }) => (
-        <OceanProvider config={config} web3={web3}>
-          <h1>My App</h1>
-          {children}
-        </OceanProvider>
-      )}
-    </Web3Provider>
   )
 }
 ```
@@ -74,12 +42,12 @@ You can then access the provider context values with the `useOcean` hook:
 import { useOcean } from '@oceanprotocol/react'
 
 function MyComponent() {
-  const { ocean, account } = useOcean()
+  const { ocean, accountId } = useOcean()
 
   return (
     <ul>
       <li>Ocean available: {`${Boolean(ocean)}`}</li>
-      <li>Account: {account}</li>
+      <li>Account: {accountId}</li>
     </ul>
   )
 }
