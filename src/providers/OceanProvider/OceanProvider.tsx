@@ -75,11 +75,11 @@ function OceanProvider({
       opts = await getDefaultProviders()
     }
 
-    const instance = new Web3Modal(opts)
+    const instance = web3Modal || new Web3Modal(opts)
     setWeb3Modal(instance)
     Logger.log('Web3Modal instance created.', instance)
 
-    const provider = await instance.connect()
+    const provider = web3Provider || (await instance.connect())
     setWeb3Provider(provider)
 
     const web3 = new Web3(provider)
@@ -137,16 +137,8 @@ function OceanProvider({
 
   const handleAccountsChanged = async (accounts: string[]) => {
     console.debug("Handling 'accountsChanged' event with payload", accounts)
-    if (status === ProviderStatus.CONNECTED) {
-      connect(web3ModalOpts)
-    }
-    // if (accounts.length > 0) {
-    //   setAccountId(accounts[0])
-
-    //   if (web3) {
-    //     const balance = await getBalance(web3, accounts[0])
-    //     setBalance(balance)
-    //   }
+    // if (status === ProviderStatus.CONNECTED) {
+    connect(web3ModalOpts)
     // }
   }
 
@@ -157,9 +149,9 @@ function OceanProvider({
       networkId,
       status
     )
-    if (status === ProviderStatus.CONNECTED) {
-      connect(web3ModalOpts)
-    }
+    // if (status === ProviderStatus.CONNECTED) {
+    connect(web3ModalOpts)
+    // }
   }
 
   useEffect(() => {
