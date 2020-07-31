@@ -143,7 +143,7 @@ function OceanProvider({
 
   const handleNetworkChanged = async (networkId: string | number) => {
     Logger.debug(
-      "Handling 'networkChanged' event with payload",
+      "Handling 'chainChanged' event with payload",
       networkId,
       status
     )
@@ -157,11 +157,11 @@ function OceanProvider({
 
     if (web3Provider !== undefined && web3Provider !== null) {
       web3Provider.on('accountsChanged', handleAccountsChanged)
-      web3Provider.on('networkChanged', handleNetworkChanged)
+      web3Provider.on('chainChanged', handleNetworkChanged)
 
       return () => {
         web3Provider.removeListener('accountsChanged', handleAccountsChanged)
-        web3Provider.removeListener('networkChanged', handleNetworkChanged)
+        web3Provider.removeListener('chainChanged', handleNetworkChanged)
       }
     }
   }, [web3Modal, web3Provider])
