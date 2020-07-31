@@ -123,7 +123,7 @@ function OceanProvider({
   }
 
   async function logout() {
-    // TODO: check how is the proper way to logout
+    // TODO: #67 check how is the proper way to logout
     web3Modal.clearCachedProvider()
   }
 
@@ -150,7 +150,7 @@ function OceanProvider({
     connect()
   }
 
-  // TODO: Refetch balance periodically, or figure out some event to subscribe to
+  // TODO: #68 Refetch balance periodically, or figure out some event to subscribe to
 
   useEffect(() => {
     // web3Modal && web3Modal.on('connect', handleConnect)
