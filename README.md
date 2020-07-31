@@ -15,16 +15,16 @@
 
 ![iu](https://user-images.githubusercontent.com/90316/80356686-1650c080-887a-11ea-854e-bdc2bbdb0c20.jpeg)
 
-**WE ARE IN HARDWARE MODE. This project is in a conceptual phase and most stuff does not work yet.**
+**WE ARE IN HARDWARE MODE. This project is in a conceptual phase and most stuff changes weekly. More importantly, it only works against bleeding edge v3 components of Ocean Protocol which are not completely public yet.**
 
 ---
 
 **Table of Contents**
 
 - [🏗 Installation](#-installation)
-- [🏄 Usage](#-usage)
-  - [1. Providers](#1-providers)
-  - [2. Hooks](#2-hooks)
+- [🏄 Quick Start](#-quick-start)
+  - [1. Add Provider](#1-add-provider)
+  - [2. Use Hooks](#2-use-hooks)
 - [🦑 Development](#-development)
 - [✨ Code Style](#-code-style)
 - [👩‍🔬 Testing](#-testing)
@@ -43,62 +43,25 @@
 npm install @oceanprotocol/react
 ```
 
-## 🏄 Usage
+## 🏄 Quick Start
 
-First, wrap your whole app with the [`Web3Provider`](src/providers/Web3Provider) and the [`OceanProvider`](src/providers/OceanProvider).
+### 1. Add Provider
 
-### 1. Providers
+First, wrap your whole app with the [`<OceanProvider />`](src/providers/OceanProvider).
 
-```tsx
-import React, { ReactNode } from 'react'
-import { Web3Provider, OceanProvider, Config } from '@oceanprotocol/react'
-
-const config: Config = {
-  nodeUri: '',
-  aquariusUri: '',
-  ...
-}
-
-export default function MyApp({
-  children
-}: {
-  children: ReactNode
-}): ReactNode {
-  return (
-    <Web3Provider>
-        <OceanProvider config={config}>
-          <h1>My App</h1>
-          {children}
-        </OceanProvider>
-      )}
-    </Web3Provider>
-  )
-}
-```
-
-The `OceanProvider` requires a Web3 instance to be passed as prop so you can replace the basic [`Web3Provider`](src/providers/Web3Provider) with whatever component/library/provider returning a Web3 instance.
-
-### 2. Hooks
+### 2. Use Hooks
 
 Then within your component use the included hooks to interact with Ocean's functionality. Each hook can be used independently:
 
 ```tsx
 import React from 'react'
-import {
-  useWeb3,
-  useOcean,
-  useMetadata,
-  useConsume
-} from '@oceanprotocol/react'
+import { useOcean, useMetadata, useConsume } from '@oceanprotocol/react'
 
 const did = 'did:op:0x000000000'
 
 export default function MyComponent() {
-  // Get web3 from built-in Web3Provider context
-  const { web3 } = useWeb3()
-
   // Get Ocean instance from built-in OceanProvider context
-  const { ocean, account } = useOcean()
+  const { ocean, web3, account } = useOcean()
 
   // Get metadata for this asset
   const { title, metadata } = useMetadata(did)

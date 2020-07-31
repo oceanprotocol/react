@@ -5,22 +5,19 @@
   "dependencies": {
     "-": "0.0.1",
     "@oceanprotocol/react": "file:../",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.5.0",
-    "@testing-library/user-event": "^7.2.1",
-    "@toruslabs/torus-embed": "^1.7.3",
+    "@toruslabs/torus-embed": "^1.8.2",
     "@types/jest": "^24.9.1",
     "@types/node": "^12.12.47",
     "@types/react": "^16.9.41",
     "@types/react-dom": "^16.9.8",
-    "@types/shortid": "0.0.29",
-    "@walletconnect/web3-provider": "^1.0.14",
+    "@types/shortid": "^0.0.29",
+    "@walletconnect/web3-provider": "^1.1.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
     "shortid": "^2.2.15",
-    "typescript": "^3.7.5",
-    "web3-eth-contract": "^1.2.9"
+    "typescript": "^3.9.7",
+    "web3-eth-contract": "^1.2.11"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -31,16 +28,10 @@
   "eslintConfig": {
     "extends": "react-app"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }

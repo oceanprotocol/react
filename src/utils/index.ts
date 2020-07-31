@@ -25,3 +25,5 @@ export const publishFeedback: { [key in number]: string } = {
   3: '3/4 Publishing asset ...',
   4: '4/4 Asset published succesfully'
 }
+
+export * from './web3'
