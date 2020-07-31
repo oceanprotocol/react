@@ -3,29 +3,19 @@ import { useOcean } from '@oceanprotocol/react'
 import { useEffect } from 'react'
 
 export function Wallet() {
-  const { web3, ocean, connect, logout, accountId } = useOcean()
-  const conn = async () => {
-    const { default: WalletConnectProvider } = await import(
-      '@walletconnect/web3-provider'
-    )
-    const providerOptions = {
-      /* See Provider Options Section */
-      walletconnect: {
-        package: WalletConnectProvider, // required
-        options: {
-          infuraId: 'INFURA_ID' // required
-        }
-      }
-    }
+  const { ocean, connect, logout, accountId } = useOcean()
 
-    await connect({ cacheProvider: true, providerOptions })
+  const conn = async () => {
+    await connect()
   }
+
   const init = async () => {
     if (ocean === undefined || accountId === undefined) return
 
     const assets = await ocean.assets.ownerAssets(accountId)
     console.log(assets)
   }
+
   useEffect(() => {
     init()
   }, [ocean, accountId])
@@ -34,6 +24,7 @@ export function Wallet() {
     await logout()
     await conn()
   }
+
   return (
     <>
       <div>wallet</div>
