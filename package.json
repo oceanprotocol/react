@@ -25,7 +25,7 @@
     "dist/"
   ],
   "dependencies": {
-    "@oceanprotocol/lib": "^0.1.9",
+    "@oceanprotocol/lib": "^0.1.10",
     "axios": "^0.19.2",
     "react": "^16.9.41",
     "web3": "^1.2.11",

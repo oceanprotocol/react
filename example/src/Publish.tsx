@@ -1,10 +1,11 @@
 import React from 'react'
 import { useOcean, usePublish } from '@oceanprotocol/react'
-import { Metadata, DDO } from '@oceanprotocol/lib'
+import {  DDO } from '@oceanprotocol/lib'
 import { useState } from 'react'
+import { Metadata } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Metadata'
 
 export function Publish() {
-  const { accountId } = useOcean()
+  const { accountId,ocean } = useOcean()
   const { publish, publishStepText } = usePublish()
   const [ddo, setDdo] = useState<DDO | undefined>()
 
@@ -29,14 +30,13 @@ export function Publish() {
     }
   }
 
-  const marketAddress = '0x4D156A2ef69ffdDC55838176C6712C90f60a2285'
-
   const publishAsset = async () => {
-    const ddo = await publish(asset as Metadata, '4', marketAddress, [
+    const ddo = await publish(asset as Metadata, '90', [
       { serviceType: 'access', cost: '1' },
       { serviceType: 'compute', cost: '1' }
     ])
     console.log(ddo)
+    const pool = ocean.pool.createDTPool(accountId,ddo.dataToken,'90','9','0.03')
     setDdo(ddo)
   }
   return (

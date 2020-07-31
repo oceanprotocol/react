@@ -53,7 +53,7 @@ function usePublish(): UsePublish {
     setIsLoading(true)
     setPublishError(undefined)
     try {
-      if (dtAddress) {
+      if (!dtAddress) {
         setStep(0)
         const data = { t: 1, url: config.metadataStoreUri }
         const blob = JSON.stringify(data)
@@ -152,6 +152,11 @@ function usePublish(): UsePublish {
   async function mint(tokenAddress: string, tokensToMint: string) {
     Logger.log('mint function', tokenAddress, accountId)
     await ocean.datatokens.mint(tokenAddress, accountId, tokensToMint)
+  }
+
+  async function createBalancerPool()
+  {
+    ocean
   }
 
   return {

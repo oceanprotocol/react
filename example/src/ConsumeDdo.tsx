@@ -10,6 +10,7 @@ import { Metadata, DDO } from '@oceanprotocol/lib'
 import { useState } from 'react'
 import { useEffect } from 'react'
 
+
 export function ConsumeDdo() {
   const { accountId, ocean } = useOcean()
   const { consumeStepText, consume, consumeError } = useConsume()
@@ -26,6 +27,7 @@ export function ConsumeDdo() {
 
     await consume(did, ddo.dataToken, 'access')
   }
+
 
   const computeDid = async () => {
     if (did === undefined) return
