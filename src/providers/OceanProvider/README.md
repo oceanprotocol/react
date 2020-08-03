@@ -2,11 +2,11 @@
 
 The `OceanProvider` maintains a connection to the Ocean Protocol network in multiple steps:
 
-1. On mount, connect to Aquarius instance right away so any asset metadata can be retrieved before, and independent of any Web3 connections.
-2. Once Web3 becomes available, a connection to all Ocean Protocol network components is established.
-3. Once Ocean becomes available, spits out some info about it.
+1. On mount, setup [Web3Modal](https://github.com/Web3Modal/).
+2. Once connection with Web3Modal is started, Web3 becomes available.
+3. Once Web3 becomes available, connection to Ocean Protocol components are initiated, all available under the `ocean` object.
 
-Also provides a `useOcean` helper hook to access its context values from any component.
+With the included `useOcean` helper hook you can access all context values from any component.
 
 ## Usage
 
@@ -18,8 +18,14 @@ import { OceanProvider, Config } from '@oceanprotocol/react'
 
 const config: Config = {
   nodeUri: '',
-  aquariusUri: '',
+  metadataStoreUri: '',
   ...
+}
+
+const web3ModalOpts = {
+  network: 'mainnet', // optional
+  cacheProvider: true, // optional
+  providerOptions // required
 }
 
 export default function MyApp({
@@ -27,10 +33,8 @@ export default function MyApp({
 }: {
   children: ReactNode
 }): ReactNode {
-  const web3 = await getWeb3()
-
   return (
-    <OceanProvider config={config} web3={web3}>
+    <OceanProvider config={config} web3ModalOpts={web3ModalOpts}>
         <h1>My App</h1>
         {children}
     </OceanProvider>
@@ -38,35 +42,7 @@ export default function MyApp({
 }
 ```
 
-The `OceanProvider` requires a Web3 instance to be passed as prop so you can either handle this with your own `getWeb3()`, or use the basic [`Web3Provider`](../Web3Provider):
-
-```tsx
-import React, { ReactNode } from 'react'
-import { Web3Provider, OceanProvider, Config } from '@oceanprotocol/react'
-
-const config: Config = {
-  nodeUri: '',
-  aquariusUri: '',
-  ...
-}
-
-export default function MyApp({
-  children
-}: {
-  children: ReactNode
-}): ReactNode {
-  return (
-    <Web3Provider>
-      {({ web3 }) => (
-        <OceanProvider config={config} web3={web3}>
-          <h1>My App</h1>
-          {children}
-        </OceanProvider>
-      )}
-    </Web3Provider>
-  )
-}
-```
+The `OceanProvider` uses [Web3Modal](https://github.com/Web3Modal/) to make its initial wallet connection. If you do not pass `web3ModalOpts` as a prop, only the default injected provider will be available. Adding more providers requires you to add them as dependencies to your project and pass them as `providerOptions`. See all the available [Provider Options](https://github.com/Web3Modal/web3modal#provider-options).
 
 You can then access the provider context values with the `useOcean` hook:
 
@@ -74,12 +50,12 @@ You can then access the provider context values with the `useOcean` hook:
 import { useOcean } from '@oceanprotocol/react'
 
 function MyComponent() {
-  const { ocean, account } = useOcean()
+  const { ocean, accountId } = useOcean()
 
   return (
     <ul>
       <li>Ocean available: {`${Boolean(ocean)}`}</li>
-      <li>Account: {account}</li>
+      <li>Account: {accountId}</li>
     </ul>
   )
 }

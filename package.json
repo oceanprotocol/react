@@ -1,6 +1,6 @@
 {
   "name": "@oceanprotocol/react",
-  "version": "0.0.28",
+  "version": "0.0.30",
   "description": "React hooks & components on top of @oceanprotocol/lib",
   "main": "dist/index.js",
   "umd:main": "dist/index.umd.js",
@@ -27,24 +27,23 @@
   "dependencies": {
     "@oceanprotocol/lib": "^0.1.10",
     "axios": "^0.19.2",
-    "react": "^16.9.41",
     "web3": "^1.2.11",
-    "web3modal": "^1.8.0"
+    "web3modal": "^1.9.0"
   },
   "devDependencies": {
-    "@release-it/bumper": "^1.4.0",
-    "@types/react": "^16.9.41",
-    "@typescript-eslint/eslint-plugin": "^3.7.0",
-    "@typescript-eslint/parser": "^3.7.0",
+    "@release-it/bumper": "^1.4.1",
+    "@types/react": "^16.9.43",
+    "@typescript-eslint/eslint-plugin": "^3.7.1",
+    "@typescript-eslint/parser": "^3.7.1",
     "auto-changelog": "^2.2.0",
     "eslint": "^7.5.0",
     "eslint-config-oceanprotocol": "^1.5.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-prettier": "^3.1.4",
-    "eslint-plugin-react": "^7.20.3",
+    "eslint-plugin-react": "^7.20.5",
     "microbundle": "^0.12.3",
     "prettier": "^2.0.5",
-    "release-it": "^13.6.4",
+    "release-it": "^13.6.6",
     "typescript": "^3.9.7"
   },
   "peerDependencies": {
