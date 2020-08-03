@@ -53,7 +53,12 @@ function useConsume(): UseConsume {
 
     return { poolAddress:cheapestPoolAddress, poolPrice: cheapestPoolPrice.toString()}
 
+  }
 
+  async function getBestDataTokenPrice(dataTokenAddress:string): Promise<string>{
+    const bestPool = await getCheapestPool(dataTokenAddress)
+
+    return bestPool.poolPrice
   }
   async function consume(
     did: string,
