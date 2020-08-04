@@ -31,10 +31,7 @@ export function Publish() {
   }
 
   const publishAsset = async () => {
-    const ddo = await publish(asset as Metadata, '90', [
-      { serviceType: 'access', cost: '1' },
-      { serviceType: 'compute', cost: '1' }
-    ])
+    const ddo = await publish(asset as Metadata, '90','access','','')
     console.log(ddo)
     const pool = ocean.pool.createDTPool(accountId,ddo.dataToken,'90','9','0.03')
     setDdo(ddo)

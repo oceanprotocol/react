@@ -5,6 +5,7 @@ import { feedback } from './../../utils'
 import { DID, Logger } from '@oceanprotocol/lib'
 import { MetadataAlgorithm } from '@oceanprotocol/lib/dist/node/ddo/interfaces/MetadataAlgorithm'
 import { ComputeJob } from '@oceanprotocol/lib/dist/node/ocean/interfaces/ComputeJob'
+import { checkAndBuyDT } from '../../utils/dtUtils'
 
 interface UseCompute {
   compute: (
@@ -63,6 +64,8 @@ function useCompute(): UseCompute {
     try {
       setIsLoading(true)
       setStep(0)
+
+      await checkAndBuyDT(ocean,dataTokenAddress, account)
       rawAlgorithmMeta.container = computeContainer
       rawAlgorithmMeta.rawcode = algorithmRawCode
 

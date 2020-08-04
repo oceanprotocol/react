@@ -4,7 +4,8 @@ import { useOcean } from '../../providers'
 import ProviderStatus from '../../providers/OceanProvider/ProviderStatus'
 import {
   Service,
-  ServiceComputePrivacy
+  ServiceComputePrivacy,
+  ServiceType
 } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Service'
 import { ServiceConfig } from './ServiceConfig'
 import { publishFeedback } from '../../utils'
@@ -13,8 +14,9 @@ interface UsePublish {
   publish: (
     asset: Metadata,
     tokensToMint: string,
-    serviceConfigs: ServiceConfig[],
-    dtAddress?: string
+    serviceConfigs: ServiceType,
+    mpAddress: string,
+    mpFee: string
   ) => Promise<DDO>
   mint: (tokenAddress: string, tokensToMint: string) => void
   publishStep?: number
@@ -24,7 +26,7 @@ interface UsePublish {
 }
 
 function usePublish(): UsePublish {
-  const { web3, ocean, status, account, accountId, config } = useOcean()
+  const {  ocean, status, account, accountId, config } = useOcean()
   const [isLoading, setIsLoading] = useState(false)
   const [publishStep, setPublishStep] = useState<number | undefined>()
   const [publishStepText, setPublishStepText] = useState<string | undefined>()
@@ -40,26 +42,26 @@ function usePublish(): UsePublish {
    * @param  {Metadata} asset The metadata of the asset.
    * @param  {string} tokensToMint Numer of tokens to mint and give allowance to market
    * @param  {ServiceConfig[]} serviceConfigs Desired services of the asset, ex: [{serviceType: 'access', cost:'1'}]
-   * @param  {string} dtAddress The address of the market
+   * @param  {string} mpAddress The address of the market
+   * @param  {string} mpFee The fee of the market
    * @return {Promise<DDO>} Returns the newly published ddo
    */
   async function publish(
     asset: Metadata,
     tokensToMint: string,
-    serviceConfigs: ServiceConfig[],
-    dtAddress?: string
+    serviceType: ServiceType,
+    mpAddress: string,
+    mpFee: string
   ): Promise<DDO> {
     if (status !== ProviderStatus.CONNECTED || !ocean || !account) return
     setIsLoading(true)
     setPublishError(undefined)
     try {
-      if (!dtAddress) {
-        setStep(0)
-        const data = { t: 1, url: config.metadataStoreUri }
-        const blob = JSON.stringify(data)
-        dtAddress = await ocean.datatokens.create(blob, accountId)
-        Logger.log('datatoken created', dtAddress)
-      }
+      setStep(0)
+      const data = { t: 1, url: config.metadataStoreUri }
+      const blob = JSON.stringify(data)
+      const dtAddress = await ocean.datatokens.create(blob, accountId)
+      Logger.log('datatoken created', dtAddress)
 
       setStep(1)
       await mint(dtAddress, tokensToMint)
@@ -71,68 +73,68 @@ function usePublish(): UsePublish {
       const timeout = 0
       const services: Service[] = []
 
-      serviceConfigs.forEach(async (serviceConfig) => {
-        const price = ocean.datatokens.toWei(serviceConfig.cost)
-        switch (serviceConfig.serviceType) {
-          case 'access': {
-            const accessService = await ocean.assets.createAccessServiceAttributes(
-              account,
-              price,
-              publishedDate,
+
+      const price = ocean.datatokens.toWei('1')
+      switch (serviceType) {
+        case 'access': {
+          const accessService = await ocean.assets.createAccessServiceAttributes(
+            account,
+            price,
+            publishedDate,
+            timeout
+          )
+          Logger.log('access service created', accessService)
+          services.push(accessService)
+          break
+        }
+        case 'compute': {
+          const cluster = ocean.compute.createClusterAttributes(
+            'Kubernetes',
+            'http://10.0.0.17/xxx'
+          )
+          const servers = [
+            ocean.compute.createServerAttributes(
+              '1',
+              'xlsize',
+              '50',
+              '16',
+              '0',
+              '128gb',
+              '160gb',
               timeout
             )
-            Logger.log('access service created', accessService)
-            services.push(accessService)
-            break
+          ]
+          const containers = [
+            ocean.compute.createContainerAttributes(
+              'tensorflow/tensorflow',
+              'latest',
+              'sha256:cb57ecfa6ebbefd8ffc7f75c0f00e57a7fa739578a429b6f72a0df19315deadc'
+            )
+          ]
+          const provider = ocean.compute.createProviderAttributes(
+            'Azure',
+            'Compute service with 16gb ram for each node.',
+            cluster,
+            containers,
+            servers
+          )
+          const origComputePrivacy = {
+            allowRawAlgorithm: true,
+            allowNetworkAccess: false,
+            trustedAlgorithms: []
           }
-          case 'compute': {
-            const cluster = ocean.compute.createClusterAttributes(
-              'Kubernetes',
-              'http://10.0.0.17/xxx'
-            )
-            const servers = [
-              ocean.compute.createServerAttributes(
-                '1',
-                'xlsize',
-                '50',
-                '16',
-                '0',
-                '128gb',
-                '160gb',
-                timeout
-              )
-            ]
-            const containers = [
-              ocean.compute.createContainerAttributes(
-                'tensorflow/tensorflow',
-                'latest',
-                'sha256:cb57ecfa6ebbefd8ffc7f75c0f00e57a7fa739578a429b6f72a0df19315deadc'
-              )
-            ]
-            const provider = ocean.compute.createProviderAttributes(
-              'Azure',
-              'Compute service with 16gb ram for each node.',
-              cluster,
-              containers,
-              servers
-            )
-            const origComputePrivacy = {
-              allowRawAlgorithm: true,
-              allowNetworkAccess: false,
-              trustedAlgorithms: []
-            }
-            const computeService = ocean.compute.createComputeService(
-              account,
-              price,
-              publishedDate,
-              provider,
-              origComputePrivacy as ServiceComputePrivacy
-            )
-            services.push(computeService)
-            break
-          }
+          const computeService = ocean.compute.createComputeService(
+            account,
+            price,
+            publishedDate,
+            provider,
+            origComputePrivacy as ServiceComputePrivacy
+          )
+          services.push(computeService)
+          break
         }
-      })
+      }
+
       Logger.log('services created', services)
       setStep(3)
       const ddo = await ocean.assets.create(asset, account, services, dtAddress)
@@ -154,8 +156,7 @@ function usePublish(): UsePublish {
     await ocean.datatokens.mint(tokenAddress, accountId, tokensToMint)
   }
 
-  async function createBalancerPool()
-  {
+  async function createBalancerPool() {
     ocean
   }
 
