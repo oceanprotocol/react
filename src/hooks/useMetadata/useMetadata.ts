@@ -1,11 +1,5 @@
 import { useState, useEffect } from 'react'
-import {
-  DID,
-  DDO,
-  Metadata,
-  MetadataStore,
-  Logger,
-} from '@oceanprotocol/lib'
+import { DID, DDO, Metadata, MetadataStore, Logger } from '@oceanprotocol/lib'
 import { useOcean } from '../../providers'
 import ProviderStatus from '../../providers/OceanProvider/ProviderStatus'
 import { getBestDataTokenPrice } from '../../utils/dtUtils'
@@ -38,7 +32,7 @@ function useMetadata(did?: DID | string): UseMetadata {
     return ddo
   }
 
-  async function getBestPrice(dataTokenAddress:string): Promise<string> {
+  async function getBestPrice(dataTokenAddress: string): Promise<string> {
     return await getBestDataTokenPrice(ocean, accountId, dataTokenAddress)
   }
 

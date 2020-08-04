@@ -2,8 +2,7 @@ import { useState } from 'react'
 import { useOcean } from '../../providers'
 import { feedback } from '../../utils'
 import { DID, Logger, ServiceType } from '@oceanprotocol/lib'
-import { getCheapestPool, checkAndBuyDT } from '../../utils/dtUtils'
-const Decimal = require('decimal.js')
+import { checkAndBuyDT } from '../../utils/dtUtils'
 interface UseConsume {
   consume: (
     did: DID | string,
@@ -46,10 +45,8 @@ function useConsume(): UseConsume {
     setConsumeError(undefined)
 
     try {
-
       setStep(0)
-      await checkAndBuyDT(ocean,dataTokenAddress, account)
-
+      await checkAndBuyDT(ocean, dataTokenAddress, account)
 
       setStep(1)
       const order = await ocean.assets.order(did, serviceType, accountId)

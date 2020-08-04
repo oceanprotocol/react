@@ -26,7 +26,7 @@ interface UsePublish {
 }
 
 function usePublish(): UsePublish {
-  const {  ocean, status, account, accountId, config } = useOcean()
+  const { ocean, status, account, accountId, config } = useOcean()
   const [isLoading, setIsLoading] = useState(false)
   const [publishStep, setPublishStep] = useState<number | undefined>()
   const [publishStepText, setPublishStepText] = useState<string | undefined>()
@@ -72,7 +72,6 @@ function usePublish(): UsePublish {
         new Date(Date.now()).toISOString().split('.')[0] + 'Z'
       const timeout = 0
       const services: Service[] = []
-
 
       const price = ocean.datatokens.toWei('1')
       switch (serviceType) {
@@ -154,10 +153,6 @@ function usePublish(): UsePublish {
   async function mint(tokenAddress: string, tokensToMint: string) {
     Logger.log('mint function', tokenAddress, accountId)
     await ocean.datatokens.mint(tokenAddress, accountId, tokensToMint)
-  }
-
-  async function createBalancerPool() {
-    ocean
   }
 
   return {

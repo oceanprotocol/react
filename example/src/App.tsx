@@ -52,24 +52,24 @@ function App() {
   }, [])
 
   return (
-      <OceanProvider config={configRinkeby} web3ModalOpts={web3ModalOpts}>
-        <div className="container">
-          <div>
-            <Wallet />
-          </div>
-          <div>
-            <AllDdos />
-          </div>
-
-          <div>
-            <Publish />
-          </div>
-
-          <div>
-            <ConsumeDdo />
-          </div>
+    <OceanProvider config={configRinkeby} web3ModalOpts={web3ModalOpts}>
+      <div className="container">
+        <div>
+          <Wallet />
         </div>
-      </OceanProvider>
+        <div>
+          <AllDdos />
+        </div>
+
+        <div>
+          <Publish />
+        </div>
+
+        <div>
+          <ConsumeDdo />
+        </div>
+      </div>
+    </OceanProvider>
   )
 }
 

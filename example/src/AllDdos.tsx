@@ -5,14 +5,13 @@ import { useState } from 'react'
 import { useEffect } from 'react'
 import shortid from 'shortid'
 export function AllDdos() {
-  const { accountId,account, ocean } = useOcean()
+  const { accountId, account, ocean } = useOcean()
 
   const [ddos, setDdos] = useState<DDO[] | undefined>()
 
   useEffect(() => {
     async function init() {
       if (ocean === undefined || account === undefined) return
-
 
       const assets = await ocean.assets.query({
         page: 1,
@@ -24,7 +23,7 @@ export function AllDdos() {
       setDdos(assets.results)
     }
     init()
-  }, [ocean,account])
+  }, [ocean, account])
 
   return (
     <>
