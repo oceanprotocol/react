@@ -1,5 +1,5 @@
 import { Logger, Ocean, Account } from '@oceanprotocol/lib'
-const Decimal = await require('decimal.js')
+import { Decimal } from 'decimal.js'
 export async function getCheapestPool(
   ocean: Ocean,
   accountId: string,
@@ -11,7 +11,7 @@ export async function getCheapestPool(
   )
   Logger.log('DT Pool found', tokenPools)
   let cheapestPoolAddress
-  let cheapestPoolPrice = 999999
+  let cheapestPoolPrice = new Decimal(999999999999)
 
   if (tokenPools) {
     for (let i = 0; i < tokenPools.length; i++) {
@@ -20,9 +20,10 @@ export async function getCheapestPool(
         tokenPools[i],
         '1'
       )
+      const decimalPoolPrice = new Decimal(poolPrice)
       Logger.log('Pool price ', tokenPools[i], poolPrice)
-      if (Decimal(poolPrice) < cheapestPoolPrice) {
-        cheapestPoolPrice = Decimal(poolPrice)
+      if (decimalPoolPrice < cheapestPoolPrice) {
+        cheapestPoolPrice = decimalPoolPrice
         cheapestPoolAddress = tokenPools[i]
       }
     }
