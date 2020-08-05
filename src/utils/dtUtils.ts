@@ -10,6 +10,12 @@ export async function getCheapestPool(
     dataTokenAddress
   )
   Logger.log('DT Pool found', tokenPools)
+  if(tokenPools===undefined || tokenPools.length===0){
+    return {
+      poolAddress: '',
+      poolPrice: '0'
+    }
+  }
   let cheapestPoolAddress
   let cheapestPoolPrice = new Decimal(999999999999)
 
