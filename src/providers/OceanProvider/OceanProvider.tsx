@@ -30,6 +30,7 @@ interface OceanProviderValue {
   status: ProviderStatus
   connect: (opts?: Partial<ICoreOptions>) => Promise<void>
   logout: () => Promise<void>
+  refreshBalance: () => Promise<void>
 }
 
 const OceanContext = createContext(null)
@@ -121,7 +122,10 @@ function OceanProvider({
       Logger.error(error)
     }
   }
-
+  async function refreshBalance() {
+    const balance = await getBalance(account)
+    setBalance(balance)
+  }
   async function logout() {
     // TODO: #67 check how is the proper way to logout
     web3Modal.clearCachedProvider()
@@ -181,7 +185,8 @@ function OceanProvider({
           status,
           config,
           connect,
-          logout
+          logout,
+          refreshBalance
         } as OceanProviderValue
       }
     >

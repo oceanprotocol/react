@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useOcean } from '../../providers'
 import { feedback } from '../../utils'
 import { DID, Logger, ServiceType } from '@oceanprotocol/lib'
-
+import { checkAndBuyDT } from '../../utils/dtUtils'
 interface UseConsume {
   consume: (
     did: DID | string,
@@ -34,17 +34,20 @@ function useConsume(): UseConsume {
     setConsumeStep(index)
     setConsumeStepText(consumeFeedback[index])
   }
+
   async function consume(
     did: string,
     dataTokenAddress: string,
     serviceType: ServiceType = 'access'
   ): Promise<void> {
-    if (!ocean || !account) return
+    if (!ocean || !account || !accountId) return
     setIsLoading(true)
     setConsumeError(undefined)
 
     try {
       setStep(0)
+      await checkAndBuyDT(ocean, dataTokenAddress, account)
+
       setStep(1)
       const order = await ocean.assets.order(did, serviceType, accountId)
       Logger.log('order created', order)

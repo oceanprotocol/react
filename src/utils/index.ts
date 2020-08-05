@@ -14,9 +14,9 @@ export function readFileContent(file: File): Promise<string> {
 
 export const feedback: { [key in number]: string } = {
   99: 'Decrypting file URL...',
-  0: '1/3 Ordering asset...',
-  1: '1/3 Transfering data token.',
-  2: '2/3 Payment confirmed. Requesting access...'
+  0: '1/3 Looking for data token. Buying if none found...',
+  1: '2/3 Transfering data token.',
+  2: '3/3 Payment confirmed. Requesting access...'
 }
 
 export const publishFeedback: { [key in number]: string } = {

@@ -1,14 +1,8 @@
 import { useState, useEffect } from 'react'
-import {
-  DID,
-  DDO,
-  Metadata,
-  MetadataStore,
-  Logger,
-  ConfigHelper
-} from '@oceanprotocol/lib'
+import { DID, DDO, Metadata, MetadataStore, Logger } from '@oceanprotocol/lib'
 import { useOcean } from '../../providers'
 import ProviderStatus from '../../providers/OceanProvider/ProviderStatus'
+import { getBestDataTokenPrice } from '../../utils/dtUtils'
 
 interface UseMetadata {
   ddo: DDO
@@ -17,10 +11,11 @@ interface UseMetadata {
   getDDO: (did: DID | string) => Promise<DDO>
   getMetadata: (did: DID | string) => Promise<Metadata>
   getTitle: (did: DID | string) => Promise<string>
+  getBestPrice: (dataTokenAddress: string) => Promise<string>
 }
 
 function useMetadata(did?: DID | string): UseMetadata {
-  const { ocean, status, config } = useOcean()
+  const { ocean, status, config, accountId } = useOcean()
   const [ddo, setDDO] = useState<DDO | undefined>()
   const [metadata, setMetadata] = useState<Metadata | undefined>()
   const [title, setTitle] = useState<string | undefined>()
@@ -35,6 +30,10 @@ function useMetadata(did?: DID | string): UseMetadata {
     const metadataStore = new MetadataStore(config.metadataStoreUri, Logger)
     const ddo = await metadataStore.retrieveDDO(did)
     return ddo
+  }
+
+  async function getBestPrice(dataTokenAddress: string): Promise<string> {
+    return await getBestDataTokenPrice(ocean, accountId, dataTokenAddress)
   }
 
   async function getMetadata(did: DID | string): Promise<Metadata> {
@@ -68,7 +67,8 @@ function useMetadata(did?: DID | string): UseMetadata {
     title,
     getDDO,
     getMetadata,
-    getTitle
+    getTitle,
+    getBestPrice
   }
 }
 
