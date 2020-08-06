@@ -13,7 +13,7 @@ export async function getCheapestPool(
   if (tokenPools === undefined || tokenPools.length === 0) {
     return {
       poolAddress: '',
-      poolPrice: '0'
+      poolPrice: ''
     }
   }
   let cheapestPoolAddress
@@ -27,7 +27,7 @@ export async function getCheapestPool(
         '1'
       )
       const decimalPoolPrice = new Decimal(poolPrice)
-      Logger.log('Pool price ', tokenPools[i], poolPrice)
+      Logger.log('Pool price ', tokenPools[i], decimalPoolPrice.toString())
       if (decimalPoolPrice < cheapestPoolPrice) {
         cheapestPoolPrice = decimalPoolPrice
         cheapestPoolAddress = tokenPools[i]
