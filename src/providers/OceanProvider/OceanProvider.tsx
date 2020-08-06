@@ -105,8 +105,8 @@ function OceanProvider({
       setChainId(chainId)
       Logger.log('chain id ', chainId)
 
-      config.web3Provider = web3
-      const ocean = await Ocean.getInstance(config)
+      newConfig.web3Provider = web3
+      const ocean = await Ocean.getInstance(newConfig)
       setOcean(ocean)
       Logger.log('Ocean instance created.', ocean)
 
