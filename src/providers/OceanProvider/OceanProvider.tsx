@@ -43,7 +43,7 @@ function OceanProvider({
 }: {
   initialConfig: Config
   web3ModalOpts?: Partial<ICoreOptions>
-  handleNetworkChanged: (networkId: string | number)=>Promise<void>
+  handleNetworkChanged: (networkId: string | number) => Promise<void>
   children: any
 }): ReactElement {
   const [web3, setWeb3] = useState<Web3 | undefined>()
@@ -140,7 +140,6 @@ function OceanProvider({
     Logger.debug("Handling 'accountsChanged' event with payload", accounts)
     connect()
   }
-
 
   // TODO: #68 Refetch balance periodically, or figure out some event to subscribe to
 
