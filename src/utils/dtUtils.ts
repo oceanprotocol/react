@@ -10,6 +10,12 @@ export async function getCheapestPool(
     dataTokenAddress
   )
   Logger.log('DT Pool found', tokenPools)
+  if (tokenPools === undefined || tokenPools.length === 0) {
+    return {
+      poolAddress: '',
+      poolPrice: ''
+    }
+  }
   let cheapestPoolAddress
   let cheapestPoolPrice = new Decimal(999999999999)
 
@@ -21,7 +27,7 @@ export async function getCheapestPool(
         '1'
       )
       const decimalPoolPrice = new Decimal(poolPrice)
-      Logger.log('Pool price ', tokenPools[i], poolPrice)
+      Logger.log('Pool price ', tokenPools[i], decimalPoolPrice.toString())
       if (decimalPoolPrice < cheapestPoolPrice) {
         cheapestPoolPrice = decimalPoolPrice
         cheapestPoolAddress = tokenPools[i]
