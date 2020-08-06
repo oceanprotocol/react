@@ -28,7 +28,7 @@ interface OceanProviderValue {
   balance: Balance
   chainId: number | undefined
   status: ProviderStatus
-  connect: (opts?: Partial<ICoreOptions>) => Promise<void>
+  connect: (config: Config) => Promise<void>
   logout: () => Promise<void>
   refreshBalance: () => Promise<void>
 }
@@ -36,12 +36,14 @@ interface OceanProviderValue {
 const OceanContext = createContext(null)
 
 function OceanProvider({
-  config,
+  initialConfig,
   web3ModalOpts,
+  handleNetworkChanged,
   children
 }: {
-  config: Config
+  initialConfig: Config
   web3ModalOpts?: Partial<ICoreOptions>
+  handleNetworkChanged: (networkId: string | number)=>Promise<void>
   children: any
 }): ReactElement {
   const [web3, setWeb3] = useState<Web3 | undefined>()
@@ -51,6 +53,7 @@ function OceanProvider({
   const [chainId, setChainId] = useState<number | undefined>()
   const [account, setAccount] = useState<Account | undefined>()
   const [accountId, setAccountId] = useState<string | undefined>()
+  const [config, setConfig] = useState<Config>(initialConfig)
   const [balance, setBalance] = useState<Balance | undefined>({
     eth: undefined,
     ocean: undefined
@@ -85,9 +88,11 @@ function OceanProvider({
     web3Modal.cachedProvider && connect()
   }, [web3Modal])
 
-  async function connect() {
+  async function connect(newConfig?: Config) {
     try {
       Logger.log('Connecting ...')
+
+      newConfig && setConfig(newConfig)
 
       const provider = await web3Modal.connect()
       setWeb3Provider(provider)
@@ -131,28 +136,11 @@ function OceanProvider({
     web3Modal.clearCachedProvider()
   }
 
-  //
-  // Listen for provider, account & network changes
-  // and react to it
-  //
-
-  // const handleConnect = async (provider: any) => {
-  //   Logger.debug("Handling 'connect' event with payload", provider)
-  // }
-
   const handleAccountsChanged = async (accounts: string[]) => {
     Logger.debug("Handling 'accountsChanged' event with payload", accounts)
     connect()
   }
 
-  const handleNetworkChanged = async (networkId: string | number) => {
-    Logger.debug(
-      "Handling 'chainChanged' event with payload",
-      networkId,
-      status
-    )
-    connect()
-  }
 
   // TODO: #68 Refetch balance periodically, or figure out some event to subscribe to
 
