@@ -9,6 +9,7 @@ import { ConsumeDdo } from './ConsumeDdo'
 
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import Torus from '@toruslabs/torus-embed'
+import { NetworkMonitor } from './NetworkMonitor'
 
 // factory Address needs to be updated each time you deploy the contract on local network
 const config = {
@@ -52,8 +53,9 @@ function App() {
   }, [])
 
   return (
-    <OceanProvider config={configRinkeby} web3ModalOpts={web3ModalOpts}>
+    <OceanProvider initialConfig={configRinkeby} web3ModalOpts={web3ModalOpts}>
       <div className="container">
+        <NetworkMonitor/>
         <div>
           <Wallet />
         </div>

@@ -38,12 +38,10 @@ const OceanContext = createContext(null)
 function OceanProvider({
   initialConfig,
   web3ModalOpts,
-  handleNetworkChanged,
   children
 }: {
   initialConfig: Config
   web3ModalOpts?: Partial<ICoreOptions>
-  handleNetworkChanged: (networkId: string | number) => Promise<void>
   children: any
 }): ReactElement {
   const [web3, setWeb3] = useState<Web3 | undefined>()
@@ -148,11 +146,11 @@ function OceanProvider({
 
     if (web3Provider !== undefined && web3Provider !== null) {
       web3Provider.on('accountsChanged', handleAccountsChanged)
-      web3Provider.on('chainChanged', handleNetworkChanged)
+      // web3Provider.on('chainChanged', handleNetworkChanged)
 
       return () => {
         web3Provider.removeListener('accountsChanged', handleAccountsChanged)
-        web3Provider.removeListener('chainChanged', handleNetworkChanged)
+        //  web3Provider.removeListener('chainChanged', handleNetworkChanged)
       }
     }
   }, [web3Modal, web3Provider])
@@ -175,6 +173,7 @@ function OceanProvider({
           logout,
           refreshBalance
         } as OceanProviderValue
+
       }
     >
       {children}
