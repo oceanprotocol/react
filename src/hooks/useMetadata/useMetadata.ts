@@ -59,7 +59,7 @@ function useMetadata(did?: DID | string): UseMetadata {
       setTitle(metadata.main.name)
     }
     init()
-  }, [])
+  }, [ocean])
 
   return {
     ddo,

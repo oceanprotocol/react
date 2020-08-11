@@ -28,7 +28,7 @@ interface OceanProviderValue {
   balance: Balance
   chainId: number | undefined
   status: ProviderStatus
-  connect: (opts?: Partial<ICoreOptions>) => Promise<void>
+  connect: (config: Config) => Promise<void>
   logout: () => Promise<void>
   refreshBalance: () => Promise<void>
 }
@@ -36,11 +36,11 @@ interface OceanProviderValue {
 const OceanContext = createContext(null)
 
 function OceanProvider({
-  config,
+  initialConfig,
   web3ModalOpts,
   children
 }: {
-  config: Config
+  initialConfig: Config
   web3ModalOpts?: Partial<ICoreOptions>
   children: any
 }): ReactElement {
@@ -51,6 +51,7 @@ function OceanProvider({
   const [chainId, setChainId] = useState<number | undefined>()
   const [account, setAccount] = useState<Account | undefined>()
   const [accountId, setAccountId] = useState<string | undefined>()
+  const [config, setConfig] = useState<Config>(initialConfig)
   const [balance, setBalance] = useState<Balance | undefined>({
     eth: undefined,
     ocean: undefined
@@ -85,9 +86,11 @@ function OceanProvider({
     web3Modal.cachedProvider && connect()
   }, [web3Modal])
 
-  async function connect() {
+  async function connect(newConfig?: Config) {
     try {
       Logger.log('Connecting ...')
+
+      newConfig && setConfig(newConfig)
 
       const provider = await web3Modal.connect()
       setWeb3Provider(provider)
@@ -100,8 +103,8 @@ function OceanProvider({
       setChainId(chainId)
       Logger.log('chain id ', chainId)
 
-      config.web3Provider = web3
-      const ocean = await Ocean.getInstance(config)
+      newConfig.web3Provider = web3
+      const ocean = await Ocean.getInstance(newConfig)
       setOcean(ocean)
       Logger.log('Ocean instance created.', ocean)
 
@@ -131,26 +134,8 @@ function OceanProvider({
     web3Modal.clearCachedProvider()
   }
 
-  //
-  // Listen for provider, account & network changes
-  // and react to it
-  //
-
-  // const handleConnect = async (provider: any) => {
-  //   Logger.debug("Handling 'connect' event with payload", provider)
-  // }
-
   const handleAccountsChanged = async (accounts: string[]) => {
     Logger.debug("Handling 'accountsChanged' event with payload", accounts)
-    connect()
-  }
-
-  const handleNetworkChanged = async (networkId: string | number) => {
-    Logger.debug(
-      "Handling 'chainChanged' event with payload",
-      networkId,
-      status
-    )
     connect()
   }
 
@@ -161,11 +146,11 @@ function OceanProvider({
 
     if (web3Provider !== undefined && web3Provider !== null) {
       web3Provider.on('accountsChanged', handleAccountsChanged)
-      web3Provider.on('chainChanged', handleNetworkChanged)
+      // web3Provider.on('chainChanged', handleNetworkChanged)
 
       return () => {
         web3Provider.removeListener('accountsChanged', handleAccountsChanged)
-        web3Provider.removeListener('chainChanged', handleNetworkChanged)
+        //  web3Provider.removeListener('chainChanged', handleNetworkChanged)
       }
     }
   }, [web3Modal, web3Provider])
