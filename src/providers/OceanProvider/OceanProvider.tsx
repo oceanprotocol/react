@@ -28,7 +28,7 @@ interface OceanProviderValue {
   balance: Balance
   chainId: number | undefined
   status: ProviderStatus
-  connect: (config: Config) => Promise<void>
+  connect: (config?: Config) => Promise<void>
   logout: () => Promise<void>
   refreshBalance: () => Promise<void>
 }
@@ -88,7 +88,7 @@ function OceanProvider({
 
   async function connect(newConfig?: Config) {
     try {
-      Logger.log('Connecting ...')
+      Logger.log('Connecting ...',newConfig)
 
       newConfig && setConfig(newConfig)
 
@@ -103,8 +103,8 @@ function OceanProvider({
       setChainId(chainId)
       Logger.log('chain id ', chainId)
 
-      newConfig.web3Provider = web3
-      const ocean = await Ocean.getInstance(newConfig)
+      config.web3Provider = web3
+      const ocean = await Ocean.getInstance(config)
       setOcean(ocean)
       Logger.log('Ocean instance created.', ocean)
 

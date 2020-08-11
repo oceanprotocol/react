@@ -6,9 +6,20 @@ import { useEffect } from 'react'
 export function NetworkMonitor() {
   const { connect, web3Provider } = useOcean()
 
-  const handleNetworkChanged = () => {
+  const handleNetworkChanged = (chainId: number) => {
     // const config = getOceanConfig(chainId)
-    const config = new ConfigHelper().getConfig('rinkeby')
+      // temp hack
+      let network = ''
+      switch (chainId) {
+          case 1:
+              {
+                  network = 'mainnet'
+              }
+          case 4: {
+              network = 'rinkeby'
+          }
+      }
+    const config = new ConfigHelper().getConfig(network)
     connect(config)
   }
   useEffect(() => {
