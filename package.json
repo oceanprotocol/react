@@ -1,6 +1,6 @@
 {
   "name": "@oceanprotocol/react",
-  "version": "0.0.33",
+  "version": "0.0.34",
   "description": "React hooks & components on top of @oceanprotocol/lib",
   "main": "dist/index.js",
   "umd:main": "dist/index.umd.js",
