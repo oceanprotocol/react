@@ -173,7 +173,6 @@ function OceanProvider({
           logout,
           refreshBalance
         } as OceanProviderValue
-
       }
     >
       {children}

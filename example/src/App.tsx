@@ -55,7 +55,7 @@ function App() {
   return (
     <OceanProvider initialConfig={configRinkeby} web3ModalOpts={web3ModalOpts}>
       <div className="container">
-        <NetworkMonitor/>
+        <NetworkMonitor />
         <div>
           <Wallet />
         </div>
