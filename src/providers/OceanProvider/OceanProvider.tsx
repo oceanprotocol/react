@@ -88,7 +88,7 @@ function OceanProvider({
 
   async function connect(newConfig?: Config) {
     try {
-      Logger.log('Connecting ...',newConfig)
+      Logger.log('Connecting ...', newConfig)
 
       newConfig && setConfig(newConfig)
 

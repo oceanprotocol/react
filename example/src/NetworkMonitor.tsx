@@ -8,17 +8,16 @@ export function NetworkMonitor() {
 
   const handleNetworkChanged = (chainId: number) => {
     // const config = getOceanConfig(chainId)
-      // temp hack
-      let network = ''
-      switch (chainId) {
-          case 1:
-              {
-                  network = 'mainnet'
-              }
-          case 4: {
-              network = 'rinkeby'
-          }
+    // temp hack
+    let network = ''
+    switch (chainId) {
+      case 1: {
+        network = 'mainnet'
       }
+      case 4: {
+        network = 'rinkeby'
+      }
+    }
     const config = new ConfigHelper().getConfig(network)
     connect(config)
   }

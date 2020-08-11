@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { useEffect } from 'react'
 import shortid from 'shortid'
 export function AllDdos() {
-  const { accountId,chainId, account, ocean } = useOcean()
+  const { accountId, chainId, account, ocean } = useOcean()
 
   const [ddos, setDdos] = useState<DDO[] | undefined>()
 
@@ -23,7 +23,7 @@ export function AllDdos() {
       setDdos(assets.results)
     }
     init()
-  }, [ocean, account,chainId])
+  }, [ocean, account, chainId])
 
   return (
     <>
