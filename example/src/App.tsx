@@ -53,7 +53,11 @@ function App() {
   }, [])
 
   return (
-    <OceanProvider initialConfig={configRinkeby} web3ModalOpts={web3ModalOpts} marketFeeAddress={'0x4D156A2ef69ffdDC55838176C6712C90f60a2285'}>
+    <OceanProvider
+      initialConfig={configRinkeby}
+      web3ModalOpts={web3ModalOpts}
+      marketFeeAddress={'0x4D156A2ef69ffdDC55838176C6712C90f60a2285'}
+    >
       <div className="container">
         <NetworkMonitor />
         <div>
