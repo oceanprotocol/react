@@ -5,6 +5,8 @@ export async function getCheapestPool(
   accountId: string,
   dataTokenAddress: string
 ): Promise<{ poolAddress: string; poolPrice: string }> {
+  if (!ocean || !accountId || !dataTokenAddress) return
+
   const tokenPools = await ocean.pool.searchPoolforDT(
     accountId,
     dataTokenAddress

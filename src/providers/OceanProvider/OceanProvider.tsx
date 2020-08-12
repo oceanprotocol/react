@@ -28,6 +28,7 @@ interface OceanProviderValue {
   balance: Balance
   chainId: number | undefined
   status: ProviderStatus
+  marketFeeAddress: string
   connect: (config?: Config) => Promise<void>
   logout: () => Promise<void>
   refreshBalance: () => Promise<void>
@@ -38,10 +39,12 @@ const OceanContext = createContext(null)
 function OceanProvider({
   initialConfig,
   web3ModalOpts,
+  marketFeeAddress,
   children
 }: {
   initialConfig: Config
   web3ModalOpts?: Partial<ICoreOptions>
+  marketFeeAddress: string
   children: any
 }): ReactElement {
   const [web3, setWeb3] = useState<Web3 | undefined>()
@@ -169,6 +172,7 @@ function OceanProvider({
           chainId,
           status,
           config,
+          marketFeeAddress,
           connect,
           logout,
           refreshBalance
