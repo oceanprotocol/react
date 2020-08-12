@@ -15,7 +15,7 @@ interface UseMetadata {
 }
 
 function useMetadata(did?: DID | string): UseMetadata {
-  const { ocean, status, config, accountId, marketFeeAddress } = useOcean()
+  const { ocean, status, config, accountId } = useOcean()
   const [ddo, setDDO] = useState<DDO | undefined>()
   const [metadata, setMetadata] = useState<Metadata | undefined>()
   const [title, setTitle] = useState<string | undefined>()
@@ -33,11 +33,7 @@ function useMetadata(did?: DID | string): UseMetadata {
   }
 
   async function getBestPrice(dataTokenAddress: string): Promise<string> {
-    return await getBestDataTokenPrice(
-      ocean,
-      marketFeeAddress,
-      dataTokenAddress
-    )
+    return await getBestDataTokenPrice(ocean, accountId, dataTokenAddress)
   }
 
   async function getMetadata(did: DID | string): Promise<Metadata> {
