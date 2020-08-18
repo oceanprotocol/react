@@ -5,7 +5,7 @@
 > 🎣 React hooks & components on top of @oceanprotocol/lib
 
 [![npm](https://img.shields.io/npm/v/@oceanprotocol/react.svg)](https://www.npmjs.com/package/@oceanprotocol/react)
-[![Build Status](https://travis-ci.com/oceanprotocol/react.svg?token=3psqw6c8KMDqfdGQ2x6d&branch=master)](https://travis-ci.com/oceanprotocol/react)
+[![Build Status](https://travis-ci.com/oceanprotocol/react.svg?token=3psqw6c8KMDqfdGQ2x6d&branch=main)](https://travis-ci.com/oceanprotocol/react)
 [![Maintainability](https://api.codeclimate.com/v1/badges/1e93b2b3e198c3670b50/maintainability)](https://codeclimate.com/repos/5ea6f2fec372a101a1000929/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/1e93b2b3e198c3670b50/test_coverage)](https://codeclimate.com/repos/5ea6f2fec372a101a1000929/test_coverage)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-7b1173.svg?style=flat-square)](https://github.com/prettier/prettier)
@@ -132,7 +132,7 @@ Releases are managed semi-automatically. They are always manually triggered from
 
 ### Production
 
-From a clean `master` branch you can run any release task bumping the version accordingly based on semantic versioning:
+From a clean `main` branch you can run any release task bumping the version accordingly based on semantic versioning:
 
 - To bump a patch version: `npm run release`
 - To bump a minor version: `npm run release -- minor`
