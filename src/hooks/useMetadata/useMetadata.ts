@@ -9,6 +9,7 @@ interface UseMetadata {
   did: DID | string
   metadata: Metadata
   title: string
+  bestPrice: string
   isLoaded: boolean
   getBestPrice: (dataTokenAddress?: string) => Promise<string>
   getBestPool: (
@@ -23,6 +24,7 @@ function useMetadata(did?: DID | string, ddo?: DDO): UseMetadata {
   const [metadata, setMetadata] = useState<Metadata | undefined>()
   const [title, setTitle] = useState<string | undefined>()
   const [isLoaded, setIsLoaded] = useState(false)
+  const [bestPrice, setBestPrice] = useState<string | undefined>()
 
   async function getDDO(did: DID | string): Promise<DDO> {
     if (status === ProviderStatus.CONNECTED) {
@@ -79,6 +81,8 @@ function useMetadata(did?: DID | string, ddo?: DDO): UseMetadata {
         const metadata = await getMetadata()
         setMetadata(metadata)
         setTitle(metadata.main.name)
+        const price = await getBestPrice()
+        setBestPrice(price)
         setIsLoaded(true)
       }
     }
@@ -89,6 +93,7 @@ function useMetadata(did?: DID | string, ddo?: DDO): UseMetadata {
     did: internalDid,
     metadata,
     title,
+    bestPrice,
     isLoaded,
     getBestPrice,
     getBestPool

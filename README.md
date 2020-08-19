@@ -64,7 +64,7 @@ export default function MyComponent() {
   const { ocean, web3, account } = useOcean()
 
   // Get metadata for this asset
-  const { title, metadata, isLoaded, getBestPrice } = useMetadata(did)
+  const { title, metadata, bestPrice } = useMetadata(did)
   const [price, setPrice] = useState<string>()
 
   // publish asset
@@ -73,16 +73,6 @@ export default function MyComponent() {
   // consume asset
   const { consume, consumeStep } = useConsume()
 
-  useEffect(() => {
-    async function init(): Promise<void> {
-      if (isLoaded) {
-        const price = await getBestPrice()
-        setPrice(price)
-        }
-      }
-    init()
-  }, [isLoaded])
-
   async function handleDownload() {
     await consume(did)
   }
@@ -90,7 +80,7 @@ export default function MyComponent() {
   return (
     <div>
       <h1>{title}</h1>
-      <p>Price: {price}</p>
+      <p>Price: {bestPrice}</p>
 
       <p>Your account: {account}</p>
       <button onClick={handleDownload}>
