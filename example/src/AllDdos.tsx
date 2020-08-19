@@ -4,6 +4,7 @@ import { DDO } from '@oceanprotocol/lib'
 import { useState } from 'react'
 import { useEffect } from 'react'
 import shortid from 'shortid'
+import { MetadataExample } from './MetadataExample'
 export function AllDdos() {
   const { accountId, chainId, account, ocean } = useOcean()
 
@@ -32,7 +33,7 @@ export function AllDdos() {
         {ddos?.map((ddo) => {
           return (
             <div key={shortid.generate()}>
-              {ddo.id}
+              <MetadataExample did={ddo.id} />
               <br />
             </div>
           )

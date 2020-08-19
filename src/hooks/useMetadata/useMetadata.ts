@@ -1,81 +1,107 @@
 import { useState, useEffect } from 'react'
-import { DID, DDO, Metadata, MetadataStore, Logger } from '@oceanprotocol/lib'
+import { DID, DDO, Metadata, Logger } from '@oceanprotocol/lib'
 import { useOcean } from '../../providers'
 import ProviderStatus from '../../providers/OceanProvider/ProviderStatus'
 import { getBestDataTokenPrice, getCheapestPool } from '../../utils/dtUtils'
 
 interface UseMetadata {
   ddo: DDO
+  did: DID | string
   metadata: Metadata
   title: string
-  getDDO: (did: DID | string) => Promise<DDO>
-  getMetadata: (did: DID | string) => Promise<Metadata>
-  getTitle: (did: DID | string) => Promise<string>
-  getBestPrice: (dataTokenAddress: string) => Promise<string>
+  bestPrice: string
+  isLoaded: boolean
+  getBestPrice: (dataTokenAddress?: string) => Promise<string>
   getBestPool: (
-    dataTokenAddress: string
+    dataTokenAddress?: string
   ) => Promise<{ poolAddress: string; poolPrice: string }>
 }
 
-function useMetadata(did?: DID | string): UseMetadata {
+function useMetadata(did?: DID | string, ddo?: DDO): UseMetadata {
   const { ocean, status, config, accountId } = useOcean()
-  const [ddo, setDDO] = useState<DDO | undefined>()
+  const [internalDdo, setDDO] = useState<DDO | undefined>()
+  const [internalDid, setDID] = useState<DID | string | undefined>()
   const [metadata, setMetadata] = useState<Metadata | undefined>()
   const [title, setTitle] = useState<string | undefined>()
+  const [isLoaded, setIsLoaded] = useState(false)
+  const [bestPrice, setBestPrice] = useState<string | undefined>()
 
   async function getDDO(did: DID | string): Promise<DDO> {
     if (status === ProviderStatus.CONNECTED) {
       const ddo = await ocean.metadatastore.retrieveDDO(did)
       return ddo
     }
-
-    // fallback hitting MetadataStore directly
-    const metadataStore = new MetadataStore(config.metadataStoreUri, Logger)
-    const ddo = await metadataStore.retrieveDDO(did)
-    return ddo
   }
 
-  async function getBestPrice(dataTokenAddress: string): Promise<string> {
+  async function getBestPrice(dataTokenAddress?: string): Promise<string> {
+    if (!dataTokenAddress) dataTokenAddress = internalDdo.dataToken
     return await getBestDataTokenPrice(ocean, accountId, dataTokenAddress)
   }
   async function getBestPool(
     dataTokenAddress: string
   ): Promise<{ poolAddress: string; poolPrice: string }> {
+    if (!dataTokenAddress) dataTokenAddress = internalDdo.dataToken
     return await getCheapestPool(ocean, accountId, dataTokenAddress)
   }
 
-  async function getMetadata(did: DID | string): Promise<Metadata> {
-    const ddo = await getDDO(did)
-    if (!ddo) return
-    const metadata = ddo.findServiceByType('metadata')
+  async function getMetadata(): Promise<Metadata> {
+    if (!internalDdo) return
+    const metadata = internalDdo.findServiceByType('metadata')
     return metadata.attributes
   }
 
-  async function getTitle(did: DID | string): Promise<string> {
-    const metadata = await getMetadata(did)
+  async function getTitle(): Promise<string> {
+    const metadata = await getMetadata()
     return metadata.main.name
   }
 
   useEffect(() => {
     async function init(): Promise<void> {
-      if (!did) return
-      const ddo = await getDDO(did)
-      setDDO(ddo)
-
-      const metadata = await getMetadata(did)
-      setMetadata(metadata)
-      setTitle(metadata.main.name)
+      Logger.debug('meta init', status)
+      if (ocean && status === ProviderStatus.CONNECTED) {
+        if (ddo) {
+          setDDO(ddo)
+          setDID(ddo.id)
+        }
+        Logger.debug('meta init', did)
+        if (did && !ddo) {
+          const ddo = await getDDO(did)
+          Logger.debug('DDO', ddo)
+          setDDO(ddo)
+          setDID(did)
+        }
+      }
     }
     init()
-  }, [ocean])
+  }, [ocean, status])
+
+  useEffect(() => {
+    async function init(): Promise<void> {
+      if (internalDdo) {
+        const metadata = await getMetadata()
+        setMetadata(metadata)
+        setTitle(metadata.main.name)
+        const price = await getBestPrice()
+        setBestPrice(price)
+        setIsLoaded(true)
+      }
+    }
+    init()
+
+    const interval = setInterval(async () => {
+      const price = await getBestPrice()
+      setBestPrice(price)
+    }, 10000)
+    return () => clearInterval(interval)
+  }, [internalDdo])
 
   return {
-    ddo,
+    ddo: internalDdo,
+    did: internalDid,
     metadata,
     title,
-    getDDO,
-    getMetadata,
-    getTitle,
+    bestPrice,
+    isLoaded,
     getBestPrice,
     getBestPool
   }

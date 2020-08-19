@@ -64,7 +64,8 @@ export default function MyComponent() {
   const { ocean, web3, account } = useOcean()
 
   // Get metadata for this asset
-  const { title, metadata } = useMetadata(did)
+  const { title, metadata, bestPrice } = useMetadata(did)
+  const [price, setPrice] = useState<string>()
 
   // publish asset
   const { publish, publishStep } = usePublish()
@@ -79,7 +80,7 @@ export default function MyComponent() {
   return (
     <div>
       <h1>{title}</h1>
-      <p>Price: {web3.utils.fromWei(metadata.main.price)}</p>
+      <p>Price: {bestPrice}</p>
 
       <p>Your account: {account}</p>
       <button onClick={handleDownload}>
