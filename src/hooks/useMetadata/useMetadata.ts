@@ -87,7 +87,14 @@ function useMetadata(did?: DID | string, ddo?: DDO): UseMetadata {
       }
     }
     init()
+
+    const interval = setInterval(async () => {
+      const price = await getBestPrice()
+      setBestPrice(price)
+    }, 10000)
+    return () => clearInterval(interval)
   }, [internalDdo])
+
   return {
     ddo: internalDdo,
     did: internalDid,
