@@ -33,7 +33,7 @@ export function AllDdos() {
         {ddos?.map((ddo) => {
           return (
             <div key={shortid.generate()}>
-              <MetadataExample did={ddo.id} />
+              <MetadataExample ddo={ddo} />
               <br />
             </div>
           )

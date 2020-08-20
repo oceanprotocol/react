@@ -4,6 +4,7 @@ import { useOcean } from '../../providers'
 import ProviderStatus from '../../providers/OceanProvider/ProviderStatus'
 import { getBestDataTokenPrice, getCheapestPool } from '../../utils/dtUtils'
 import Pool from './Pool'
+import { isDDO } from '../../utils'
 
 interface UseMetadata {
   ddo: DDO
@@ -17,7 +18,7 @@ interface UseMetadata {
   getPool: (dataTokenAddress?: string) => Promise<Pool>
 }
 
-function useMetadata(did?: DID | string, ddo?: DDO): UseMetadata {
+function useMetadata(asset?: DID | string | DDO): UseMetadata {
   const { ocean, status, config, accountId } = useOcean()
   const [internalDdo, setDDO] = useState<DDO | undefined>()
   const [internalDid, setDID] = useState<DID | string | undefined>()
@@ -58,16 +59,16 @@ function useMetadata(did?: DID | string, ddo?: DDO): UseMetadata {
     async function init(): Promise<void> {
       Logger.debug('meta init', status)
       if (ocean && status === ProviderStatus.CONNECTED) {
-        if (ddo) {
-          setDDO(ddo)
-          setDID(ddo.id)
-        }
-        Logger.debug('meta init', did)
-        if (did && !ddo) {
-          const ddo = await getDDO(did)
+        if (!asset) return
+
+        if (isDDO(asset)) {
+          setDDO(asset)
+          setDID(asset.id)
+        } else {
+          const ddo = await getDDO(asset)
           Logger.debug('DDO', ddo)
           setDDO(ddo)
-          setDID(did)
+          setDID(asset)
         }
       }
     }
