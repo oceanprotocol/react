@@ -1,10 +1,12 @@
 import { Logger, Ocean, Account } from '@oceanprotocol/lib'
 import { Decimal } from 'decimal.js'
+import Pool from '../hooks/useMetadata/Pool'
+
 export async function getCheapestPool(
   ocean: Ocean,
   accountId: string,
   dataTokenAddress: string
-): Promise<{ poolAddress: string; poolPrice: string }> {
+): Promise<Pool> {
   if (!ocean || !accountId || !dataTokenAddress) return
 
   const tokenPools = await ocean.pool.searchPoolforDT(
@@ -14,8 +16,8 @@ export async function getCheapestPool(
   Logger.log('DT Pool found', tokenPools)
   if (tokenPools === undefined || tokenPools.length === 0) {
     return {
-      poolAddress: '',
-      poolPrice: ''
+      address: '',
+      price: ''
     }
   }
   let cheapestPoolAddress
@@ -38,8 +40,8 @@ export async function getCheapestPool(
   }
 
   return {
-    poolAddress: cheapestPoolAddress,
-    poolPrice: cheapestPoolPrice.toString()
+    address: cheapestPoolAddress,
+    price: cheapestPoolPrice.toString()
   }
 }
 
@@ -50,7 +52,7 @@ export async function getBestDataTokenPrice(
 ): Promise<string> {
   const bestPool = await getCheapestPool(ocean, accountId, dataTokenAddress)
 
-  return bestPool.poolPrice
+  return bestPool.price
 }
 
 export async function checkAndBuyDT(
