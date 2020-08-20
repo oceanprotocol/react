@@ -11,8 +11,8 @@ interface UseMetadata {
   metadata: Metadata
   title: string
   price: string
-  pool: Pool
-  isLoaded: boolean
+  poolAddress: string
+  isLoaded: boolean 
   getPrice: (dataTokenAddress?: string) => Promise<string>
   getPool: (dataTokenAddress?: string) => Promise<Pool>
 }
@@ -25,7 +25,7 @@ function useMetadata(did?: DID | string, ddo?: DDO): UseMetadata {
   const [title, setTitle] = useState<string | undefined>()
   const [isLoaded, setIsLoaded] = useState(false)
   const [price, setPrice] = useState<string | undefined>()
-  const [pool, setPool] = useState<Pool | undefined>()
+  const [poolAddress, setPoolAddress] = useState<string | undefined>()
 
   async function getDDO(did: DID | string): Promise<DDO> {
     if (status === ProviderStatus.CONNECTED) {
@@ -81,7 +81,7 @@ function useMetadata(did?: DID | string, ddo?: DDO): UseMetadata {
         setMetadata(metadata)
         setTitle(metadata.main.name)
         const pool = await getPool()
-        setPool(pool)
+        setPoolAddress(pool.address)
         setPrice(pool.price)
         setIsLoaded(true)
       }
@@ -90,7 +90,7 @@ function useMetadata(did?: DID | string, ddo?: DDO): UseMetadata {
 
     const interval = setInterval(async () => {
       const pool = await getPool()
-      setPool(pool)
+      setPoolAddress(pool.address)
       setPrice(pool.price)
     }, 10000)
     return () => clearInterval(interval)
@@ -102,7 +102,7 @@ function useMetadata(did?: DID | string, ddo?: DDO): UseMetadata {
     metadata,
     title,
     price,
-    pool,
+    poolAddress,
     isLoaded,
     getPrice,
     getPool
