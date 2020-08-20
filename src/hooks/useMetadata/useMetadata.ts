@@ -12,7 +12,7 @@ interface UseMetadata {
   title: string
   price: string
   poolAddress: string
-  isLoaded: boolean 
+  isLoaded: boolean
   getPrice: (dataTokenAddress?: string) => Promise<string>
   getPool: (dataTokenAddress?: string) => Promise<Pool>
 }
