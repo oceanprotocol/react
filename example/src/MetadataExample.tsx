@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { useMetadata } from '@oceanprotocol/react'
+import { DDO } from '@oceanprotocol/lib'
 
-export function MetadataExample({ did }: { did: string }) {
-  const { title, pool } = useMetadata(did)
+export function MetadataExample({ ddo }: { ddo: DDO }) {
+  const { title, poolAddress, price } = useMetadata(ddo)
 
   return (
     <>
       <div>
-        {title} - {pool && pool.price + ' - ' + pool.address}
+        {title} - price = {price} // pool = {poolAddress}
       </div>
     </>
   )

@@ -1,3 +1,5 @@
+import { DDO, DID } from '@oceanprotocol/lib'
+
 export function readFileContent(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
@@ -10,6 +12,13 @@ export function readFileContent(file: File): Promise<string> {
     }
     reader.readAsText(file)
   })
+}
+
+export function isDDO(toBeDetermined): toBeDetermined is DDO {
+  if ((toBeDetermined as DDO).id) {
+    return true
+  }
+  return false
 }
 
 export const feedback: { [key in number]: string } = {
