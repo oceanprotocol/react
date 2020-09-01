@@ -6,9 +6,9 @@ import { Metadata } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Metadata'
 
 export function Publish() {
   const { accountId, ocean } = useOcean()
-  const { publish, publishStepText } = usePublish()
+  const { publish, publishStepText, isLoading } = usePublish()
   const [ddo, setDdo] = useState<DDO | undefined>()
-
+ 
   const asset = {
     main: {
       type: 'dataset',
@@ -31,8 +31,10 @@ export function Publish() {
   }
 
   const publishAsset = async () => {
+    console.log(isLoading)
     const ddo = await publish(asset as Metadata, '90', 'access', '', '')
     console.log(ddo)
+    console.log(isLoading)
     const pool = ocean.pool.createDTPool(
       accountId,
       ddo.dataToken,
@@ -48,7 +50,8 @@ export function Publish() {
       <div>
         <button onClick={publishAsset}>Publish</button>
       </div>
-      <div>Status: {publishStepText}</div>
+      <div>IsLoading: {isLoading.toString()} || Status: {publishStepText}</div>
+
       <div>DID: {ddo && ddo.id} </div>
     </>
   )
