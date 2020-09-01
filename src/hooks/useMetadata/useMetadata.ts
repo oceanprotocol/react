@@ -76,6 +76,8 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
   }, [ocean, status])
 
   useEffect(() => {
+    if (!accountId) return
+
     async function init(): Promise<void> {
       if (internalDdo) {
         const metadata = await getMetadata()
@@ -95,7 +97,7 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
       setPrice(pool.price)
     }, 10000)
     return () => clearInterval(interval)
-  }, [internalDdo])
+  }, [accountId, internalDdo])
 
   return {
     ddo: internalDdo,
