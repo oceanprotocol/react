@@ -58,9 +58,8 @@ function usePublish(): UsePublish {
     setPublishError(undefined)
     try {
       setStep(0)
-      const data = { t: 1, url: config.metadataStoreUri }
-      const blob = JSON.stringify(data)
-      const dtAddress = await ocean.datatokens.create(blob, accountId)
+      
+      const dtAddress = await ocean.datatokens.create(config.metadataStoreUri,"name",'DT',"1000", accountId)
       Logger.log('datatoken created', dtAddress)
 
       setStep(1)

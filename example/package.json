@@ -25,7 +25,7 @@
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": "@oceanprotocol/react"
   },
   "browserslist": [
     ">0.2%",
