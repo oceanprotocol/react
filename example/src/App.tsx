@@ -6,9 +6,6 @@ import { Publish } from './Publish'
 import { Config, ConfigHelper } from '@oceanprotocol/lib'
 import { AllDdos } from './AllDdos'
 import { ConsumeDdo } from './ConsumeDdo'
-
-import WalletConnectProvider from '@walletconnect/web3-provider'
-import Torus from '@toruslabs/torus-embed'
 import { NetworkMonitor } from './NetworkMonitor'
 import { MetadataExample } from './MetadataExample'
 
@@ -22,24 +19,7 @@ const config = {
 
 const configRinkeby = new ConfigHelper().getConfig('rinkeby')
 
-const providerOptions = {
-  walletconnect: {
-    package: WalletConnectProvider,
-    options: {
-      infuraId: ''
-    }
-  },
-  torus: {
-    package: Torus,
-    options: {
-      networkParams: {
-        host: config.nodeUri // optional
-        // chainId: 1337, // optional
-        // networkId: 1337 // optional
-      }
-    }
-  }
-}
+const providerOptions = {}
 
 export const web3ModalOpts = {
   cacheProvider: true,
