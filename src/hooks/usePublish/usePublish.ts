@@ -57,21 +57,6 @@ function usePublish(): UsePublish {
     setIsLoading(true)
     setPublishError(undefined)
     try {
-      setStep(0)
-      const dtAddress = await ocean.datatokens.create(
-        config.metadataStoreUri,
-        'Ocean Data Token',
-        'Ocean-DT',
-        '1000',
-        accountId
-      )
-      Logger.log('datatoken created', dtAddress)
-
-      setStep(1)
-      await mint(dtAddress, tokensToMint)
-      Logger.log(`minted ${tokensToMint} tokens`)
-
-      setStep(2)
       const publishedDate =
         new Date(Date.now()).toISOString().split('.')[0] + 'Z'
       const timeout = 0
@@ -139,10 +124,15 @@ function usePublish(): UsePublish {
       }
 
       Logger.log('services created', services)
-      setStep(3)
-      const ddo = await ocean.assets.create(asset, account, services, dtAddress)
+
+      const ddo = await ocean.assets
+        .create(asset, account, services)
+        .next(setStep)
       Logger.log('ddo created', ddo)
-      setStep(4)
+      setStep(7)
+      await mint(ddo.dataToken, tokensToMint)
+      Logger.log(`minted ${tokensToMint} tokens`)
+      setStep(8)
 
       return ddo
     } catch (error) {
