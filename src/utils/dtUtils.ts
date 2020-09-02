@@ -73,12 +73,12 @@ export async function checkAndBuyDT(
       dataTokenAddress
     )
     Decimal.set({ precision: 5 })
-    const price = new Decimal(cheapestPool.poolPrice).times(1.05).toString()
-    const maxPrice = new Decimal(cheapestPool.poolPrice).times(2).toString()
+    const price = new Decimal(cheapestPool.price).times(1.05).toString()
+    const maxPrice = new Decimal(cheapestPool.price).times(2).toString()
     Logger.log('Buying token', cheapestPool, account.getId(), price)
     const buyResponse = await ocean.pool.buyDT(
       account.getId(),
-      cheapestPool.poolAddress,
+      cheapestPool.address,
       '1',
       price,
       maxPrice
