@@ -25,9 +25,9 @@
     "dist/"
   ],
   "engines": {
-    "node": ">=12.18.3",
-    "npm": ">=6.14.8",
-    "yarn": ">=1.22.5"
+    "node": ">=12.18.0",
+    "npm": ">=6.14.0",
+    "yarn": ">=1.22.0"
   },
   "dependencies": {
     "@oceanprotocol/lib": "^0.1.17",

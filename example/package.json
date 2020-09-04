@@ -29,9 +29,9 @@
     "extends": "react-app"
   },
   "engines": {
-    "node": ">=12.18.3",
-    "npm": ">=6.14.8",
-    "yarn": ">=1.22.5"
+    "node": ">=12.18.0",
+    "npm": ">=6.14.0",
+    "yarn": ">=1.22.0"
   },
   "browserslist": {
     "production": [
