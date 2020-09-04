@@ -7,7 +7,6 @@ import { Config, ConfigHelper } from '@oceanprotocol/lib'
 import { AllDdos } from './AllDdos'
 import { ConsumeDdo } from './ConsumeDdo'
 import { NetworkMonitor } from './NetworkMonitor'
-import { MetadataExample } from './MetadataExample'
 
 // factory Address needs to be updated each time you deploy the contract on local network
 const config = {
