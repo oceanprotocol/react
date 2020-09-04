@@ -24,6 +24,11 @@
     "README.md",
     "dist/"
   ],
+  "engines": {
+    "node": ">=12.18.3",
+    "npm": ">=6.14.8",
+    "yarn": ">=1.22.5"
+  },
   "dependencies": {
     "@oceanprotocol/lib": "^0.1.17",
     "axios": "^0.20.0",
