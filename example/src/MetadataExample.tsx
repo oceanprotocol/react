@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { useMetadata } from '@oceanprotocol/react'
 import { DDO } from '@oceanprotocol/lib'
 
