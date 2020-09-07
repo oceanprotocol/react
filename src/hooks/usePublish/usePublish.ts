@@ -150,7 +150,7 @@ function usePublish(): UsePublish {
     dataTokenAddress: string
   ) {
     switch (priceOptions.type) {
-      case 'advanced': {
+      case 'dynamic': {
         // weight is hardcoded at 9 (90%) and publisher fee at 0.03(this was a random value set by me)
         const pool = await ocean.pool.createDTPool(
           accountId,
@@ -161,7 +161,7 @@ function usePublish(): UsePublish {
         )
         break
       }
-      case 'simple': {
+      case 'fixed': {
         const fixedPriceExchange = await ocean.fixedRateExchange.create(
           dataTokenAddress,
           priceOptions.price.toString(),

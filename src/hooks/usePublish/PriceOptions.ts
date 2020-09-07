@@ -1,7 +1,7 @@
 export interface PriceOptions {
   price?: number
   tokensToMint: number
-  type: 'simple' | 'advanced' | string
+  type: 'fixed' | 'dynamic' | string
   weightOnDataToken: string
   liquidityProviderFee: string
 }
