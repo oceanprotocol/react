@@ -3,6 +3,7 @@ import { useOcean } from '../../providers'
 import { feedback } from '../../utils'
 import { DID, Logger, ServiceType } from '@oceanprotocol/lib'
 import { checkAndBuyDT } from '../../utils/dtUtils'
+
 interface UseConsume {
   consume: (
     did: DID | string,

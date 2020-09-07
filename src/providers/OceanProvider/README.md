@@ -14,13 +14,8 @@ Wrap your whole app with the `OceanProvider`:
 
 ```tsx
 import React, { ReactNode } from 'react'
-import { OceanProvider, Config } from '@oceanprotocol/react'
-
-const config: Config = {
-  nodeUri: '',
-  metadataStoreUri: '',
-  ...
-}
+import { OceanProvider } from '@oceanprotocol/react'
+import { ConfigHelper } from '@oceanprotocol/lib'
 
 const web3ModalOpts = {
   network: 'mainnet', // optional
@@ -33,10 +28,15 @@ export default function MyApp({
 }: {
   children: ReactNode
 }): ReactNode {
+  const oceanInitialConfig = new ConfigHelper().getConfig(
+    'mainnet',
+    'INFURA_PROJECT_ID'
+  )
+
   return (
-    <OceanProvider config={config} web3ModalOpts={web3ModalOpts}>
-        <h1>My App</h1>
-        {children}
+    <OceanProvider initialConfig={config} web3ModalOpts={web3ModalOpts}>
+      <h1>My App</h1>
+      {children}
     </OceanProvider>
   )
 }
