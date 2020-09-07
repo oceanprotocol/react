@@ -31,8 +31,6 @@ export function Publish() {
   }
 
   const publishAsset = async () => {
-    console.log(isLoading)
-
     const priceOptions = {
       price: 10,
       tokensToMint: 10,
@@ -43,7 +41,6 @@ export function Publish() {
 
     const ddo = await publish(asset as Metadata, priceOptions, 'access', '', '')
     console.log(ddo)
-    console.log(isLoading)
     setDdo(ddo)
   }
   return (
