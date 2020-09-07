@@ -39,7 +39,7 @@ export function Publish() {
       liquidityProviderFee: ''
     }
 
-    const ddo = await publish(asset as Metadata, priceOptions, 'access', '', '')
+    const ddo = await publish(asset as Metadata, priceOptions, 'access')
     console.log(ddo)
     setDdo(ddo)
   }

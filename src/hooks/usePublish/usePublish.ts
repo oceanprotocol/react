@@ -9,14 +9,14 @@ import {
 } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Service'
 import { PriceOptions } from './PriceOptions'
 import { publishFeedback } from '../../utils'
+import { DataTokenOptions } from '.'
 
 interface UsePublish {
   publish: (
     asset: Metadata,
     priceOptions: PriceOptions,
     serviceConfigs: ServiceType,
-    mpAddress: string,
-    mpFee: string
+    dataTokenOptions?: DataTokenOptions
   ) => Promise<DDO>
   mint: (tokenAddress: string, tokensToMint: string) => void
   publishStep?: number
@@ -42,6 +42,7 @@ function usePublish(): UsePublish {
    * @param  {Metadata} asset The metadata of the asset.
    * @param  {PriceOptions}  priceOptions : number of tokens to mint, datatoken weight , liquidity fee, type : fixed, dynamic
    * @param  {ServiceType} serviceType Desired service type of the asset access or compute
+   * @param  {DataTokenOptions} dataTokenOptions custom name, symbol and cap for datatoken
    * @param  {string} mpAddress The address of the market
    * @param  {string} mpFee The fee of the market
    * @return {Promise<DDO>} Returns the newly published ddo
@@ -49,7 +50,8 @@ function usePublish(): UsePublish {
   async function publish(
     asset: Metadata,
     priceOptions: PriceOptions,
-    serviceType: ServiceType
+    serviceType: ServiceType,
+    dataTokenOptions?: DataTokenOptions
   ): Promise<DDO> {
     if (status !== ProviderStatus.CONNECTED || !ocean || !account) return
     setIsLoading(true)
@@ -126,7 +128,14 @@ function usePublish(): UsePublish {
       Logger.log('services created', services)
 
       const ddo = await ocean.assets
-        .create(asset, account, services)
+        .create(
+          asset,
+          account,
+          services,
+          dataTokenOptions?.cap,
+          dataTokenOptions?.name,
+          dataTokenOptions?.symbol
+        )
         .next(setStep)
       Logger.log('ddo created', ddo)
       setStep(7)
