@@ -1,2 +1,2 @@
 export * from './usePublish'
-export * from './ServiceConfig'
+export * from './PriceOptions'

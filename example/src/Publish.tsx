@@ -6,7 +6,6 @@ import { useState } from 'react'
 import { Metadata } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Metadata'
 
 export function Publish() {
-  // const { accountId, ocean } = useOcean()
   const { publish, publishStepText, isLoading } = usePublish()
   const [ddo, setDdo] = useState<DDO | undefined>()
 
@@ -32,14 +31,16 @@ export function Publish() {
   }
 
   const publishAsset = async () => {
-    const ddo = await publish(asset as Metadata, '90', 'access', '', '')
-    // const pool = ocean.pool.createDTPool(
-    //   accountId,
-    //   ddo.dataToken,
-    //   '90',
-    //   '9',
-    //   '0.03'
-    // )
+    const priceOptions = {
+      price: 10,
+      tokensToMint: 10,
+      type: 'fixed',
+      weightOnDataToken: '',
+      liquidityProviderFee: ''
+    }
+
+    const ddo = await publish(asset as Metadata, priceOptions, 'access', '', '')
+    console.log(ddo)
     setDdo(ddo)
   }
   return (
@@ -51,7 +52,6 @@ export function Publish() {
       <div>
         IsLoading: {isLoading.toString()} || Status: {publishStepText}
       </div>
-
       <div>DID: {ddo && ddo.id} </div>
     </>
   )

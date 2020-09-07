@@ -54,6 +54,48 @@ export async function getBestDataTokenPrice(
 
   return bestPool.price
 }
+export async function getCheapestExchange(
+  ocean: Ocean,
+  dataTokenAddress: string
+) {
+  if (!ocean || !dataTokenAddress) return
+
+  const tokenExchanges = await ocean.fixedRateExchange.searchforDT(
+    dataTokenAddress,
+    '1'
+  )
+  Logger.log('Exchanges found', tokenExchanges)
+  if (tokenExchanges === undefined || tokenExchanges.length === 0) {
+    return {
+      address: '',
+      price: ''
+    }
+  }
+  let cheapestExchangeAddress
+  let cheapestExchangePrice = new Decimal(999999999999)
+
+  if (tokenExchanges) {
+    for (let i = 0; i < tokenExchanges.length; i++) {
+      const exchangePrice = tokenExchanges[i].fixedRate
+
+      const decimalExchangePrice = new Decimal(exchangePrice)
+      Logger.log(
+        'Pool price ',
+        tokenExchanges[i],
+        decimalExchangePrice.toString()
+      )
+      if (decimalExchangePrice < cheapestExchangePrice) {
+        cheapestExchangePrice = decimalExchangePrice
+        cheapestExchangeAddress = tokenExchanges[i]
+      }
+    }
+  }
+
+  return {
+    address: cheapestExchangeAddress,
+    price: cheapestExchangePrice.toString()
+  }
+}
 
 export async function checkAndBuyDT(
   ocean: Ocean,
@@ -65,25 +107,37 @@ export async function checkAndBuyDT(
     account
   )
   Logger.log(`User has ${userOwnedTokens} tokens`)
-  let cheapestPool
   if (userOwnedTokens === '0') {
-    cheapestPool = await getCheapestPool(
+    const cheapestPool = await getCheapestPool(
       ocean,
       account.getId(),
       dataTokenAddress
     )
+    const cheapestExchange = await getCheapestExchange(ocean, dataTokenAddress)
     Decimal.set({ precision: 5 })
-    const price = new Decimal(cheapestPool.price).times(1.05).toString()
-    const maxPrice = new Decimal(cheapestPool.price).times(2).toString()
-    Logger.log('Buying token', cheapestPool, account.getId(), price)
-    const buyResponse = await ocean.pool.buyDT(
-      account.getId(),
-      cheapestPool.address,
-      '1',
-      price,
-      maxPrice
-    )
-    Logger.log('DT buy response', buyResponse)
-    return buyResponse
+    const cheapestPoolPrice = new Decimal(cheapestPool.price)
+    const cheapestExchangePrice = new Decimal(cheapestExchange.price)
+
+    if (cheapestExchangePrice > cheapestPoolPrice) {
+      const price = new Decimal(cheapestPool.price).times(1.05).toString()
+      const maxPrice = new Decimal(cheapestPool.price).times(2).toString()
+      Logger.log('Buying token', cheapestPool, account.getId(), price)
+      const buyResponse = await ocean.pool.buyDT(
+        account.getId(),
+        cheapestPool.address,
+        '1',
+        price,
+        maxPrice
+      )
+      Logger.log('DT buy response', buyResponse)
+      return buyResponse
+    } else {
+      const exchange = await ocean.fixedRateExchange.buyDT(
+        cheapestExchange.address,
+        '1',
+        account.getId()
+      )
+      return exchange
+    }
   }
 }

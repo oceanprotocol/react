@@ -29,11 +29,9 @@ export function Wallet() {
       <div>
         <button onClick={conn}>Connect</button>
       </div>
-
       <div>
         <button onClick={disc}>Disconnect</button>
       </div>
-
       <div>{accountId}</div>
     </>
   )

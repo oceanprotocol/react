@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { DDO, Metadata, DataTokens, Logger } from '@oceanprotocol/lib'
+import { useState } from 'react'
+import { DDO, Metadata, Logger } from '@oceanprotocol/lib'
 import { useOcean } from '../../providers'
 import ProviderStatus from '../../providers/OceanProvider/ProviderStatus'
 import {
@@ -7,13 +7,13 @@ import {
   ServiceComputePrivacy,
   ServiceType
 } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Service'
-import { ServiceConfig } from './ServiceConfig'
+import { PriceOptions } from './PriceOptions'
 import { publishFeedback } from '../../utils'
 
 interface UsePublish {
   publish: (
     asset: Metadata,
-    tokensToMint: string,
+    priceOptions: PriceOptions,
     serviceConfigs: ServiceType,
     mpAddress: string,
     mpFee: string
@@ -26,7 +26,7 @@ interface UsePublish {
 }
 
 function usePublish(): UsePublish {
-  const { ocean, status, account, accountId, config } = useOcean()
+  const { ocean, status, account, accountId } = useOcean()
   const [isLoading, setIsLoading] = useState(false)
   const [publishStep, setPublishStep] = useState<number | undefined>()
   const [publishStepText, setPublishStepText] = useState<string | undefined>()
@@ -40,23 +40,23 @@ function usePublish(): UsePublish {
   /**
    * Publish an asset.It also creates the datatoken, mints tokens and gives the market allowance
    * @param  {Metadata} asset The metadata of the asset.
-   * @param  {string} tokensToMint Numer of tokens to mint and give allowance to market
-   * @param  {ServiceConfig[]} serviceConfigs Desired services of the asset, ex: [{serviceType: 'access', cost:'1'}]
+   * @param  {PriceOptions}  priceOptions : number of tokens to mint, datatoken weight , liquidity fee, type : fixed, dynamic
+   * @param  {ServiceType} serviceType Desired service type of the asset access or compute
    * @param  {string} mpAddress The address of the market
    * @param  {string} mpFee The fee of the market
    * @return {Promise<DDO>} Returns the newly published ddo
    */
   async function publish(
     asset: Metadata,
-    tokensToMint: string,
-    serviceType: ServiceType,
-    mpAddress: string,
-    mpFee: string
+    priceOptions: PriceOptions,
+    serviceType: ServiceType
   ): Promise<DDO> {
     if (status !== ProviderStatus.CONNECTED || !ocean || !account) return
     setIsLoading(true)
     setPublishError(undefined)
     try {
+      const tokensToMint = priceOptions.tokensToMint.toString()
+
       const publishedDate =
         new Date(Date.now()).toISOString().split('.')[0] + 'Z'
       const timeout = 0
@@ -132,8 +132,9 @@ function usePublish(): UsePublish {
       setStep(7)
       await mint(ddo.dataToken, tokensToMint)
       Logger.log(`minted ${tokensToMint} tokens`)
-      setStep(8)
 
+      await createPricing(priceOptions, ddo.dataToken)
+      setStep(8)
       return ddo
     } catch (error) {
       setPublishError(error.message)
@@ -141,6 +142,34 @@ function usePublish(): UsePublish {
       setStep(undefined)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  async function createPricing(
+    priceOptions: PriceOptions,
+    dataTokenAddress: string
+  ) {
+    switch (priceOptions.type) {
+      case 'dynamic': {
+        // weight is hardcoded at 9 (90%) and publisher fee at 0.03(this was a random value set by me)
+        const pool = await ocean.pool.createDTPool(
+          accountId,
+          dataTokenAddress,
+          priceOptions.tokensToMint.toString(),
+          priceOptions.weightOnDataToken,
+          priceOptions.liquidityProviderFee
+        )
+        break
+      }
+      case 'fixed': {
+        const fixedPriceExchange = await ocean.fixedRateExchange.create(
+          dataTokenAddress,
+          priceOptions.price.toString(),
+          accountId
+        )
+        await ocean.fixedRateExchange.activate(fixedPriceExchange, accountId)
+        break
+      }
     }
   }
 

@@ -19,14 +19,14 @@ export function ConsumeDdo() {
   }, [ocean])
 
   const consumeDid = async () => {
-    if (did === undefined) return
+    if (!did) return
     const ddo = await ocean.assets.resolve(did)
 
     await consume(did, ddo.dataToken, 'access')
   }
 
   const computeDid = async () => {
-    if (did === undefined) return
+    if (!did) return
     const ddo = await ocean.assets.resolve(did)
     console.log(ddo)
     console.log('ocean dt', ocean.datatokens)

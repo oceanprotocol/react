@@ -13,7 +13,7 @@ export function AllDdos() {
 
   useEffect(() => {
     async function init() {
-      if (ocean === undefined || account === undefined) return
+      if (!ocean || !account) return
 
       const assets = await ocean.assets.query({
         page: 1,
