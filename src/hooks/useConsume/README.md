@@ -6,18 +6,17 @@ Get access to, and download a data asset.
 
 ```tsx
 import React from 'react'
-import { useWeb3, useMetadata, useConsume } from '@oceanprotocol/react'
+import { useOcean, useConsume } from '@oceanprotocol/react'
 
 const did = 'did:op:0x000000000'
 
 export default function MyComponent() {
-  // Get web3 from Web3Provider context
-  const { web3, account } = useWeb3()
+  const { accountId } = useOcean()
 
   // Get metadata for this asset
-  const { title, metadata } = useMetadata(did)
+  const { title, price } = useMetadata(did)
 
-  // consume asset
+  // Consume helpers
   const { consume, consumeStep } = useConsume()
 
   async function handleDownload() {
@@ -27,9 +26,9 @@ export default function MyComponent() {
   return (
     <div>
       <h1>{title}</h1>
-      <p>Price: {web3.utils.fromWei(metadata.main.price)}</p>
+      <p>Price: {price}</p>
 
-      <p>Your account: {account}</p>
+      <p>Your account: {accountId}</p>
       <button onClick={handleDownload}>
         {consumeStep || 'Download Asset'}
       </button>
