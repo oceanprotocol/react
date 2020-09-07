@@ -34,11 +34,9 @@ function App() {
         <div>
           <AllDdos />
         </div>
-
         <div>
           <Publish />
         </div>
-
         <div>
           <ConsumeDdo />
         </div>

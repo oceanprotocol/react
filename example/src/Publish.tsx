@@ -55,7 +55,6 @@ export function Publish() {
       <div>
         IsLoading: {isLoading.toString()} || Status: {publishStepText}
       </div>
-
       <div>DID: {ddo && ddo.id} </div>
     </>
   )
