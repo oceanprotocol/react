@@ -10,8 +10,8 @@ export function Wallet() {
   }
 
   const init = useCallback(async () => {
-    if (ocean === undefined || accountId === undefined) return;
-    await ocean.assets.ownerAssets(accountId);
+    if (ocean === undefined || accountId === undefined) return
+    await ocean.assets.ownerAssets(accountId)
   }, [accountId, ocean])
 
   useEffect(() => {

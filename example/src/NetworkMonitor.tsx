@@ -6,23 +6,26 @@ import { useEffect } from 'react'
 export const NetworkMonitor = () => {
   const { connect, web3Provider } = useOcean()
 
-  const handleNetworkChanged = useCallback((chainId: number) => {
-    // const config = getOceanConfig(chainId)
-    // temp hack
-    let network = ''
-    switch (chainId) {
-      case 1: {
-        network = 'mainnet';
-        break;
+  const handleNetworkChanged = useCallback(
+    (chainId: number) => {
+      // const config = getOceanConfig(chainId)
+      // temp hack
+      let network = ''
+      switch (chainId) {
+        case 1: {
+          network = 'mainnet'
+          break
+        }
+        case 4: {
+          network = 'rinkeby'
+          break
+        }
       }
-      case 4: {
-        network = 'rinkeby';
-        break;
-      }
-    }
-    const config = new ConfigHelper().getConfig(network)
-    connect(config)
-  }, [connect]);
+      const config = new ConfigHelper().getConfig(network)
+      connect(config)
+    },
+    [connect]
+  )
 
   useEffect(() => {
     if (!web3Provider) return
