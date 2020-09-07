@@ -1,17 +1,15 @@
 import React from 'react'
 import {
   useOcean,
-  usePublish,
   useConsume,
   useCompute,
   computeOptions
 } from '@oceanprotocol/react'
-import { Metadata, DDO } from '@oceanprotocol/lib'
 import { useState } from 'react'
 import { useEffect } from 'react'
 
 export function ConsumeDdo() {
-  const { accountId, ocean } = useOcean()
+  const { ocean } = useOcean()
   const { consumeStepText, consume, consumeError } = useConsume()
   const { compute, computeStepText } = useCompute()
   const [did, setDid] = useState<string | undefined>()

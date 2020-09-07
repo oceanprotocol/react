@@ -1,12 +1,13 @@
 import React from 'react'
-import { useOcean, usePublish } from '@oceanprotocol/react'
+import { useOcean } from '@oceanprotocol/react'
 import { DDO } from '@oceanprotocol/lib'
 import { useState } from 'react'
 import { useEffect } from 'react'
 import shortid from 'shortid'
 import { MetadataExample } from './MetadataExample'
+
 export function AllDdos() {
-  const { accountId, chainId, account, ocean } = useOcean()
+  const { chainId, account, ocean } = useOcean()
 
   const [ddos, setDdos] = useState<DDO[] | undefined>()
 
