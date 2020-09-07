@@ -25,6 +25,7 @@
 - [🏄 Quick Start](#-quick-start)
   - [1. Add Provider](#1-add-provider)
   - [2. Use Hooks](#2-use-hooks)
+- [📖 Documentation](#-documentation)
 - [🦑 Development](#-development)
 - [✨ Code Style](#-code-style)
 - [👩‍🔬 Testing](#-testing)
@@ -64,7 +65,7 @@ export default function MyComponent() {
   const { ocean, web3, account } = useOcean()
 
   // Get metadata for this asset
-  const { title, metadata, bestPrice } = useMetadata(did)
+  const { title, metadata, price } = useMetadata(did)
   const [price, setPrice] = useState<string>()
 
   // publish asset
@@ -80,7 +81,7 @@ export default function MyComponent() {
   return (
     <div>
       <h1>{title}</h1>
-      <p>Price: {bestPrice}</p>
+      <p>Price: {price}</p>
 
       <p>Your account: {account}</p>
       <button onClick={handleDownload}>
@@ -90,6 +91,16 @@ export default function MyComponent() {
   )
 }
 ```
+
+## 📖 Documentation
+
+- [useOcean/OceanProvider](src/providers/OceanProvider/)
+- [usePublish](src/hooks/usePublish/)
+- [useMetadata](src/hooks/useMetadata/)
+- [useConsume](src/hooks/useConsume/)
+- [useCompute](src/hooks/useCompute/)
+
+There is also an example app based on Create React App under [`example/`](example/).
 
 ## 🦑 Development
 
