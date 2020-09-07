@@ -8,7 +8,7 @@ export function Publish() {
   const { accountId, ocean } = useOcean()
   const { publish, publishStepText, isLoading } = usePublish()
   const [ddo, setDdo] = useState<DDO | undefined>()
- 
+
   const asset = {
     main: {
       type: 'dataset',
@@ -59,7 +59,9 @@ export function Publish() {
       <div>
         <button onClick={publishAsset}>Publish</button>
       </div>
-      <div>IsLoading: {isLoading.toString()} || Status: {publishStepText}</div>
+      <div>
+        IsLoading: {isLoading.toString()} || Status: {publishStepText}
+      </div>
 
       <div>DID: {ddo && ddo.id} </div>
     </>

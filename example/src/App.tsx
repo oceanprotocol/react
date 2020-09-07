@@ -4,12 +4,8 @@ import { OceanProvider } from '@oceanprotocol/react'
 import { Wallet } from './Wallet'
 import { Publish } from './Publish'
 import { Config, ConfigHelper } from '@oceanprotocol/lib'
-import { AllDdos } from './AllDdos'
-import { ConsumeDdo } from './ConsumeDdo'
-
-
-import { NetworkMonitor } from './NetworkMonitor'
-import { MetadataExample } from './MetadataExample'
+imprt { ConsumeDdo } from './Consume'
+import { NetworkMonitor } from './NetworkMonadataExample from './MetadataExample'
 
 // factory Address needs to be updated each time you deploy the contract on local network
 const config = {
@@ -21,9 +17,7 @@ const config = {
 
 const configRinkeby = new ConfigHelper().getConfig('rinkeby')
 
-const providerOptions = {
-
-}
+const providerOptions = {}
 
 export const web3ModalOpts = {
   cacheProvider: true,
