@@ -32,7 +32,16 @@ export function Publish() {
 
   const publishAsset = async () => {
     console.log(isLoading)
-    const ddo = await publish(asset as Metadata, '90', 'access', '', '')
+
+    const priceOptions = {
+      price:10,
+      tokensToMint:10,
+      type: 'simple',
+      weightOnDataToken: '',
+      liquidityProviderFee: ''
+    }
+
+    const ddo = await publish(asset as Metadata, priceOptions, 'access', '', '')
     console.log(ddo)
     console.log(isLoading)
     const pool = ocean.pool.createDTPool(
