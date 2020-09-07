@@ -10,7 +10,7 @@ export function Wallet() {
   }
 
   const init = async () => {
-    if (ocean === undefined || accountId === undefined) return
+    if (!ocean || !accountId) return
 
     const assets = await ocean.assets.ownerAssets(accountId)
     console.log(assets)

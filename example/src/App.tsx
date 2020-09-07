@@ -3,17 +3,10 @@ import './App.css'
 import { OceanProvider } from '@oceanprotocol/react'
 import { Wallet } from './Wallet'
 import { Publish } from './Publish'
-import { Config, ConfigHelper } from '@oceanprotocol/lib'
-imprt { ConsumeDdo } from './Consume'
-import { NetworkMonitor } from './NetworkMonadataExample from './MetadataExample'
-
-// factory Address needs to be updated each time you deploy the contract on local network
-const config = {
-  metadataStoreUri: 'http://aquarius:5000',
-  providerUri: 'http://localhost:8030',
-  nodeUri: `http://localhost:8545`,
-  factoryAddress: '0x2fC1fd21cb222Dc180Ef817dE4c426fd9230b5A5'
-} as Config
+import { ConfigHelper } from '@oceanprotocol/lib'
+import { NetworkMonitor } from './NetworkMonitor'
+import { AllDdos } from './AllDdos'
+import { ConsumeDdo } from './ConsumeDdo'
 
 const configRinkeby = new ConfigHelper().getConfig('rinkeby')
 

@@ -1,17 +1,15 @@
 import React from 'react'
 import {
   useOcean,
-  usePublish,
   useConsume,
   useCompute,
   computeOptions
 } from '@oceanprotocol/react'
-import { Metadata, DDO } from '@oceanprotocol/lib'
 import { useState } from 'react'
 import { useEffect } from 'react'
 
 export function ConsumeDdo() {
-  const { accountId, ocean } = useOcean()
+  const { ocean } = useOcean()
   const { consumeStepText, consume, consumeError } = useConsume()
   const { compute, computeStepText } = useCompute()
   const [did, setDid] = useState<string | undefined>()
@@ -21,14 +19,14 @@ export function ConsumeDdo() {
   }, [ocean])
 
   const consumeDid = async () => {
-    if (did === undefined) return
+    if (!did) return
     const ddo = await ocean.assets.resolve(did)
 
     await consume(did, ddo.dataToken, 'access')
   }
 
   const computeDid = async () => {
-    if (did === undefined) return
+    if (!did) return
     const ddo = await ocean.assets.resolve(did)
     console.log(ddo)
     console.log('ocean dt', ocean.datatokens)

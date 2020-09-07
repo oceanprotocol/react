@@ -55,11 +55,8 @@ function usePublish(): UsePublish {
     setIsLoading(true)
     setPublishError(undefined)
     try {
-<<<<<<< HEAD
       const tokensToMint = priceOptions.tokensToMint.toString()
 
-=======
->>>>>>> main
       const publishedDate =
         new Date(Date.now()).toISOString().split('.')[0] + 'Z'
       const timeout = 0
@@ -135,7 +132,6 @@ function usePublish(): UsePublish {
       setStep(7)
       await mint(ddo.dataToken, tokensToMint)
       Logger.log(`minted ${tokensToMint} tokens`)
-      setStep(8)
 
       await createPricing(priceOptions, ddo.dataToken)
       setStep(8)
