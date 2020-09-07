@@ -8,7 +8,7 @@
     "eject": "react-app-rewired eject"
   },
   "dependencies": {
-    "@oceanprotocol/lib": "^0.1.17",
+    "@oceanprotocol/lib": "^0.2.0",
     "@oceanprotocol/react": "file:../",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
