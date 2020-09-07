@@ -36,7 +36,7 @@ export function Publish() {
     const priceOptions = {
       price: 10,
       tokensToMint: 10,
-      type: 'simple',
+      type: 'fixed',
       weightOnDataToken: '',
       liquidityProviderFee: ''
     }

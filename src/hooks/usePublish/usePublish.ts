@@ -40,7 +40,7 @@ function usePublish(): UsePublish {
   /**
    * Publish an asset.It also creates the datatoken, mints tokens and gives the market allowance
    * @param  {Metadata} asset The metadata of the asset.
-   * @param  {PriceOptions}  priceOptions : number of tokens to mint, datatoken weight , liquidity fee, type : simple, advanced
+   * @param  {PriceOptions}  priceOptions : number of tokens to mint, datatoken weight , liquidity fee, type : fixed, dynamic
    * @param  {ServiceType} serviceType Desired service type of the asset access or compute
    * @param  {string} mpAddress The address of the market
    * @param  {string} mpFee The fee of the market
