@@ -1,15 +1,32 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useOcean } from '@oceanprotocol/react'
 import { ConfigHelper } from '@oceanprotocol/lib'
 import { useEffect } from 'react'
 
-export function NetworkMonitor() {
+export const NetworkMonitor = () => {
   const { connect, web3Provider } = useOcean()
 
-  const handleNetworkChanged = (chainId: number) => {
-    const config = new ConfigHelper().getConfigById(chainId)
-    connect(config)
-  }
+  const handleNetworkChanged = useCallback(
+    (chainId: number) => {
+      // const config = getOceanConfig(chainId)
+      // temp hack
+      let network = ''
+      switch (chainId) {
+        case 1: {
+          network = 'mainnet'
+          break
+        }
+        case 4: {
+          network = 'rinkeby'
+          break
+        }
+      }
+      const config = new ConfigHelper().getConfig(network)
+      connect(config)
+    },
+    [connect]
+  )
+
   useEffect(() => {
     if (!web3Provider) return
 
@@ -18,7 +35,7 @@ export function NetworkMonitor() {
     return () => {
       web3Provider.removeListener('chainChanged', handleNetworkChanged)
     }
-  }, [web3Provider])
+  }, [web3Provider, handleNetworkChanged])
 
   return <></>
 }

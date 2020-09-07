@@ -4,9 +4,9 @@ import { OceanProvider } from '@oceanprotocol/react'
 import { Wallet } from './Wallet'
 import { Publish } from './Publish'
 import { ConfigHelper } from '@oceanprotocol/lib'
-import { NetworkMonitor } from './NetworkMonitor'
 import { AllDdos } from './AllDdos'
 import { ConsumeDdo } from './ConsumeDdo'
+import { NetworkMonitor } from './NetworkMonitor'
 
 const configRinkeby = new ConfigHelper().getConfig('rinkeby')
 

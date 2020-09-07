@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { useEffect } from 'react'
 import shortid from 'shortid'
 import { MetadataExample } from './MetadataExample'
+
 export function AllDdos() {
   const { chainId, account, ocean } = useOcean()
 

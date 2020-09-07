@@ -1,5 +1,6 @@
 import React from 'react'
-import { useOcean, usePublish } from '@oceanprotocol/react'
+import { usePublish } from '@oceanprotocol/react'
+// import { useOcean, usePublish } from '@oceanprotocol/react'
 import { DDO } from '@oceanprotocol/lib'
 import { useState } from 'react'
 import { Metadata } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Metadata'
