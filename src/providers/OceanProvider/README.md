@@ -23,16 +23,22 @@ const web3ModalOpts = {
   providerOptions // required
 }
 
+const oceanDefaultConfig = new ConfigHelper().getConfig(
+  'mainnet',
+  'YOUR_INFURA_PROJECT_ID'
+)
+
+const config = {
+  ...oceanDefaultConfig,
+  metadataStoreUri: 'https://your-metadata-store.com',
+  providerUri: 'https://your-provider.com'
+}
+
 export default function MyApp({
   children
 }: {
   children: ReactNode
 }): ReactNode {
-  const oceanInitialConfig = new ConfigHelper().getConfig(
-    'mainnet',
-    'INFURA_PROJECT_ID'
-  )
-
   return (
     <OceanProvider initialConfig={config} web3ModalOpts={web3ModalOpts}>
       <h1>My App</h1>
