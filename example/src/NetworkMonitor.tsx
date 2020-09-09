@@ -8,7 +8,7 @@ export const NetworkMonitor = () => {
 
   const handleNetworkChanged = useCallback(
     (chainId: number) => {
-      const config = new ConfigHelper().getConfigById(chainId)
+      const config = new ConfigHelper().getConfig(chainId)
       connect(config)
     },
     [connect]

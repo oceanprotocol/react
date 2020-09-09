@@ -57,7 +57,6 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
 
   useEffect(() => {
     async function init(): Promise<void> {
-      Logger.debug('meta init', status)
       if (ocean && status === ProviderStatus.CONNECTED) {
         if (!asset) return
 
