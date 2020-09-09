@@ -18,6 +18,7 @@ export const web3ModalOpts = {
 }
 
 function App() {
+  console.log(configRinkeby)
   const init = async () => {}
 
   useEffect(() => {

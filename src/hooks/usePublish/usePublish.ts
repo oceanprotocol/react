@@ -43,8 +43,6 @@ function usePublish(): UsePublish {
    * @param  {PriceOptions}  priceOptions : number of tokens to mint, datatoken weight , liquidity fee, type : fixed, dynamic
    * @param  {ServiceType} serviceType Desired service type of the asset access or compute
    * @param  {DataTokenOptions} dataTokenOptions custom name, symbol and cap for datatoken
-   * @param  {string} mpAddress The address of the market
-   * @param  {string} mpFee The fee of the market
    * @return {Promise<DDO>} Returns the newly published ddo
    */
   async function publish(
@@ -160,7 +158,6 @@ function usePublish(): UsePublish {
   ) {
     switch (priceOptions.type) {
       case 'dynamic': {
-        // weight is hardcoded at 9 (90%) and publisher fee at 0.03(this was a random value set by me)
         const pool = await ocean.pool.createDTPool(
           accountId,
           dataTokenAddress,
@@ -176,7 +173,7 @@ function usePublish(): UsePublish {
           priceOptions.price.toString(),
           accountId
         )
-        await ocean.fixedRateExchange.activate(fixedPriceExchange, accountId)
+
         break
       }
     }

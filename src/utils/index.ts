@@ -33,8 +33,8 @@ export const publishFeedback: { [key in number]: string } = {
   2: '2/6 Encrypting files ...',
   4: '3/6 Generating proof ...',
   6: '4/6 Storing ddo ...',
-  7: '2/6 Minting tokens ...',
-  8: '4/6 Asset published succesfully'
+  7: '5/6 Minting tokens ...',
+  8: '6/6 Asset published succesfully'
 }
 
 export * from './web3'

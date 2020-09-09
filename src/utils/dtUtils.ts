@@ -13,7 +13,7 @@ export async function getCheapestPool(
     accountId,
     dataTokenAddress
   )
-  Logger.log('DT Pool found', tokenPools)
+  // Logger.log('DT Pool found', tokenPools)
   if (tokenPools === undefined || tokenPools.length === 0) {
     return {
       address: '',
