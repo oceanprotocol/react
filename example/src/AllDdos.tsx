@@ -22,7 +22,7 @@ export function AllDdos() {
         sort: { created: -1 }
       })
 
-      setDdos(assets.results)
+      setDdos(assets.results.slice(0, 4))
     }
     init()
   }, [ocean, account, chainId])

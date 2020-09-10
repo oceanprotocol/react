@@ -25,7 +25,7 @@ export const consumeFeedback: { [key in number]: string } = {
 }
 
 function useConsume(): UseConsume {
-  const { ocean, account, accountId } = useOcean()
+  const { ocean, account, accountId, config } = useOcean()
   const [isLoading, setIsLoading] = useState(false)
   const [consumeStep, setConsumeStep] = useState<number | undefined>()
   const [consumeStepText, setConsumeStepText] = useState<string | undefined>()
@@ -47,7 +47,7 @@ function useConsume(): UseConsume {
 
     try {
       setStep(0)
-      await checkAndBuyDT(ocean, dataTokenAddress, account)
+      await checkAndBuyDT(ocean, dataTokenAddress, account, config)
 
       setStep(1)
       const order = await ocean.assets.order(did, serviceType, accountId)
