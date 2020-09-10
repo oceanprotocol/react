@@ -65,7 +65,7 @@ function useCompute(): UseCompute {
       setIsLoading(true)
       setStep(0)
 
-      await checkAndBuyDT(ocean, dataTokenAddress, account)
+      await checkAndBuyDT(ocean, dataTokenAddress, account, config)
       rawAlgorithmMeta.container = computeContainer
       rawAlgorithmMeta.rawcode = algorithmRawCode
 
