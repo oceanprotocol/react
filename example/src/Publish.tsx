@@ -32,7 +32,7 @@ export function Publish() {
 
   const publishAsset = async () => {
     const priceOptions = {
-      price: 10,
+      price: 7,
       tokensToMint: 10,
       type: 'fixed',
       weightOnDataToken: '',

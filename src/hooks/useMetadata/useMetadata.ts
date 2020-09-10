@@ -2,31 +2,28 @@ import { useState, useEffect } from 'react'
 import { DID, DDO, Metadata, Logger } from '@oceanprotocol/lib'
 import { useOcean } from '../../providers'
 import ProviderStatus from '../../providers/OceanProvider/ProviderStatus'
-import { getBestDataTokenPrice, getCheapestPool } from '../../utils/dtUtils'
-import Pool from './Pool'
+import { getBestDataTokenPrice } from '../../utils/dtUtils'
 import { isDDO } from '../../utils'
+import BestPrice from './BestPrice'
 
 interface UseMetadata {
   ddo: DDO
   did: DID | string
   metadata: Metadata
   title: string
-  price: string
-  poolAddress: string
+  price: BestPrice
   isLoaded: boolean
-  getPrice: (dataTokenAddress?: string) => Promise<string>
-  getPool: (dataTokenAddress?: string) => Promise<Pool>
+  getPrice: (dataTokenAddress?: string) => Promise<BestPrice>
 }
 
 function useMetadata(asset?: DID | string | DDO): UseMetadata {
-  const { ocean, status, config, accountId } = useOcean()
+  const { ocean, status, accountId } = useOcean()
   const [internalDdo, setDDO] = useState<DDO | undefined>()
   const [internalDid, setDID] = useState<DID | string | undefined>()
   const [metadata, setMetadata] = useState<Metadata | undefined>()
   const [title, setTitle] = useState<string | undefined>()
   const [isLoaded, setIsLoaded] = useState(false)
-  const [price, setPrice] = useState<string | undefined>()
-  const [poolAddress, setPoolAddress] = useState<string | undefined>()
+  const [price, setPrice] = useState<BestPrice | undefined>()
 
   async function getDDO(did: DID | string): Promise<DDO> {
     if (status === ProviderStatus.CONNECTED) {
@@ -35,24 +32,15 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
     }
   }
 
-  async function getPrice(dataTokenAddress?: string): Promise<string> {
+  async function getPrice(dataTokenAddress?: string): Promise<BestPrice> {
     if (!dataTokenAddress) dataTokenAddress = internalDdo.dataToken
-    return await getBestDataTokenPrice(ocean, accountId, dataTokenAddress)
-  }
-  async function getPool(dataTokenAddress?: string): Promise<Pool> {
-    if (!dataTokenAddress) dataTokenAddress = internalDdo.dataToken
-    return await getCheapestPool(ocean, accountId, dataTokenAddress)
+    return await getBestDataTokenPrice(ocean, dataTokenAddress, accountId)
   }
 
   async function getMetadata(): Promise<Metadata> {
     if (!internalDdo) return
     const metadata = internalDdo.findServiceByType('metadata')
     return metadata.attributes
-  }
-
-  async function getTitle(): Promise<string> {
-    const metadata = await getMetadata()
-    return metadata.main.name
   }
 
   useEffect(() => {
@@ -82,18 +70,17 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
         const metadata = await getMetadata()
         setMetadata(metadata)
         setTitle(metadata.main.name)
-        const pool = await getPool()
-        setPoolAddress(pool.address)
-        setPrice(pool.price)
+        const price = await getPrice()
+
+        setPrice(price)
         setIsLoaded(true)
       }
     }
     init()
 
     const interval = setInterval(async () => {
-      const pool = await getPool()
-      setPoolAddress(pool.address)
-      setPrice(pool.price)
+      const price = await getPrice()
+      setPrice(price)
     }, 10000)
     return () => clearInterval(interval)
   }, [accountId, internalDdo])
@@ -104,10 +91,8 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
     metadata,
     title,
     price,
-    poolAddress,
     isLoaded,
-    getPrice,
-    getPool
+    getPrice
   }
 }
 

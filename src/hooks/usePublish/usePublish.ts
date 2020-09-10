@@ -26,7 +26,7 @@ interface UsePublish {
 }
 
 function usePublish(): UsePublish {
-  const { ocean, status, account, accountId } = useOcean()
+  const { ocean, status, account, accountId, config } = useOcean()
   const [isLoading, setIsLoading] = useState(false)
   const [publishStep, setPublishStep] = useState<number | undefined>()
   const [publishStepText, setPublishStepText] = useState<string | undefined>()
@@ -140,7 +140,7 @@ function usePublish(): UsePublish {
       await mint(ddo.dataToken, tokensToMint)
       Logger.log(`minted ${tokensToMint} tokens`)
 
-      await createPricing(priceOptions, ddo.dataToken)
+      await createPricing(priceOptions, ddo.dataToken, tokensToMint)
       setStep(8)
       return ddo
     } catch (error) {
@@ -154,7 +154,8 @@ function usePublish(): UsePublish {
 
   async function createPricing(
     priceOptions: PriceOptions,
-    dataTokenAddress: string
+    dataTokenAddress: string,
+    mintedTokens: string
   ) {
     switch (priceOptions.type) {
       case 'dynamic': {
@@ -173,7 +174,12 @@ function usePublish(): UsePublish {
           priceOptions.price.toString(),
           accountId
         )
-
+        await ocean.datatokens.approve(
+          dataTokenAddress,
+          config.fixedRateExchangeAddress,
+          mintedTokens,
+          accountId
+        )
         break
       }
     }
