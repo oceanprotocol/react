@@ -1,6 +1,6 @@
-[![banner](https://raw.githubusercontent.com/oceanprotocol/art/master/github/repo-banner%402x.png)](https://oceanprotocol.com)
+# React - Ocean V3
 
-<h1 align="center">react</h1>
+[![banner](https://raw.githubusercontent.com/oceanprotocol/art/master/github/repo-banner%402x.png)](https://oceanprotocol.com)
 
 > 🎣 React hooks & components on top of @oceanprotocol/lib
 
@@ -15,46 +15,69 @@
 
 ![iu](https://user-images.githubusercontent.com/90316/80356686-1650c080-887a-11ea-854e-bdc2bbdb0c20.jpeg)
 
-**WE ARE IN HARDWARE MODE. This project is in a conceptual phase and most stuff changes weekly. More importantly, it only works against bleeding edge v3 components of Ocean Protocol which are not completely public yet.**
+**WE ARE IN A HARDWARE MODE. This project is in a conceptual phase and most things change weekly. More importantly, it only works against bleeding edge v3 components of Ocean Protocol which are not completely public yet.**
 
 ---
 
-**Table of Contents**
+## Table of Contents
 
-- [🏗 Installation](#-installation)
-- [🏄 Quick Start](#-quick-start)
-  - [1. Add Provider](#1-add-provider)
-  - [2. Use Hooks](#2-use-hooks)
-- [📖 Documentation](#-documentation)
-- [🦑 Development](#-development)
-- [✨ Code Style](#-code-style)
-- [👩‍🔬 Testing](#-testing)
-- [🛳 Production](#-production)
-- [⬆️ Releases](#️-releases)
-  - [Production](#production)
-  - [Pre-Releases](#pre-releases)
-- [📜 Changelog](#-changelog)
-- [🎁 Contribute](#-contribute)
-- [🧜 Authors](#-authors)
-- [🏛 License](#-license)
+- [React - Ocean V3](#react---ocean-v3)
+  - [Table of Contents](#table-of-contents)
+  - [🏗 Installation](#-installation)
+  - [🏄 Quick Start](#-quick-start)
+    - [1. Add Provider](#1-add-provider)
+    - [2. Use Hooks](#2-use-hooks)
+  - [📖 Documentation](#-documentation)
+  - [🦑 Development](#-development)
+  - [✨ Code Style](#-code-style)
+  - [👩‍🔬 Testing](#-testing)
+  - [🛳 Production](#-production)
+  - [⬆️ Releases](#️-releases)
+    - [Production](#production)
+    - [Pre-Releases](#pre-releases)
+  - [📜 Changelog](#-changelog)
+  - [🎁 Contribute](#-contribute)
+  - [🧜 Authors](#-authors)
+  - [🏛 License](#-license)
 
 ## 🏗 Installation
 
+For use in your repo, install this library with the following command (you can alternatively use `yarn`, of course)
+
 ```bash
 npm install @oceanprotocol/react
+```
+
+If you want to clone this repo and work locally, then execute the following **instead** (in the root directory of this repository)
+
+```bash
+yarn install
 ```
 
 ## 🏄 Quick Start
 
 ### 1. Add Provider
 
-First, wrap your whole app with the [`<OceanProvider />`](src/providers/OceanProvider).
+First, wrap your whole app with [`<OceanProvider>`](src/providers/OceanProvider) component, i.e.
+
+```jsx
+import React from 'react';
+import { OceanProvider } from "@oceanprotocol/react";
+
+export default () => {
+  return (
+    <OceanProvider>
+      <YourApp />
+    <OceanProvider />
+  )
+}
+```
 
 ### 2. Use Hooks
 
 Then within your component use the included hooks to interact with Ocean's functionality. Each hook can be used independently:
 
-```tsx
+```jsx
 import React from 'react'
 import { useOcean, useMetadata, useConsume } from '@oceanprotocol/react'
 
@@ -100,13 +123,13 @@ export default function MyComponent() {
 - [useConsume](src/hooks/useConsume/)
 - [useCompute](src/hooks/useCompute/)
 
-There is also an example app based on Create React App under [`example/`](example/).
+There is also an example app in [`example/`](example/) directory of this repo.
 
 ## 🦑 Development
 
-The project is authored with TypeScript and compiled with `tsc`.
+The project uses TypeScript and compiled with the `tsc` command.
 
-To start compiler in watch mode:
+To start the compiler in watch mode:
 
 ```bash
 npm start
@@ -114,7 +137,7 @@ npm start
 
 ## ✨ Code Style
 
-For linting and auto-formatting you can use from the root of the project:
+For linting and auto-formatting run these from the root of the repo:
 
 ```bash
 # auto format all ts & css with eslint & stylelint
