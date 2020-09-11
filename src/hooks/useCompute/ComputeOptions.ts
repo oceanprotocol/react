@@ -1,11 +1,11 @@
 export interface ComputeValue {
-  entrypoint: string
-  image: string
-  tag: string
+  entrypoint: string;
+  image: string;
+  tag: string;
 }
 export interface ComputeOption {
-  name: string
-  value: ComputeValue
+  name: string;
+  value: ComputeValue;
 }
 
 export const computeOptions: ComputeOption[] = [
@@ -25,4 +25,4 @@ export const computeOptions: ComputeOption[] = [
       tag: 'python-panda'
     }
   }
-]
+];

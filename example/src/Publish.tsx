@@ -1,13 +1,12 @@
-import React from 'react'
-import { usePublish } from '@oceanprotocol/react'
-// import { useOcean, usePublish } from '@oceanprotocol/react'
-import { DDO } from '@oceanprotocol/lib'
-import { useState } from 'react'
-import { Metadata } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Metadata'
+import React from 'react';
+import { usePublish } from '../../src';
+import { DDO } from '@oceanprotocol/lib';
+import { useState } from 'react';
+import { Metadata } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Metadata';
 
 export function Publish() {
-  const { publish, publishStepText, isLoading } = usePublish()
-  const [ddo, setDdo] = useState<DDO | undefined>()
+  const { publish, publishStepText, isLoading } = usePublish();
+  const [ddo, setDdo] = useState<DDO>();
 
   const asset = {
     main: {
@@ -28,7 +27,7 @@ export function Publish() {
         }
       ]
     }
-  }
+  };
 
   const publishAsset = async () => {
     const priceOptions = {
@@ -37,12 +36,12 @@ export function Publish() {
       type: 'fixed',
       weightOnDataToken: '',
       liquidityProviderFee: ''
-    }
+    };
 
-    const ddo = await publish(asset as Metadata, priceOptions, 'access')
-    console.log(ddo)
-    setDdo(ddo)
-  }
+    // ! same issue as in App.tsx again
+    const ddo: any = await publish(asset as Metadata, priceOptions, 'access');
+    setDdo(ddo);
+  };
   return (
     <>
       <div>Publish</div>
@@ -54,5 +53,5 @@ export function Publish() {
       </div>
       <div>DID: {ddo && ddo.id} </div>
     </>
-  )
+  );
 }

@@ -45,13 +45,13 @@
 For use in your repo, install this library with the following command (you can alternatively use `yarn`, of course)
 
 ```bash
-npm install @oceanprotocol/react
+yarn add @oceanprotocol/react
 ```
 
 If you want to clone this repo and work locally, then execute the following **instead** (in the root directory of this repository)
 
 ```bash
-yarn install
+yarn
 ```
 
 ## 🏄 Quick Start
@@ -132,7 +132,7 @@ The project uses TypeScript and compiled with the `tsc` command.
 To start the compiler in watch mode:
 
 ```bash
-npm start
+yarn run start
 ```
 
 ## ✨ Code Style
@@ -141,10 +141,10 @@ For linting and auto-formatting run these from the root of the repo:
 
 ```bash
 # auto format all ts & css with eslint & stylelint
-npm run lint
+yarn run lint
 
 # auto format all ts & css with prettier, taking all configs into account
-npm run format
+yarn run format
 ```
 
 ## 👩‍🔬 Testing
@@ -158,7 +158,7 @@ The build script will compile `src/` with [`microbundle`](https://github.com/dev
 3. UMD build
 
 ```bash
-npm run build
+yarn build
 ```
 
 ## ⬆️ Releases
@@ -169,9 +169,9 @@ Releases are managed semi-automatically. They are always manually triggered from
 
 From a clean `main` branch you can run any release task bumping the version accordingly based on semantic versioning:
 
-- To bump a patch version: `npm run release`
-- To bump a minor version: `npm run release -- minor`
-- To bump a major version: `npm run release -- major`
+- To bump a patch version: `yarn run release`
+- To bump a minor version: `yarn run release -- minor`
+- To bump a major version: `yarn run release -- major`
 
 Every task does the following:
 
@@ -191,13 +191,13 @@ Usually from a feature branch you can release a develop version under the `next`
 Say the current version is at `v1.1.0`, then to publish a pre-release for a next major version `v2.0.0-beta.0`, do:
 
 ```bash
-npm run release -- major --preRelease=beta --npm.tag=next
+yarn run release -- major --preRelease=beta --npm.tag=next
 
 # consecutive releases, e.g. to then get `v2.0.0-beta.1`
-npm run release -- --preRelease
+yarn run release -- --preRelease
 
 # final version, e.g. to then get `v2.0.0`
-npm run release -- major
+yarn run release -- major
 ```
 
 ## 📜 Changelog

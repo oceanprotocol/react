@@ -1,27 +1,27 @@
-import React, { useCallback } from 'react'
-import { useOcean } from '@oceanprotocol/react'
-import { useEffect } from 'react'
+import React, { useCallback } from 'react';
+import { useOcean } from '../../src';
+import { useEffect } from 'react';
 
 export function Wallet() {
-  const { ocean, connect, logout, accountId } = useOcean()
+  const { ocean, connect, logout, accountId } = useOcean();
 
   const conn = async () => {
-    await connect()
-  }
+    await connect();
+  };
 
   const init = useCallback(async () => {
-    if (ocean === undefined || accountId === undefined) return
-    await ocean.assets.ownerAssets(accountId)
-  }, [accountId, ocean])
+    if (ocean === undefined || accountId === undefined) return;
+    await ocean.assets.ownerAssets(accountId);
+  }, [accountId, ocean]);
 
   useEffect(() => {
-    init()
-  }, [ocean, accountId, init])
+    init();
+  }, [ocean, accountId, init]);
 
   const disc = async () => {
-    await logout()
-    await conn()
-  }
+    await logout();
+    await conn();
+  };
 
   return (
     <>
@@ -34,5 +34,5 @@ export function Wallet() {
       </div>
       <div>{accountId}</div>
     </>
-  )
+  );
 }

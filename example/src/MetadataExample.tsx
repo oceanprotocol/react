@@ -1,9 +1,12 @@
-import React from 'react'
-import { useMetadata } from '@oceanprotocol/react'
-import { DDO } from '@oceanprotocol/lib'
+import React from 'react';
+import { useMetadata } from '../../src';
+import { DDO } from '@oceanprotocol/lib';
 
-export function MetadataExample({ ddo }: { ddo: DDO }) {
-  const { title, price, did } = useMetadata(ddo)
+export const MetadataExample = (ddo: any) => {
+  // ! if ddo: DDO then:
+  // ! same issue as in App.tsx:
+  // ! Property 'ocean' is protected but type 'Instantiable' is not a class derived from 'Instantiable'.
+  const { title, price, did } = useMetadata(ddo);
 
   return (
     <>
@@ -18,5 +21,5 @@ export function MetadataExample({ ddo }: { ddo: DDO }) {
         )}
       </div>
     </>
-  )
-}
+  );
+};

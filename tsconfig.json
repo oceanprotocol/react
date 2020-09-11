@@ -11,7 +11,11 @@
     "sourceMap": true,
     "declaration": true,
     "strictNullChecks": false,
-    "importHelpers": true
+    "importHelpers": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@oceanprotocol/react": ["index.ts"]
+    }
   },
   "include": ["./src/@types", "./src/index.ts"],
   "exclude": ["node_modules", "dist", "example"]

@@ -1,15 +1,15 @@
-import { useState } from 'react'
-import { DDO, Metadata, Logger } from '@oceanprotocol/lib'
-import { useOcean } from '../../providers'
-import ProviderStatus from '../../providers/OceanProvider/ProviderStatus'
+import { useState } from 'react';
+import { DDO, Metadata, Logger } from '@oceanprotocol/lib';
+import { useOcean } from '../../providers';
+import ProviderStatus from '../../providers/OceanProvider/ProviderStatus';
 import {
   Service,
   ServiceComputePrivacy,
   ServiceType
-} from '@oceanprotocol/lib/dist/node/ddo/interfaces/Service'
-import { PriceOptions } from './PriceOptions'
-import { publishFeedback } from '../../utils'
-import { DataTokenOptions } from '.'
+} from '@oceanprotocol/lib/dist/node/ddo/interfaces/Service';
+import { PriceOptions } from './PriceOptions';
+import { publishFeedback } from '../../utils';
+import { DataTokenOptions } from '.';
 
 interface UsePublish {
   publish: (
@@ -17,24 +17,24 @@ interface UsePublish {
     priceOptions: PriceOptions,
     serviceConfigs: ServiceType,
     dataTokenOptions?: DataTokenOptions
-  ) => Promise<DDO>
-  mint: (tokenAddress: string, tokensToMint: string) => void
-  publishStep?: number
-  publishStepText?: string
-  publishError?: string
-  isLoading: boolean
+  ) => Promise<DDO>;
+  mint: (tokenAddress: string, tokensToMint: string) => void;
+  publishStep?: number;
+  publishStepText?: string;
+  publishError?: string;
+  isLoading: boolean;
 }
 
 function usePublish(): UsePublish {
-  const { ocean, status, account, accountId, config } = useOcean()
-  const [isLoading, setIsLoading] = useState(false)
-  const [publishStep, setPublishStep] = useState<number | undefined>()
-  const [publishStepText, setPublishStepText] = useState<string | undefined>()
-  const [publishError, setPublishError] = useState<string | undefined>()
+  const { ocean, status, account, accountId, config } = useOcean();
+  const [isLoading, setIsLoading] = useState(false);
+  const [publishStep, setPublishStep] = useState<number | undefined>();
+  const [publishStepText, setPublishStepText] = useState<string | undefined>();
+  const [publishError, setPublishError] = useState<string | undefined>();
 
   function setStep(index: number) {
-    setPublishStep(index)
-    setPublishStepText(publishFeedback[index])
+    setPublishStep(index);
+    setPublishStepText(publishFeedback[index]);
   }
 
   /**
@@ -51,18 +51,18 @@ function usePublish(): UsePublish {
     serviceType: ServiceType,
     dataTokenOptions?: DataTokenOptions
   ): Promise<DDO> {
-    if (status !== ProviderStatus.CONNECTED || !ocean || !account) return
-    setIsLoading(true)
-    setPublishError(undefined)
+    if (status !== ProviderStatus.CONNECTED || !ocean || !account) return;
+    setIsLoading(true);
+    setPublishError(undefined);
     try {
-      const tokensToMint = priceOptions.tokensToMint.toString()
+      const tokensToMint = priceOptions.tokensToMint.toString();
 
       const publishedDate =
-        new Date(Date.now()).toISOString().split('.')[0] + 'Z'
-      const timeout = 0
-      const services: Service[] = []
+        new Date(Date.now()).toISOString().split('.')[0] + 'Z';
+      const timeout = 0;
+      const services: Service[] = [];
 
-      const price = ocean.datatokens.toWei('1')
+      const price = ocean.datatokens.toWei('1');
       switch (serviceType) {
         case 'access': {
           const accessService = await ocean.assets.createAccessServiceAttributes(
@@ -70,16 +70,16 @@ function usePublish(): UsePublish {
             price,
             publishedDate,
             timeout
-          )
-          Logger.log('access service created', accessService)
-          services.push(accessService)
-          break
+          );
+          Logger.log('access service created', accessService);
+          services.push(accessService);
+          break;
         }
         case 'compute': {
           const cluster = ocean.compute.createClusterAttributes(
             'Kubernetes',
             'http://10.0.0.17/xxx'
-          )
+          );
           const servers = [
             ocean.compute.createServerAttributes(
               '1',
@@ -91,39 +91,39 @@ function usePublish(): UsePublish {
               '160gb',
               timeout
             )
-          ]
+          ];
           const containers = [
             ocean.compute.createContainerAttributes(
               'tensorflow/tensorflow',
               'latest',
               'sha256:cb57ecfa6ebbefd8ffc7f75c0f00e57a7fa739578a429b6f72a0df19315deadc'
             )
-          ]
+          ];
           const provider = ocean.compute.createProviderAttributes(
             'Azure',
             'Compute service with 16gb ram for each node.',
             cluster,
             containers,
             servers
-          )
+          );
           const origComputePrivacy = {
             allowRawAlgorithm: true,
             allowNetworkAccess: false,
             trustedAlgorithms: []
-          }
+          };
           const computeService = ocean.compute.createComputeService(
             account,
             price,
             publishedDate,
             provider,
             origComputePrivacy as ServiceComputePrivacy
-          )
-          services.push(computeService)
-          break
+          );
+          services.push(computeService);
+          break;
         }
       }
 
-      Logger.log('services created', services)
+      Logger.log('services created', services);
 
       const ddo = await ocean.assets
         .create(
@@ -134,21 +134,21 @@ function usePublish(): UsePublish {
           dataTokenOptions?.name,
           dataTokenOptions?.symbol
         )
-        .next(setStep)
-      Logger.log('ddo created', ddo)
-      setStep(7)
-      await mint(ddo.dataToken, tokensToMint)
-      Logger.log(`minted ${tokensToMint} tokens`)
+        .next(setStep);
+      Logger.log('ddo created', ddo);
+      setStep(7);
+      await mint(ddo.dataToken, tokensToMint);
+      Logger.log(`minted ${tokensToMint} tokens`);
 
-      await createPricing(priceOptions, ddo.dataToken, tokensToMint)
-      setStep(8)
-      return ddo
+      await createPricing(priceOptions, ddo.dataToken, tokensToMint);
+      setStep(8);
+      return ddo;
     } catch (error) {
-      setPublishError(error.message)
-      Logger.error(error)
-      setStep(undefined)
+      setPublishError(error.message);
+      Logger.error(error);
+      setStep(undefined);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -159,35 +159,35 @@ function usePublish(): UsePublish {
   ) {
     switch (priceOptions.type) {
       case 'dynamic': {
-        const pool = await ocean.pool.createDTPool(
+        await ocean.pool.createDTPool(
           accountId,
           dataTokenAddress,
           priceOptions.tokensToMint.toString(),
           priceOptions.weightOnDataToken,
           priceOptions.liquidityProviderFee
-        )
-        break
+        );
+        break;
       }
       case 'fixed': {
-        const fixedPriceExchange = await ocean.fixedRateExchange.create(
+        await ocean.fixedRateExchange.create(
           dataTokenAddress,
           priceOptions.price.toString(),
           accountId
-        )
+        );
         await ocean.datatokens.approve(
           dataTokenAddress,
           config.fixedRateExchangeAddress,
           mintedTokens,
           accountId
-        )
-        break
+        );
+        break;
       }
     }
   }
 
   async function mint(tokenAddress: string, tokensToMint: string) {
-    Logger.log('mint function', tokenAddress, accountId)
-    await ocean.datatokens.mint(tokenAddress, accountId, tokensToMint)
+    Logger.log('mint function', tokenAddress, accountId);
+    await ocean.datatokens.mint(tokenAddress, accountId, tokensToMint);
   }
 
   return {
@@ -197,8 +197,8 @@ function usePublish(): UsePublish {
     publishStepText,
     isLoading,
     publishError
-  }
+  };
 }
 
-export { usePublish, UsePublish }
-export default usePublish
+export { usePublish, UsePublish };
+export default usePublish;

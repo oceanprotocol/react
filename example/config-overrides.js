@@ -1,5 +1,5 @@
 module.exports = function override(config, env) {
-  const path = require('path')
+  const path = require('path');
 
   return {
     ...config,
@@ -10,5 +10,5 @@ module.exports = function override(config, env) {
         react: path.resolve('../node_modules/react')
       }
     }
-  }
-}
+  };
+};

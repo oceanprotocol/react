@@ -1,2 +1,2 @@
-export * from './useCompute'
-export * from './ComputeOptions'
+export * from './useCompute';
+export * from './ComputeOptions';

@@ -1,5 +1,5 @@
-import { ICoreOptions } from 'web3modal/dist/helpers/types'
+import { ICoreOptions } from 'web3modal/dist/helpers/types';
 
 export async function getDefaultProviders(): Promise<Partial<ICoreOptions>> {
-  return { cacheProvider: true }
+  return { cacheProvider: true };
 }

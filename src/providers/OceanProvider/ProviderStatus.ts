@@ -4,4 +4,4 @@ enum ProviderStatus {
   CONNECTED = 1
 }
 
-export default ProviderStatus
+export default ProviderStatus;

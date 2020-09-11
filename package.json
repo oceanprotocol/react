@@ -9,14 +9,14 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "start": "microbundle watch --no-compress --jsx React.createElement",
-    "start-example": "cd example && npm start",
+    "start-example": "cd example && yarn start",
     "build": "rm -rf dist && microbundle build --no-compress --jsx React.createElement",
-    "test": "npm run lint && npm run type-check",
+    "test": "yarn run lint && yarn run type-check",
     "lint": "eslint --ignore-path .eslintignore --ext .js --ext .ts --ext .tsx .",
     "format": "prettier --ignore-path .gitignore './**/*.{css,yml,js,ts,tsx,json}' --write",
     "release": "release-it --non-interactive",
     "changelog": "auto-changelog -p",
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "yarn run build",
     "type-check": "tsc --noEmit"
   },
   "files": [
@@ -28,6 +28,7 @@
     "@oceanprotocol/lib": "^0.2.4",
     "axios": "^0.20.0",
     "decimal.js": "^10.2.0",
+    "eslint-plugin-standard": "^4.0.1",
     "web3": "^1.2.11",
     "web3modal": "^1.9.0"
   },
@@ -40,6 +41,9 @@
     "eslint": "^7.8.1",
     "eslint-config-oceanprotocol": "^1.5.0",
     "eslint-config-prettier": "^6.11.0",
+    "eslint-import-resolver-typescript": "^2.3.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-react": "^7.20.5",
     "microbundle": "^0.12.3",
@@ -63,7 +67,7 @@
   "homepage": "https://github.com/oceanprotocol/react#readme",
   "release-it": {
     "hooks": {
-      "after:bump": "npm run changelog"
+      "after:bump": "yarn run changelog"
     },
     "plugins": {
       "@release-it/bumper": {

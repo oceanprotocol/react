@@ -1,1 +1,1 @@
-export * from './useConsume'
+export * from './useConsume';
