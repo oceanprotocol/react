@@ -56,7 +56,7 @@ Then within your component use the included hooks to interact with Ocean's funct
 
 ```tsx
 import React from 'react'
-import { useOcean, useMetadata, useConsume } from '@oceanprotocol/react'
+import { useOcean, useMetadata, useConsume, usePublish } from '@oceanprotocol/react'
 
 const did = 'did:op:0x000000000'
 
