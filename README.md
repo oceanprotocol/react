@@ -66,7 +66,6 @@ export default function MyComponent() {
 
   // Get metadata for this asset
   const { title, metadata, price } = useMetadata(did)
-  const [price, setPrice] = useState<string>()
 
   // publish asset
   const { publish, publishStep } = usePublish()
