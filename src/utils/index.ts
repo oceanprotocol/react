@@ -14,7 +14,9 @@ export function readFileContent(file: File): Promise<string> {
   })
 }
 
-export function isDDO(toBeDetermined): toBeDetermined is DDO {
+export function isDDO(
+  toBeDetermined: DID | string | DDO
+): toBeDetermined is DDO {
   if ((toBeDetermined as DDO).id) {
     return true
   }

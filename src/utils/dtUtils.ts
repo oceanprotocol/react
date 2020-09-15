@@ -8,8 +8,8 @@ export async function getCheapestPool(
   ocean: Ocean,
   accountId: string,
   dataTokenAddress: string
-): Promise<Pool> {
-  if (!ocean || !accountId || !dataTokenAddress) return
+): Promise<Pool | null> {
+  if (!ocean || !accountId || !dataTokenAddress) return null
 
   const tokenPools = await ocean.pool.searchPoolforDT(
     accountId,
@@ -57,31 +57,35 @@ export async function getBestDataTokenPrice(
   Decimal.set({ precision: 5 })
 
   const cheapestPoolPrice = new Decimal(
-    cheapestPool.price !== '' ? cheapestPool.price : 999999999999
+    cheapestPool && cheapestPool.price !== ''
+      ? cheapestPool.price
+      : 999999999999
   )
   const cheapestExchangePrice = new Decimal(
-    cheapestExchange.price !== '' ? cheapestExchange.price : 999999999999
+    cheapestExchange && cheapestExchange?.price !== ''
+      ? cheapestExchange.price
+      : 999999999999
   )
 
   if (cheapestPoolPrice < cheapestExchangePrice) {
     return {
       type: 'pool',
-      address: cheapestPool.address,
-      value: cheapestPool.price
+      address: cheapestPool?.address,
+      value: cheapestPool?.price
     } as BestPrice
   } else {
     return {
       type: 'exchange',
-      address: cheapestExchange.address,
-      value: cheapestExchange.price
+      address: cheapestExchange?.address,
+      value: cheapestExchange?.price
     } as BestPrice
   }
 }
 export async function getCheapestExchange(
   ocean: Ocean,
   dataTokenAddress: string
-) {
-  if (!ocean || !dataTokenAddress) return
+): Promise<{ address?: string; price: string } | null> {
+  if (!ocean || !dataTokenAddress) return null
 
   const tokenExchanges = await ocean.fixedRateExchange.searchforDT(
     dataTokenAddress,
@@ -132,7 +136,7 @@ export async function checkAndBuyDT(
       account.getId()
     )
 
-    switch (bestPrice.type) {
+    switch (bestPrice?.type) {
       case 'pool': {
         const price = new Decimal(bestPrice.value).times(1.05).toString()
         const maxPrice = new Decimal(bestPrice.value).times(2).toString()
@@ -148,6 +152,16 @@ export async function checkAndBuyDT(
         return buyResponse
       }
       case 'exchange': {
+        if (!config.oceanTokenAddress) {
+          Logger.error(`'oceanTokenAddress' not set in config`)
+          return null
+        }
+
+        if (!config.fixedRateExchangeAddress) {
+          Logger.error(`'fixedRateExchangeAddress' not set in config`)
+          return null
+        }
+
         Logger.log('Buying token from exchange', bestPrice, account.getId())
         await ocean.datatokens.approve(
           config.oceanTokenAddress,

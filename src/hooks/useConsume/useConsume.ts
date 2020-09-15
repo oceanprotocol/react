@@ -37,7 +37,7 @@ function useConsume(): UseConsume {
   }
 
   async function consume(
-    did: string,
+    did: DID | string,
     dataTokenAddress: string,
     serviceType: ServiceType = 'access'
   ): Promise<void> {
@@ -50,7 +50,11 @@ function useConsume(): UseConsume {
       await checkAndBuyDT(ocean, dataTokenAddress, account, config)
 
       setStep(1)
-      const order = await ocean.assets.order(did, serviceType, accountId)
+      const order = await ocean.assets.order(
+        did as string,
+        serviceType,
+        accountId
+      )
       Logger.log('order created', order)
       setStep(2)
       const res = JSON.parse(order)
@@ -65,7 +69,7 @@ function useConsume(): UseConsume {
       Logger.log('token transfered', tokenTransfer)
       setStep(3)
       await ocean.assets.download(
-        did,
+        did as string,
         (tokenTransfer as any).transactionHash,
         dataTokenAddress,
         account,

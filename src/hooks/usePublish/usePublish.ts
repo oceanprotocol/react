@@ -17,7 +17,7 @@ interface UsePublish {
     priceOptions: PriceOptions,
     serviceConfigs: ServiceType,
     dataTokenOptions?: DataTokenOptions
-  ) => Promise<DDO>
+  ) => Promise<DDO | undefined | null>
   mint: (tokenAddress: string, tokensToMint: string) => void
   publishStep?: number
   publishStepText?: string
@@ -32,9 +32,9 @@ function usePublish(): UsePublish {
   const [publishStepText, setPublishStepText] = useState<string | undefined>()
   const [publishError, setPublishError] = useState<string | undefined>()
 
-  function setStep(index: number) {
+  function setStep(index?: number) {
     setPublishStep(index)
-    setPublishStepText(publishFeedback[index])
+    index && setPublishStepText(publishFeedback[index])
   }
 
   /**
@@ -50,10 +50,12 @@ function usePublish(): UsePublish {
     priceOptions: PriceOptions,
     serviceType: ServiceType,
     dataTokenOptions?: DataTokenOptions
-  ): Promise<DDO> {
-    if (status !== ProviderStatus.CONNECTED || !ocean || !account) return
+  ): Promise<DDO | undefined | null> {
+    if (status !== ProviderStatus.CONNECTED || !ocean || !account) return null
+
     setIsLoading(true)
     setPublishError(undefined)
+
     try {
       const tokensToMint = priceOptions.tokensToMint.toString()
 
@@ -109,7 +111,7 @@ function usePublish(): UsePublish {
           const origComputePrivacy = {
             allowRawAlgorithm: true,
             allowNetworkAccess: false,
-            trustedAlgorithms: []
+            trustedAlgorithms: [] as any
           }
           const computeService = ocean.compute.createComputeService(
             account,
@@ -146,7 +148,7 @@ function usePublish(): UsePublish {
     } catch (error) {
       setPublishError(error.message)
       Logger.error(error)
-      setStep(undefined)
+      setStep()
     } finally {
       setIsLoading(false)
     }
@@ -156,7 +158,7 @@ function usePublish(): UsePublish {
     priceOptions: PriceOptions,
     dataTokenAddress: string,
     mintedTokens: string
-  ) {
+  ): Promise<void | null> {
     switch (priceOptions.type) {
       case 'dynamic': {
         const pool = await ocean.pool.createDTPool(
@@ -169,6 +171,11 @@ function usePublish(): UsePublish {
         break
       }
       case 'fixed': {
+        if (!config.fixedRateExchangeAddress) {
+          Logger.error(`'fixedRateExchangeAddress' not set in ccnfig.`)
+          return null
+        }
+
         const fixedPriceExchange = await ocean.fixedRateExchange.create(
           dataTokenAddress,
           priceOptions.price.toString(),
