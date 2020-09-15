@@ -14,6 +14,10 @@
     "prettier/@typescript-eslint"
   ],
   "plugins": ["@typescript-eslint", "prettier"],
+  "rules": {
+    "no-use-before-define": "off",
+    "@typescript-eslint/no-use-before-define": "error"
+  },
   "env": { "es6": true, "node": true },
   "settings": {
     "react": {

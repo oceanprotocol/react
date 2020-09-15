@@ -37,6 +37,49 @@ function usePublish(): UsePublish {
     index && setPublishStepText(publishFeedback[index])
   }
 
+  async function mint(tokenAddress: string, tokensToMint: string) {
+    Logger.log('mint function', tokenAddress, accountId)
+    await ocean.datatokens.mint(tokenAddress, accountId, tokensToMint)
+  }
+
+  async function createPricing(
+    priceOptions: PriceOptions,
+    dataTokenAddress: string,
+    mintedTokens: string
+  ): Promise<void | null> {
+    switch (priceOptions.type) {
+      case 'dynamic': {
+        const pool = await ocean.pool.createDTPool(
+          accountId,
+          dataTokenAddress,
+          priceOptions.tokensToMint.toString(),
+          priceOptions.weightOnDataToken,
+          priceOptions.liquidityProviderFee
+        )
+        break
+      }
+      case 'fixed': {
+        if (!config.fixedRateExchangeAddress) {
+          Logger.error(`'fixedRateExchangeAddress' not set in ccnfig.`)
+          return null
+        }
+
+        const fixedPriceExchange = await ocean.fixedRateExchange.create(
+          dataTokenAddress,
+          priceOptions.price.toString(),
+          accountId
+        )
+        await ocean.datatokens.approve(
+          dataTokenAddress,
+          config.fixedRateExchangeAddress,
+          mintedTokens,
+          accountId
+        )
+        break
+      }
+    }
+  }
+
   /**
    * Publish an asset.It also creates the datatoken, mints tokens and gives the market allowance
    * @param  {Metadata} asset The metadata of the asset.
@@ -152,49 +195,6 @@ function usePublish(): UsePublish {
     } finally {
       setIsLoading(false)
     }
-  }
-
-  async function createPricing(
-    priceOptions: PriceOptions,
-    dataTokenAddress: string,
-    mintedTokens: string
-  ): Promise<void | null> {
-    switch (priceOptions.type) {
-      case 'dynamic': {
-        const pool = await ocean.pool.createDTPool(
-          accountId,
-          dataTokenAddress,
-          priceOptions.tokensToMint.toString(),
-          priceOptions.weightOnDataToken,
-          priceOptions.liquidityProviderFee
-        )
-        break
-      }
-      case 'fixed': {
-        if (!config.fixedRateExchangeAddress) {
-          Logger.error(`'fixedRateExchangeAddress' not set in ccnfig.`)
-          return null
-        }
-
-        const fixedPriceExchange = await ocean.fixedRateExchange.create(
-          dataTokenAddress,
-          priceOptions.price.toString(),
-          accountId
-        )
-        await ocean.datatokens.approve(
-          dataTokenAddress,
-          config.fixedRateExchangeAddress,
-          mintedTokens,
-          accountId
-        )
-        break
-      }
-    }
-  }
-
-  async function mint(tokenAddress: string, tokensToMint: string) {
-    Logger.log('mint function', tokenAddress, accountId)
-    await ocean.datatokens.mint(tokenAddress, accountId, tokensToMint)
   }
 
   return {

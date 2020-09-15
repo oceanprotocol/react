@@ -75,17 +75,6 @@ function OceanProvider({
     Logger.log('Web3Modal instance created.', web3ModalInstance)
   }
 
-  // On mount setup Web3Modal instance
-  useEffect(() => {
-    init()
-  }, [])
-
-  // Connect automatically to cached provider if present
-  useEffect(() => {
-    if (!web3Modal) return
-    web3Modal.cachedProvider && connect()
-  }, [web3Modal])
-
   async function connect(newConfig?: Config) {
     try {
       Logger.log('Connecting ...', newConfig)
@@ -125,6 +114,18 @@ function OceanProvider({
       Logger.error(error)
     }
   }
+
+  // On mount setup Web3Modal instance
+  useEffect(() => {
+    init()
+  }, [])
+
+  // Connect automatically to cached provider if present
+  useEffect(() => {
+    if (!web3Modal) return
+    web3Modal.cachedProvider && connect()
+  }, [web3Modal])
+
   async function refreshBalance() {
     const balance = account && (await getBalance(account))
     setBalance(balance)
