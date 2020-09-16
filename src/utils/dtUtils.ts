@@ -51,36 +51,42 @@ export async function getCheapestExchange(
   ocean: Ocean,
   dataTokenAddress: string
 ): Promise<{ address?: string; price: string } | null> {
-  if (!ocean || !dataTokenAddress) return null
+  if (!ocean || !dataTokenAddress) return
+  try {
+    const tokenExchanges = await ocean.fixedRateExchange.searchforDT(
+      dataTokenAddress,
+      '1'
+    )
+    if (tokenExchanges === undefined || tokenExchanges.length === 0) {
+      return {
+        address: '',
+        price: ''
+      }
+    }
+    let cheapestExchangeAddress = tokenExchanges[0].exchangeID
+    let cheapestExchangePrice = new Decimal(tokenExchanges[0].fixedRate)
 
-  const tokenExchanges = await ocean.fixedRateExchange.searchforDT(
-    dataTokenAddress,
-    '1'
-  )
+    for (let i = 0; i < tokenExchanges.length; i++) {
+      const decimalExchangePrice = new Decimal(
+        Web3.utils.fromWei(tokenExchanges[i].fixedRate)
+      )
 
-  if (tokenExchanges === undefined || tokenExchanges.length === 0) {
+      if (decimalExchangePrice < cheapestExchangePrice) {
+        cheapestExchangePrice = decimalExchangePrice
+        cheapestExchangeAddress = tokenExchanges[i].exchangeID
+      }
+    }
+
+    return {
+      address: cheapestExchangeAddress,
+      price: cheapestExchangePrice.toString()
+    }
+  } catch (err) {
+    Logger.log(err)
     return {
       address: '',
       price: ''
     }
-  }
-  let cheapestExchangeAddress = tokenExchanges[0].exchangeID
-  let cheapestExchangePrice = new Decimal(tokenExchanges[0].fixedRate)
-
-  for (let i = 0; i < tokenExchanges.length; i++) {
-    const decimalExchangePrice = new Decimal(
-      Web3.utils.fromWei(tokenExchanges[i].fixedRate)
-    )
-
-    if (decimalExchangePrice < cheapestExchangePrice) {
-      cheapestExchangePrice = decimalExchangePrice
-      cheapestExchangeAddress = tokenExchanges[i].exchangeID
-    }
-  }
-
-  return {
-    address: cheapestExchangeAddress,
-    price: cheapestExchangePrice.toString()
   }
 }
 
