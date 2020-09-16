@@ -33,7 +33,7 @@ interface OceanProviderValue {
   refreshBalance: () => Promise<void>
 }
 
-const OceanContext = createContext(null)
+const OceanContext = createContext({} as OceanProviderValue)
 
 function OceanProvider({
   initialConfig,
@@ -47,7 +47,7 @@ function OceanProvider({
   const [web3, setWeb3] = useState<Web3 | undefined>()
   const [web3Provider, setWeb3Provider] = useState<any | undefined>()
   const [ocean, setOcean] = useState<Ocean | undefined>()
-  const [web3Modal, setWeb3Modal] = useState<Web3Modal>(null)
+  const [web3Modal, setWeb3Modal] = useState<Web3Modal>()
   const [chainId, setChainId] = useState<number | undefined>()
   const [account, setAccount] = useState<Account | undefined>()
   const [accountId, setAccountId] = useState<string | undefined>()
@@ -75,24 +75,13 @@ function OceanProvider({
     Logger.log('Web3Modal instance created.', web3ModalInstance)
   }
 
-  // On mount setup Web3Modal instance
-  useEffect(() => {
-    init()
-  }, [])
-
-  // Connect automatically to cached provider if present
-  useEffect(() => {
-    if (!web3Modal) return
-    web3Modal.cachedProvider && connect()
-  }, [web3Modal])
-
   async function connect(newConfig?: Config) {
     try {
       Logger.log('Connecting ...', newConfig)
 
       newConfig && setConfig(newConfig)
 
-      const provider = await web3Modal.connect()
+      const provider = await web3Modal?.connect()
       setWeb3Provider(provider)
 
       const web3 = new Web3(provider)
@@ -125,13 +114,25 @@ function OceanProvider({
       Logger.error(error)
     }
   }
+
+  // On mount setup Web3Modal instance
+  useEffect(() => {
+    init()
+  }, [])
+
+  // Connect automatically to cached provider if present
+  useEffect(() => {
+    if (!web3Modal) return
+    web3Modal.cachedProvider && connect()
+  }, [web3Modal])
+
   async function refreshBalance() {
-    const balance = await getBalance(account)
+    const balance = account && (await getBalance(account))
     setBalance(balance)
   }
   async function logout() {
     // TODO: #67 check how is the proper way to logout
-    web3Modal.clearCachedProvider()
+    web3Modal?.clearCachedProvider()
   }
 
   const handleAccountsChanged = async (accounts: string[]) => {

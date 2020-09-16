@@ -25,11 +25,11 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
   const [isLoaded, setIsLoaded] = useState(false)
   const [price, setPrice] = useState<BestPrice | undefined>()
 
-  async function getDDO(did: DID | string): Promise<DDO> {
-    if (status === ProviderStatus.CONNECTED) {
-      const ddo = await ocean.metadatastore.retrieveDDO(did)
-      return ddo
-    }
+  async function getDDO(did: DID | string): Promise<DDO | null> {
+    if (status !== ProviderStatus.CONNECTED) return null
+
+    const ddo = await ocean.metadatastore.retrieveDDO(did)
+    return ddo
   }
 
   async function getPrice(dataTokenAddress?: string): Promise<BestPrice> {
@@ -37,8 +37,8 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
     return await getBestDataTokenPrice(ocean, dataTokenAddress, accountId)
   }
 
-  async function getMetadata(): Promise<Metadata> {
-    if (!internalDdo) return
+  async function getMetadata(): Promise<Metadata | null> {
+    if (!internalDdo) return null
     const metadata = internalDdo.findServiceByType('metadata')
     return metadata.attributes
   }

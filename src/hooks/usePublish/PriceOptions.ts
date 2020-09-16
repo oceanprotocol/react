@@ -1,5 +1,5 @@
 export interface PriceOptions {
-  price?: number
+  price: number
   tokensToMint: number
   type: 'fixed' | 'dynamic' | string
   weightOnDataToken: string

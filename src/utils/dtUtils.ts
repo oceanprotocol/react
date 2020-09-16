@@ -8,8 +8,8 @@ export async function getCheapestPool(
   ocean: Ocean,
   accountId: string,
   dataTokenAddress: string
-): Promise<Pool> {
-  if (!ocean || !accountId || !dataTokenAddress) return
+): Promise<Pool | null> {
+  if (!ocean || !accountId || !dataTokenAddress) return null
 
   const tokenPools = await ocean.pool.searchPoolforDT(
     accountId,
@@ -47,47 +47,16 @@ export async function getCheapestPool(
   }
 }
 
-export async function getBestDataTokenPrice(
-  ocean: Ocean,
-  dataTokenAddress: string,
-  accountId: string
-): Promise<BestPrice | undefined> {
-  const cheapestPool = await getCheapestPool(ocean, accountId, dataTokenAddress)
-  const cheapestExchange = await getCheapestExchange(ocean, dataTokenAddress)
-  Decimal.set({ precision: 5 })
-
-  const cheapestPoolPrice = new Decimal(
-    cheapestPool.price !== '' ? cheapestPool.price : 999999999999
-  )
-  const cheapestExchangePrice = new Decimal(
-    cheapestExchange.price !== '' ? cheapestExchange.price : 999999999999
-  )
-
-  if (cheapestPoolPrice < cheapestExchangePrice) {
-    return {
-      type: 'pool',
-      address: cheapestPool.address,
-      value: cheapestPool.price
-    } as BestPrice
-  } else {
-    return {
-      type: 'exchange',
-      address: cheapestExchange.address,
-      value: cheapestExchange.price
-    } as BestPrice
-  }
-}
 export async function getCheapestExchange(
   ocean: Ocean,
   dataTokenAddress: string
-) {
+): Promise<{ address?: string; price: string } | null> {
   if (!ocean || !dataTokenAddress) return
   try {
     const tokenExchanges = await ocean.fixedRateExchange.searchforDT(
       dataTokenAddress,
       '1'
     )
-
     if (tokenExchanges === undefined || tokenExchanges.length === 0) {
       return {
         address: '',
@@ -121,6 +90,41 @@ export async function getCheapestExchange(
   }
 }
 
+export async function getBestDataTokenPrice(
+  ocean: Ocean,
+  dataTokenAddress: string,
+  accountId: string
+): Promise<BestPrice | undefined> {
+  const cheapestPool = await getCheapestPool(ocean, accountId, dataTokenAddress)
+  const cheapestExchange = await getCheapestExchange(ocean, dataTokenAddress)
+  Decimal.set({ precision: 5 })
+
+  const cheapestPoolPrice = new Decimal(
+    cheapestPool && cheapestPool.price !== ''
+      ? cheapestPool.price
+      : 999999999999
+  )
+  const cheapestExchangePrice = new Decimal(
+    cheapestExchange && cheapestExchange?.price !== ''
+      ? cheapestExchange.price
+      : 999999999999
+  )
+
+  if (cheapestPoolPrice < cheapestExchangePrice) {
+    return {
+      type: 'pool',
+      address: cheapestPool?.address,
+      value: cheapestPool?.price
+    } as BestPrice
+  } else {
+    return {
+      type: 'exchange',
+      address: cheapestExchange?.address,
+      value: cheapestExchange?.price
+    } as BestPrice
+  }
+}
+
 export async function checkAndBuyDT(
   ocean: Ocean,
   dataTokenAddress: string,
@@ -139,7 +143,7 @@ export async function checkAndBuyDT(
       account.getId()
     )
 
-    switch (bestPrice.type) {
+    switch (bestPrice?.type) {
       case 'pool': {
         const price = new Decimal(bestPrice.value).times(1.05).toString()
         const maxPrice = new Decimal(bestPrice.value).times(2).toString()
@@ -155,6 +159,16 @@ export async function checkAndBuyDT(
         return buyResponse
       }
       case 'exchange': {
+        if (!config.oceanTokenAddress) {
+          Logger.error(`'oceanTokenAddress' not set in config`)
+          return null
+        }
+
+        if (!config.fixedRateExchangeAddress) {
+          Logger.error(`'fixedRateExchangeAddress' not set in config`)
+          return null
+        }
+
         Logger.log('Buying token from exchange', bestPrice, account.getId())
         await ocean.datatokens.approve(
           config.oceanTokenAddress,
