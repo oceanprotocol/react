@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { DID, DDO, Metadata, Logger } from '@oceanprotocol/lib'
 import { useOcean } from '../../providers'
 import ProviderStatus from '../../providers/OceanProvider/ProviderStatus'
@@ -25,23 +25,29 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
   const [isLoaded, setIsLoaded] = useState(false)
   const [price, setPrice] = useState<BestPrice | undefined>()
 
-  async function getDDO(did: DID | string): Promise<DDO | null> {
-    if (status !== ProviderStatus.CONNECTED) return null
+  const getDDO = useCallback(
+    async (did: DID | string): Promise<DDO | null> => {
+      if (status !== ProviderStatus.CONNECTED) return null
 
-    const ddo = await ocean.metadatastore.retrieveDDO(did)
-    return ddo
-  }
+      const ddo = await ocean.metadatastore.retrieveDDO(did)
+      return ddo
+    },
+    [ocean?.metadatastore, status]
+  )
 
-  async function getPrice(dataTokenAddress?: string): Promise<BestPrice> {
-    if (!dataTokenAddress) dataTokenAddress = internalDdo.dataToken
-    return await getBestDataTokenPrice(ocean, dataTokenAddress, accountId)
-  }
+  const getPrice = useCallback(
+    async (dataTokenAddress?: string): Promise<BestPrice> => {
+      if (!dataTokenAddress) dataTokenAddress = internalDdo.dataToken
+      return await getBestDataTokenPrice(ocean, dataTokenAddress, accountId)
+    },
+    [ocean, accountId, internalDdo?.dataToken]
+  )
 
-  async function getMetadata(): Promise<Metadata | null> {
+  const getMetadata = useCallback(async (): Promise<Metadata | null> => {
     if (!internalDdo) return null
     const metadata = internalDdo.findServiceByType('metadata')
     return metadata.attributes
-  }
+  }, [internalDdo])
 
   useEffect(() => {
     async function init(): Promise<void> {
@@ -60,7 +66,7 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
       }
     }
     init()
-  }, [ocean, status])
+  }, [ocean, status, asset, getDDO])
 
   useEffect(() => {
     if (!accountId) return
@@ -83,7 +89,7 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
       setPrice(price)
     }, 10000)
     return () => clearInterval(interval)
-  }, [accountId, internalDdo])
+  }, [accountId, internalDdo, getMetadata, getPrice])
 
   return {
     ddo: internalDdo,
