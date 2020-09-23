@@ -13,7 +13,7 @@ interface UseCompute {
     dataTokenAddress: string,
     algorithmRawCode: string,
     computeContainer: ComputeValue
-  ) => Promise<ComputeJob>
+  ) => Promise<ComputeJob | void>
   computeStep?: number
   computeStepText?: string
   computeError?: string
@@ -44,7 +44,13 @@ function useCompute(): UseCompute {
   const [computeError, setComputeError] = useState<string | undefined>()
   const [isLoading, setIsLoading] = useState(false)
 
-  function setStep(index: number) {
+  function setStep(index?: number) {
+    if (!index) {
+      setComputeStep(undefined)
+      setComputeStepText(undefined)
+      return
+    }
+
     setComputeStep(index)
     setComputeStepText(computeFeedback[index])
   }
@@ -55,7 +61,7 @@ function useCompute(): UseCompute {
     dataTokenAddress: string,
     algorithmRawCode: string,
     computeContainer: ComputeValue
-  ): Promise<ComputeJob> {
+  ): Promise<ComputeJob | void> {
     if (!ocean || !account) return
 
     setComputeError(undefined)
