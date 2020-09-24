@@ -6,8 +6,8 @@
 
 [![npm](https://img.shields.io/npm/v/@oceanprotocol/react.svg)](https://www.npmjs.com/package/@oceanprotocol/react)
 [![Build Status](https://travis-ci.com/oceanprotocol/react.svg?token=3psqw6c8KMDqfdGQ2x6d&branch=main)](https://travis-ci.com/oceanprotocol/react)
-[![Maintainability](https://api.codeclimate.com/v1/badges/1e93b2b3e198c3670b50/maintainability)](https://codeclimate.com/repos/5ea6f2fec372a101a1000929/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/1e93b2b3e198c3670b50/test_coverage)](https://codeclimate.com/repos/5ea6f2fec372a101a1000929/test_coverage)
+[![Maintainability](https://api.codeclimate.com/v1/badges/d3150ecf9468f8238310/maintainability)](https://codeclimate.com/github/oceanprotocol/react/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/d3150ecf9468f8238310/test_coverage)](https://codeclimate.com/github/oceanprotocol/react/test_coverage)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-7b1173.svg?style=flat-square)](https://github.com/prettier/prettier)
 [![js oceanprotocol](https://img.shields.io/badge/js-oceanprotocol-7b1173.svg)](https://github.com/oceanprotocol/eslint-config-oceanprotocol)
 
