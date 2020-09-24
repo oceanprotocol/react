@@ -11,11 +11,7 @@
     "sourceMap": true,
     "declaration": true,
     "importHelpers": true,
-
-    /* Strict Type-Checking */
-    // TODO: remove and adapt for `strictNullChecks`
-    "strict": true,
-    "strictNullChecks": false
+    "strict": true
   },
   "include": ["./src/@types", "./src/index.ts"]
 }

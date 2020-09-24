@@ -50,8 +50,7 @@ export async function getCheapestPool(
 export async function getCheapestExchange(
   ocean: Ocean,
   dataTokenAddress: string
-): Promise<{ address?: string; price: string } | null> {
-  if (!ocean || !dataTokenAddress) return
+): Promise<{ address?: string; price: string }> {
   try {
     const tokenExchanges = await ocean.fixedRateExchange.searchforDT(
       dataTokenAddress,
@@ -94,7 +93,7 @@ export async function getBestDataTokenPrice(
   ocean: Ocean,
   dataTokenAddress: string,
   accountId: string
-): Promise<BestPrice | undefined> {
+): Promise<BestPrice> {
   const cheapestPool = await getCheapestPool(ocean, accountId, dataTokenAddress)
   const cheapestExchange = await getCheapestExchange(ocean, dataTokenAddress)
   Decimal.set({ precision: 5 })

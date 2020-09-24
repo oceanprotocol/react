@@ -49,7 +49,7 @@ function usePublish(): UsePublish {
   ): Promise<void | null> {
     switch (priceOptions.type) {
       case 'dynamic': {
-        const pool = await ocean.pool.createDTPool(
+        await ocean.pool.createDTPool(
           accountId,
           dataTokenAddress,
           priceOptions.tokensToMint.toString(),
@@ -64,7 +64,7 @@ function usePublish(): UsePublish {
           return null
         }
 
-        const fixedPriceExchange = await ocean.fixedRateExchange.create(
+        await ocean.fixedRateExchange.create(
           dataTokenAddress,
           priceOptions.price.toString(),
           accountId
