@@ -82,7 +82,7 @@ function useCompute(): UseCompute {
         computeService,
         rawAlgorithmMeta
       )
-      const order = await ocean.compute.order(
+      const tokenTransfer = await ocean.compute.order(
         accountId,
         did,
         computeService.index,
@@ -91,18 +91,18 @@ function useCompute(): UseCompute {
       )
 
       setStep(1)
-      const computeOrder = JSON.parse(order)
-      Logger.log('compute order', computeOrder)
-      const tokenTransfer = await ocean.datatokens.transferWei(
-        computeOrder.dataToken,
-        computeOrder.to,
-        String(computeOrder.numTokens),
-        computeOrder.from
-      )
+      // const computeOrder = JSON.parse(order)
+      // Logger.log('compute order', computeOrder)
+      // const tokenTransfer = await ocean.datatokens.transferWei(
+      //   computeOrder.dataToken,
+      //   computeOrder.to,
+      //   String(computeOrder.numTokens),
+      //   computeOrder.from
+      // )
       setStep(2)
       const response = await ocean.compute.start(
         did,
-        (tokenTransfer as any).transactionHash,
+        tokenTransfer,
         dataTokenAddress,
         account,
         undefined,

@@ -7,7 +7,8 @@ module.exports = function override(config, env) {
       ...config.resolve,
       alias: {
         ...config.resolve.alias,
-        react: path.resolve('../node_modules/react')
+        react: path.resolve('../node_modules/react'),
+        "@oceanprotocol/lib": path.resolve('../node_modules/@oceanprotocol/lib')
       }
     }
   }
