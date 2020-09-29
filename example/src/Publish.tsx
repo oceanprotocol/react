@@ -36,7 +36,7 @@ export function Publish() {
       tokensToMint: 10,
       type: 'fixed',
       weightOnDataToken: '',
-      liquidityProviderFee: ''
+      swapFee: ''
     }
 
     const ddo = await publish(asset as Metadata, priceOptions, 'access')

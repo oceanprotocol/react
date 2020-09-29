@@ -3,5 +3,5 @@ export interface PriceOptions {
   tokensToMint: number
   type: 'fixed' | 'dynamic' | string
   weightOnDataToken: string
-  liquidityProviderFee: string
+  swapFee: string
 }
