@@ -170,15 +170,16 @@ function usePublish(): UsePublish {
 
       Logger.log('services created', services)
 
-      const ddo = await ocean.assets.create(
-        asset,
-        account,
-        services,
-        dataTokenOptions?.cap,
-        dataTokenOptions?.name,
-        dataTokenOptions?.symbol
-      )
-      //   .next(setStep)
+      const ddo = await ocean.assets
+        .create(
+          asset,
+          account,
+          services,
+          dataTokenOptions?.cap,
+          dataTokenOptions?.name,
+          dataTokenOptions?.symbol
+        )
+        .next(setStep)
       Logger.log('ddo created', ddo)
       setStep(7)
       await mint(ddo.dataToken, tokensToMint)
