@@ -7,12 +7,12 @@ import { Metadata } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Metadata'
 
 export function Publish() {
   const { publish, publishStepText, isLoading } = usePublish()
-  const [ddo, setDdo] = useState<DDO | undefined>()
+  const [ddo, setDdo] = useState<DDO | undefined | null>()
 
   const asset = {
     main: {
       type: 'dataset',
-      name: 'test-dataset',
+      name: 'test-dataset - ' + new Date().toISOString(),
       dateCreated: new Date(Date.now()).toISOString().split('.')[0] + 'Z', // remove milliseconds
       author: 'oceanprotocol-team',
       license: 'MIT',

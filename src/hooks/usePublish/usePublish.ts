@@ -107,7 +107,7 @@ function usePublish(): UsePublish {
       const timeout = 0
       const services: Service[] = []
 
-      const price = ocean.datatokens.toWei('1')
+      const price = '1'
       switch (serviceType) {
         case 'access': {
           const accessService = await ocean.assets.createAccessServiceAttributes(
