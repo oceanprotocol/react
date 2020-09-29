@@ -1,15 +1,15 @@
-import { useState } from 'react'
-import { DDO, Metadata, Logger } from '@oceanprotocol/lib'
-import { useOcean } from '../../providers'
-import ProviderStatus from '../../providers/OceanProvider/ProviderStatus'
+import { DDO, Logger, Metadata } from '@oceanprotocol/lib'
 import {
   Service,
   ServiceComputePrivacy,
   ServiceType
 } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Service'
-import { PriceOptions } from './PriceOptions'
-import { publishFeedback } from '../../utils'
+import { useState } from 'react'
 import { DataTokenOptions } from '.'
+import { useOcean } from '../../providers'
+import ProviderStatus from '../../providers/OceanProvider/ProviderStatus'
+import { publishFeedback } from '../../utils'
+import { PriceOptions } from './PriceOptions'
 
 interface UsePublish {
   publish: (
@@ -175,6 +175,7 @@ function usePublish(): UsePublish {
           asset,
           account,
           services,
+          undefined,
           dataTokenOptions?.cap,
           dataTokenOptions?.name,
           dataTokenOptions?.symbol
