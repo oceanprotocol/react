@@ -7,25 +7,20 @@ import shortid from 'shortid'
 import { MetadataExample } from './MetadataExample'
 
 export function AllDdos() {
-  const { chainId, account, ocean } = useOcean()
+  const { chainId, account, accountId, ocean } = useOcean()
 
   const [ddos, setDdos] = useState<DDO[] | undefined>()
 
   useEffect(() => {
     async function init() {
-      if (!ocean || !account) return
+      if (!ocean || !account || !accountId) return
 
-      const assets = await ocean.assets.query({
-        page: 1,
-        offset: 10,
-        query: {},
-        sort: { created: -1 }
-      })
+      const assets = await ocean.assets.ownerAssets(accountId)
 
       setDdos(assets.results.slice(0, 4))
     }
     init()
-  }, [ocean, account, chainId])
+  }, [ocean, account, chainId, accountId])
 
   return (
     <>

@@ -107,7 +107,7 @@ function usePublish(): UsePublish {
       const timeout = 0
       const services: Service[] = []
 
-      const price = ocean.datatokens.toWei('1')
+      const price = '1'
       switch (serviceType) {
         case 'access': {
           const accessService = await ocean.assets.createAccessServiceAttributes(
@@ -170,16 +170,15 @@ function usePublish(): UsePublish {
 
       Logger.log('services created', services)
 
-      const ddo = await ocean.assets
-        .create(
-          asset,
-          account,
-          services,
-          dataTokenOptions?.cap,
-          dataTokenOptions?.name,
-          dataTokenOptions?.symbol
-        )
-        .next(setStep)
+      const ddo = await ocean.assets.create(
+        asset,
+        account,
+        services,
+        dataTokenOptions?.cap,
+        dataTokenOptions?.name,
+        dataTokenOptions?.symbol
+      )
+      //   .next(setStep)
       Logger.log('ddo created', ddo)
       setStep(7)
       await mint(ddo.dataToken, tokensToMint)

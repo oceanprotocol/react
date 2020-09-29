@@ -3,13 +3,13 @@ import './App.css'
 import { OceanProvider } from '@oceanprotocol/react'
 import { Wallet } from './Wallet'
 import { Publish } from './Publish'
-import { ConfigHelper } from '@oceanprotocol/lib'
+import { ConfigHelper, Logger } from '@oceanprotocol/lib'
 import { AllDdos } from './AllDdos'
 import { ConsumeDdo } from './ConsumeDdo'
 import { NetworkMonitor } from './NetworkMonitor'
+import { LogLevel } from '@oceanprotocol/lib/dist/node/utils'
 
 const configRinkeby = new ConfigHelper().getConfig('rinkeby')
-
 const providerOptions = {}
 
 export const web3ModalOpts = {
@@ -19,6 +19,7 @@ export const web3ModalOpts = {
 
 function App() {
   console.log(configRinkeby)
+  Logger.setLevel(LogLevel.Verbose)
   const init = async () => {}
 
   useEffect(() => {
