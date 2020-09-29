@@ -54,7 +54,7 @@ function usePublish(): UsePublish {
           dataTokenAddress,
           priceOptions.tokensToMint.toString(),
           priceOptions.weightOnDataToken,
-          priceOptions.liquidityProviderFee
+          priceOptions.swapFee
         )
         break
       }

@@ -29,7 +29,7 @@ export default function MyComponent() {
     tokensToMint: 10,
     type: 'fixed',
     weightOnDataToken: '',
-    liquidityProviderFee: ''
+    swapFee: ''
   }
 
   async function handlePublish() {
