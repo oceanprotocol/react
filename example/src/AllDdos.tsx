@@ -9,14 +9,20 @@ import { MetadataExample } from './MetadataExample'
 export function AllDdos() {
   const { chainId, account, accountId, ocean } = useOcean()
 
-  const [ddos, setDdos] = useState<DDO[] | undefined>()
+  const [ddos, setDdos] = useState<DDO[]>()
 
   useEffect(() => {
     async function init() {
-      if (!ocean || !account || !accountId) return
+      if (!ocean || !accountId || !accountId) return
 
       const assets = await ocean.assets.ownerAssets(accountId)
-
+      // const assets = await ocean.assets.query({
+      //   page: 1,
+      //   offset: 10,
+      //   query: {},
+      //   sort: { created: -1 }
+      // })
+      console.log('assets', assets.results)
       setDdos(assets.results.slice(0, 4))
     }
     init()
