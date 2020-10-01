@@ -6,15 +6,11 @@ import Web3 from 'web3'
 
 export async function getCheapestPool(
   ocean: Ocean,
-  accountId: string,
   dataTokenAddress: string
 ): Promise<Pool | null> {
-  if (!ocean || !accountId || !dataTokenAddress) return null
+  if (!ocean || !dataTokenAddress) return null
 
-  const tokenPools = await ocean.pool.searchPoolforDT(
-    accountId,
-    dataTokenAddress
-  )
+  const tokenPools = await ocean.pool.searchPoolforDT(dataTokenAddress)
 
   if (tokenPools === undefined || tokenPools.length === 0) {
     return {
@@ -27,11 +23,7 @@ export async function getCheapestPool(
 
   if (tokenPools) {
     for (let i = 0; i < tokenPools.length; i++) {
-      const poolPrice = await ocean.pool.getOceanNeeded(
-        accountId,
-        tokenPools[i],
-        '1'
-      )
+      const poolPrice = await ocean.pool.getOceanNeeded(tokenPools[i], '1')
       const decimalPoolPrice = new Decimal(poolPrice)
 
       if (decimalPoolPrice < cheapestPoolPrice) {
@@ -94,7 +86,7 @@ export async function getBestDataTokenPrice(
   dataTokenAddress: string,
   accountId: string
 ): Promise<BestPrice> {
-  const cheapestPool = await getCheapestPool(ocean, accountId, dataTokenAddress)
+  const cheapestPool = await getCheapestPool(ocean, dataTokenAddress)
   const cheapestExchange = await getCheapestExchange(ocean, dataTokenAddress)
   Decimal.set({ precision: 5 })
 

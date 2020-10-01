@@ -16,7 +16,8 @@ interface UsePublish {
     asset: Metadata,
     priceOptions: PriceOptions,
     serviceConfigs: ServiceType,
-    dataTokenOptions?: DataTokenOptions
+    dataTokenOptions?: DataTokenOptions,
+    providerUri?: string
   ) => Promise<DDO | undefined | null>
   mint: (tokenAddress: string, tokensToMint: string) => void
   publishStep?: number
@@ -92,7 +93,8 @@ function usePublish(): UsePublish {
     asset: Metadata,
     priceOptions: PriceOptions,
     serviceType: ServiceType,
-    dataTokenOptions?: DataTokenOptions
+    dataTokenOptions?: DataTokenOptions,
+    providerUri?: string
   ): Promise<DDO | undefined | null> {
     if (status !== ProviderStatus.CONNECTED || !ocean || !account) return null
 
@@ -178,7 +180,8 @@ function usePublish(): UsePublish {
           undefined,
           dataTokenOptions?.cap,
           dataTokenOptions?.name,
-          dataTokenOptions?.symbol
+          dataTokenOptions?.symbol,
+          providerUri
         )
         .next(setStep)
       Logger.log('ddo created', ddo)
