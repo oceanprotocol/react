@@ -7,7 +7,7 @@ import shortid from 'shortid'
 import { MetadataExample } from './MetadataExample'
 
 export function AllDdos() {
-  const { chainId, account, accountId, ocean } = useOcean()
+  const { networkId, account, accountId, ocean } = useOcean()
 
   const [ddos, setDdos] = useState<DDO[]>()
 
@@ -26,7 +26,7 @@ export function AllDdos() {
       setDdos(assets.results.slice(0, 4))
     }
     init()
-  }, [ocean, account, chainId, accountId])
+  }, [ocean, account, networkId, accountId])
 
   return (
     <>

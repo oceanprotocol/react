@@ -28,7 +28,7 @@ interface OceanProviderValue {
   account: Account
   accountId: string
   balance: Balance
-  chainId: number | undefined
+  networkId: number | undefined
   status: ProviderStatus
   connect: (config?: Config) => Promise<void>
   logout: () => Promise<void>
@@ -50,7 +50,7 @@ function OceanProvider({
   const [web3Provider, setWeb3Provider] = useState<any | undefined>()
   const [ocean, setOcean] = useState<Ocean | undefined>()
   const [web3Modal, setWeb3Modal] = useState<Web3Modal>()
-  const [chainId, setChainId] = useState<number | undefined>()
+  const [networkId, setNetworkId] = useState<number | undefined>()
   const [account, setAccount] = useState<Account | undefined>()
   const [accountId, setAccountId] = useState<string | undefined>()
   const [config, setConfig] = useState<Config>(initialConfig)
@@ -91,9 +91,9 @@ function OceanProvider({
         setWeb3(web3)
         Logger.log('Web3 created.', web3)
 
-        const chainId = web3 && (await web3.eth.getChainId())
-        setChainId(chainId)
-        Logger.log('chain id ', chainId)
+        const networkId = web3 && (await web3.eth.net.getId())
+        setNetworkId(networkId)
+        Logger.log('network id ', networkId)
 
         config.web3Provider = web3
         const ocean = await Ocean.getInstance(config)
@@ -171,7 +171,7 @@ function OceanProvider({
           account,
           accountId,
           balance,
-          chainId,
+          networkId,
           status,
           config,
           connect,
