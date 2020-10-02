@@ -17,7 +17,7 @@ interface UseMetadata {
 }
 
 function useMetadata(asset?: DID | string | DDO): UseMetadata {
-  const { ocean, status, accountId, chainId } = useOcean()
+  const { ocean, status, accountId, networkId } = useOcean()
   const [internalDdo, setDDO] = useState<DDO>()
   const [internalDid, setDID] = useState<DID | string>()
   const [metadata, setMetadata] = useState<Metadata>()
@@ -100,7 +100,7 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
     return () => {
       clearInterval(interval)
     }
-  }, [accountId, chainId, internalDdo, getMetadata, getPrice])
+  }, [accountId, networkId, internalDdo, getMetadata, getPrice])
 
   return {
     ddo: internalDdo,
