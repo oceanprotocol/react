@@ -1,6 +1,6 @@
 import Web3 from 'web3'
 import { Account } from '@oceanprotocol/lib'
-import { Balance } from '../providers'
+import { Balance } from 'providers'
 
 export async function getAccountId(web3: Web3): Promise<string> {
   const accounts = await web3.eth.getAccounts()

@@ -8,6 +8,7 @@
     "jsx": "react",
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    "baseUrl": "src",
     "sourceMap": true,
     "declaration": true,
     "importHelpers": true,
