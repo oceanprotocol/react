@@ -6,9 +6,9 @@ import {
 } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Service'
 import { useState } from 'react'
 import { DataTokenOptions } from '.'
-import { useOcean } from '../../providers'
-import ProviderStatus from '../../providers/OceanProvider/ProviderStatus'
-import { publishFeedback } from '../../utils'
+import { useOcean } from 'providers'
+import ProviderStatus from 'providers/OceanProvider/ProviderStatus'
+import { publishFeedback } from 'utils'
 import { PriceOptions } from './PriceOptions'
 
 interface UsePublish {

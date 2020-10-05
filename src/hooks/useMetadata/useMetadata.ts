@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import { DID, DDO, Metadata, Logger } from '@oceanprotocol/lib'
-import { useOcean } from '../../providers'
-import ProviderStatus from '../../providers/OceanProvider/ProviderStatus'
-import { getBestDataTokenPrice } from '../../utils/dtUtils'
-import { isDDO } from '../../utils'
+import { useOcean } from 'providers'
+import ProviderStatus from 'providers/OceanProvider/ProviderStatus'
+import { getBestDataTokenPrice } from 'utils/dtUtils'
+import { isDDO } from 'utils'
 import BestPrice from './BestPrice'
 
 interface UseMetadata {

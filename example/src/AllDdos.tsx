@@ -15,13 +15,13 @@ export function AllDdos() {
     async function init() {
       if (!ocean || !accountId || !accountId) return
 
-      const assets = await ocean.assets.ownerAssets(accountId)
-      // const assets = await ocean.assets.query({
-      //   page: 1,
-      //   offset: 10,
-      //   query: {},
-      //   sort: { created: -1 }
-      // })
+      //const assets = await ocean.assets.ownerAssets(accountId)
+      const assets = await ocean.assets.query({
+        page: 1,
+        offset: 10,
+        query: {},
+        sort: { created: -1 }
+      })
       console.log('assets', assets.results)
       setDdos(assets.results.slice(0, 4))
     }

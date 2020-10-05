@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { useOcean } from '../../providers'
+import { useOcean } from 'providers'
 import { ComputeValue } from './ComputeOptions'
 import { Logger } from '@oceanprotocol/lib'
 import { MetadataAlgorithm } from '@oceanprotocol/lib/dist/node/ddo/interfaces/MetadataAlgorithm'
 import { ComputeJob } from '@oceanprotocol/lib/dist/node/ocean/interfaces/ComputeJob'
-import { checkAndBuyDT } from '../../utils/dtUtils'
+import { checkAndBuyDT } from 'utils/dtUtils'
 
 interface UseCompute {
   compute: (

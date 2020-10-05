@@ -1,7 +1,7 @@
 import { Logger, Ocean, Account, Config } from '@oceanprotocol/lib'
 import { Decimal } from 'decimal.js'
-import Pool from '../hooks/useMetadata/Pool'
-import BestPrice from '../hooks/useMetadata/BestPrice'
+import Pool from 'hooks/useMetadata/Pool'
+import BestPrice from 'hooks/useMetadata/BestPrice'
 import Web3 from 'web3'
 
 export async function getCheapestPool(
