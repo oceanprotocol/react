@@ -1,10 +1,9 @@
 import { useState, useEffect, useCallback } from 'react'
-import { DID, DDO, Metadata, Logger } from '@oceanprotocol/lib'
+import { DID, DDO, Metadata, Logger, BestPrice } from '@oceanprotocol/lib'
 import { useOcean } from 'providers'
 import ProviderStatus from 'providers/OceanProvider/ProviderStatus'
 import { getBestDataTokenPrice } from 'utils/dtUtils'
 import { isDDO } from 'utils'
-import BestPrice from './BestPrice'
 
 interface UseMetadata {
   ddo: DDO | undefined
@@ -35,14 +34,10 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
 
   const getPrice = useCallback(
     async (dataTokenAddress: string): Promise<BestPrice> => {
-      const price = await getBestDataTokenPrice(
-        ocean,
-        dataTokenAddress,
-        accountId
-      )
+      const price = await getBestDataTokenPrice(ocean, dataTokenAddress)
       return price
     },
-    [ocean, accountId]
+    [ocean]
   )
 
   const getMetadata = useCallback(async (ddo: DDO): Promise<Metadata> => {
