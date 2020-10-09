@@ -10,6 +10,7 @@ import {
 import { useOcean } from 'providers'
 import { getBestDataTokenPrice } from 'utils/dtUtils'
 import { isDDO } from 'utils'
+import { ConfigHelperConfig } from '@oceanprotocol/lib/dist/node/utils/ConfigHelper'
 
 interface UseMetadata {
   ddo: DDO | undefined
@@ -22,7 +23,7 @@ interface UseMetadata {
 }
 
 function useMetadata(asset?: DID | string | DDO): UseMetadata {
-  const { ocean, accountId, networkId, config } = useOcean()
+  const { ocean, config, status, networkId } = useOcean()
   const [internalDdo, setDDO] = useState<DDO>()
   const [internalDid, setDID] = useState<DID | string>()
   const [metadata, setMetadata] = useState<Metadata>()
@@ -90,7 +91,13 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
       setTitle(metadata.main.name)
       setIsLoaded(true)
 
-      if (!accountId) return
+      // Stop here and do not start fetching from chain, when not connected properly.
+      if (
+        status !== 1 ||
+        networkId !== (config as ConfigHelperConfig).networkId
+      )
+        return
+
       // Set price again, but from chain
       const priceLive = await getPrice(internalDdo.dataToken)
       priceLive && internalDdo.price !== priceLive && setPrice(priceLive)
@@ -98,7 +105,13 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
     init()
 
     const interval = setInterval(async () => {
-      if (!internalDdo || !accountId) return
+      if (
+        !internalDdo ||
+        status !== 1 ||
+        networkId !== (config as ConfigHelperConfig).networkId
+      )
+        return
+
       const priceLive = await getPrice(internalDdo.dataToken)
       priceLive && setPrice(priceLive)
     }, 10000)
@@ -106,7 +119,7 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
     return () => {
       clearInterval(interval)
     }
-  }, [accountId, networkId, internalDdo, getMetadata, getPrice])
+  }, [status, networkId, config, internalDdo, getMetadata, getPrice])
 
   return {
     ddo: internalDdo,
