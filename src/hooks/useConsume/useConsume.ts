@@ -8,7 +8,8 @@ interface UseConsume {
   consume: (
     did: DID | string,
     dataTokenAddress: string,
-    serviceType: ServiceType
+    serviceType: ServiceType,
+    marketFeeAddress: string
   ) => Promise<void>
   consumeStep?: number
   consumeStepText?: string
@@ -39,7 +40,8 @@ function useConsume(): UseConsume {
   async function consume(
     did: DID | string,
     dataTokenAddress: string,
-    serviceType: ServiceType = 'access'
+    serviceType: ServiceType = 'access',
+    marketFeeAddress: string
   ): Promise<void> {
     if (!ocean || !account || !accountId) return
     setIsLoading(true)
@@ -53,7 +55,9 @@ function useConsume(): UseConsume {
       const tokenTransfer = await ocean.assets.order(
         did as string,
         serviceType,
-        accountId
+        accountId,
+        undefined,
+        marketFeeAddress
       )
       Logger.log('order created', tokenTransfer)
       setStep(2)
