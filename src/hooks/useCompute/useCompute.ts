@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useOcean } from 'providers'
 import { ComputeValue } from './ComputeOptions'
-import { Logger } from '@oceanprotocol/lib'
+import { Logger, ServiceCompute } from '@oceanprotocol/lib'
 import { MetadataAlgorithm } from '@oceanprotocol/lib/dist/node/ddo/interfaces/MetadataAlgorithm'
 import { ComputeJob } from '@oceanprotocol/lib/dist/node/ocean/interfaces/ComputeJob'
 import { checkAndBuyDT } from 'utils/dtUtils'
@@ -9,10 +9,11 @@ import { checkAndBuyDT } from 'utils/dtUtils'
 interface UseCompute {
   compute: (
     did: string,
-    computeService: any,
+    computeService: ServiceCompute,
     dataTokenAddress: string,
     algorithmRawCode: string,
-    computeContainer: ComputeValue
+    computeContainer: ComputeValue,
+    marketFeeAddress: string
   ) => Promise<ComputeJob | void>
   computeStep?: number
   computeStepText?: string
@@ -57,10 +58,11 @@ function useCompute(): UseCompute {
 
   async function compute(
     did: string,
-    computeService: any,
+    computeService: ServiceCompute,
     dataTokenAddress: string,
     algorithmRawCode: string,
-    computeContainer: ComputeValue
+    computeContainer: ComputeValue,
+    marketFeeAddress: string
   ): Promise<ComputeJob | void> {
     if (!ocean || !account) return
 
@@ -80,14 +82,16 @@ function useCompute(): UseCompute {
         accountId,
         did,
         computeService,
-        rawAlgorithmMeta
+        rawAlgorithmMeta,
+        marketFeeAddress
       )
       const tokenTransfer = await ocean.compute.order(
         accountId,
         did,
         computeService.index,
         undefined,
-        rawAlgorithmMeta
+        rawAlgorithmMeta,
+        marketFeeAddress
       )
 
       setStep(1)
@@ -108,7 +112,7 @@ function useCompute(): UseCompute {
         undefined,
         rawAlgorithmMeta,
         output,
-        computeService.index,
+        `${computeService.index}`,
         computeService.type
       )
       return response
