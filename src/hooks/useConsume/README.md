@@ -14,13 +14,13 @@ export default function MyComponent() {
   const { accountId } = useOcean()
 
   // Get metadata for this asset
-  const { title, price } = useMetadata(did)
+  const { title, price, ddo } = useMetadata(did)
 
   // Consume helpers
   const { consume, consumeStep } = useConsume()
 
   async function handleDownload() {
-    await consume(did)
+    await consume(did, ddo.dataToken, 'access')
   }
 
   return (

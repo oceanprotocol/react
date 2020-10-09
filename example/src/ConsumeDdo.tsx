@@ -9,7 +9,7 @@ import { useState } from 'react'
 import { useEffect } from 'react'
 
 export function ConsumeDdo() {
-  const { ocean } = useOcean()
+  const { ocean, accountId } = useOcean()
   const { consumeStepText, consume, consumeError } = useConsume()
   const { compute, computeStepText } = useCompute()
   const [did, setDid] = useState<string | undefined>()
@@ -22,7 +22,8 @@ export function ConsumeDdo() {
     if (!did) return
     const ddo = await ocean.assets.resolve(did)
 
-    await consume(did, ddo.dataToken, 'access')
+    // use own accountId for marketFeeAddress for testing purposes
+    await consume(did, ddo.dataToken, 'access', accountId)
   }
 
   const computeDid = async () => {
