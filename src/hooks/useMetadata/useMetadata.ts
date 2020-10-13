@@ -5,7 +5,7 @@ import {
   Metadata,
   Logger,
   BestPrice,
-  MetadataStore
+  MetadataCache
 } from '@oceanprotocol/lib'
 import { useOcean } from 'providers'
 import { getBestDataTokenPrice } from 'utils/dtUtils'
@@ -33,13 +33,13 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
 
   const getDDO = useCallback(
     async (did: DID | string): Promise<DDO | undefined> => {
-      if (!config.metadataStoreUri) return
+      if (!config.metadataCacheUri) return
 
-      const metadataStore = new MetadataStore(config.metadataStoreUri, Logger)
-      const ddo = await metadataStore.retrieveDDO(did)
+      const metadataCache = new MetadataCache(config.metadataCacheUri, Logger)
+      const ddo = await metadataCache.retrieveDDO(did)
       return ddo
     },
-    [config.metadataStoreUri]
+    [config.metadataCacheUri]
   )
 
   const getPrice = useCallback(

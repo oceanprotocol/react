@@ -30,7 +30,7 @@ const oceanDefaultConfig = new ConfigHelper().getConfig(
 
 const config = {
   ...oceanDefaultConfig,
-  metadataStoreUri: 'https://your-metadata-store.com',
+  metadataCacheUri: 'https://your-metadata-cache.com',
   providerUri: 'https://your-provider.com'
 }
 

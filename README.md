@@ -2,7 +2,7 @@
 
 <h1 align="center">react</h1>
 
-> 🎣 React hooks & components on top of @oceanprotocol/lib
+> 🎣 React hooks & components on top of ocean.js
 
 [![npm](https://img.shields.io/npm/v/@oceanprotocol/react.svg)](https://www.npmjs.com/package/@oceanprotocol/react)
 [![Build Status](https://travis-ci.com/oceanprotocol/react.svg?token=3psqw6c8KMDqfdGQ2x6d&branch=main)](https://travis-ci.com/oceanprotocol/react)
@@ -56,7 +56,12 @@ Then within your component use the included hooks to interact with Ocean's funct
 
 ```tsx
 import React from 'react'
-import { useOcean, useMetadata, useConsume, usePublish } from '@oceanprotocol/react'
+import {
+  useOcean,
+  useMetadata,
+  useConsume,
+  usePublish
+} from '@oceanprotocol/react'
 
 const did = 'did:op:0x000000000'
 
