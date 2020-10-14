@@ -1,13 +1,6 @@
-import { DID, DDO, Logger, Metadata } from '@oceanprotocol/lib'
-import {
-  Service,
-  ServiceComputePrivacy,
-  ServiceType
-} from '@oceanprotocol/lib/dist/node/ddo/interfaces/Service'
+import { Logger } from '@oceanprotocol/lib'
 import { useState } from 'react'
 import { useOcean } from 'providers'
-import ProviderStatus from 'providers/OceanProvider/ProviderStatus'
-import { publishFeedback } from 'utils'
 import { PriceOptions } from './PriceOptions'
 import { TransactionReceipt } from 'web3-core'
 import { getBestDataTokenPrice, getFirstPool } from 'utils/dtUtils'
@@ -17,7 +10,7 @@ interface UsePricing {
   createPricing: (
     dataTokenAddress: string,
     priceOptions: PriceOptions
-  ) => Promise<TransactionReceipt | null>
+  ) => Promise<TransactionReceipt | string | null>
   buyDT: (
     dataTokenAddress: string,
     dtAmount: number | string
@@ -73,7 +66,8 @@ function usePricing(): UsePricing {
   async function createPricing(
     dataTokenAddress: string,
     priceOptions: PriceOptions
-  ): Promise<TransactionReceipt | null> {
+  ): Promise<TransactionReceipt | string | null> {
+    if (!ocean || !account || !accountId) return null
     setStepCreatePricing(0)
     let response = null
     try {
@@ -105,7 +99,7 @@ function usePricing(): UsePricing {
           await ocean.datatokens.approve(
             dataTokenAddress,
             config.fixedRateExchangeAddress,
-            priceOptions.dtAmount,
+            String(priceOptions.dtAmount),
             accountId
           )
           setStepCreatePricing(3)
@@ -120,13 +114,14 @@ function usePricing(): UsePricing {
       setPricingStepText(undefined)
       setIsLoading(false)
     }
+    return null
   }
 
   async function buyDT(
     dataTokenAddress: string,
     dtAmount: number | string
   ): Promise<TransactionReceipt | null> {
-    if (!ocean || !account || !accountId) return
+    if (!ocean || !account || !accountId) return null
 
     setIsLoading(true)
     setPricingError(undefined)
@@ -159,11 +154,11 @@ function usePricing(): UsePricing {
         case 'exchange': {
           if (!config.oceanTokenAddress) {
             Logger.error(`'oceanTokenAddress' not set in config`)
-            return
+            return null
           }
           if (!config.fixedRateExchangeAddress) {
             Logger.error(`'fixedRateExchangeAddress' not set in config`)
-            return
+            return null
           }
           Logger.log('Buying token from exchange', bestPrice, account.getId())
           await ocean.datatokens.approve(
@@ -191,21 +186,26 @@ function usePricing(): UsePricing {
       setPricingStepText(undefined)
       setIsLoading(false)
     }
+    return null
   }
 
   async function sellDT(
     dataTokenAddress: string,
     dtAmount: number | string
   ): Promise<TransactionReceipt | null> {
-    if (!ocean || !account || !accountId) return
-
+    if (!ocean || !account || !accountId) return null
+    if (!config.oceanTokenAddress) {
+      Logger.error(`'oceanTokenAddress' not set in config`)
+      return null
+    }
     setIsLoading(true)
     setPricingError(undefined)
     setStepSellDT(0)
 
     try {
       const pool = await getFirstPool(ocean, dataTokenAddress)
-      const price = new Decimal(pool.value).times(0.95).toString()
+      if (!pool || pool.price === 0) return null
+      const price = new Decimal(pool.price).times(0.95).toString()
       setStepSellDT(1)
       Logger.log('Selling token to pool', pool, account.getId(), price)
       const sellResponse = await ocean.pool.sellDT(
@@ -225,6 +225,7 @@ function usePricing(): UsePricing {
       setPricingStepText(undefined)
       setIsLoading(false)
     }
+    return null
   }
 
   return {

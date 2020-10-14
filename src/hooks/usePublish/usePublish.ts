@@ -65,7 +65,7 @@ function usePublish(): UsePublish {
 
       const publishedDate =
         new Date(Date.now()).toISOString().split('.')[0] + 'Z'
-      const timeout = 0
+      let timeout = 0
       const services: Service[] = []
 
       const price = '1'
@@ -75,13 +75,15 @@ function usePublish(): UsePublish {
             account,
             price,
             publishedDate,
-            timeout
+            timeout,
+            providerUri
           )
           Logger.log('access service created', accessService)
           services.push(accessService)
           break
         }
         case 'compute': {
+          timeout = 3600
           const cluster = ocean.compute.createClusterAttributes(
             'Kubernetes',
             'http://10.0.0.17/xxx'
@@ -122,7 +124,9 @@ function usePublish(): UsePublish {
             price,
             publishedDate,
             provider,
-            origComputePrivacy as ServiceComputePrivacy
+            origComputePrivacy as ServiceComputePrivacy,
+            timeout,
+            providerUri
           )
           services.push(computeService)
           break
