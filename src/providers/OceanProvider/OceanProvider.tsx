@@ -137,7 +137,7 @@ function OceanProvider({
   }
   async function logout() {
     // TODO: #67 check how is the proper way to logout
-    web3Modal?.clearCachedProvider()
+    if (web3Modal) web3Modal.clearCachedProvider()
   }
 
   // TODO: #68 Refetch balance periodically, or figure out some event to subscribe to

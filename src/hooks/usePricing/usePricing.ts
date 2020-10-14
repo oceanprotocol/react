@@ -16,15 +16,15 @@ import { Decimal } from 'decimal.js'
 interface UsePricing {
   createPricing: (
     dataTokenAddress: string,
-    priceOptions: PriceOptions,
+    priceOptions: PriceOptions
   ) => Promise<TransactionReceipt | null>
   buyDT: (
     dataTokenAddress: string,
-    dtAmount: number | string,
+    dtAmount: number | string
   ) => Promise<TransactionReceipt | null>
   sellDT: (
     dataTokenAddress: string,
-    dtAmount: number | string,
+    dtAmount: number | string
   ) => Promise<TransactionReceipt | null>
   pricingStep?: number
   pricingStepText?: string
@@ -35,19 +35,19 @@ interface UsePricing {
 export const buyDTFeedback: { [key in number]: string } = {
   0: '1/3 Approving OCEAN ...',
   1: '2/3 Buying DT ...',
-  2: '3/3 DT Bought'  
+  2: '3/3 DT Bought'
 }
 export const sellDTFeedback: { [key in number]: string } = {
   0: '1/3 Approving DT ...',
   1: '2/3 Selling DT ...',
-  2: '3/3 DT sold'  
+  2: '3/3 DT sold'
 }
 
-export const createPricingFeedback:{ [key in number]: string } = {
+export const createPricingFeedback: { [key in number]: string } = {
   0: '1/4 Approving DT ...',
   1: '2/4 Approving Ocean ...',
   2: '3/4 Creating ....',
-  3: '4/4 Pricing created',
+  3: '4/4 Pricing created'
 }
 
 function usePricing(): UsePricing {
@@ -76,11 +76,11 @@ function usePricing(): UsePricing {
   ): Promise<TransactionReceipt | null> {
     setStepCreatePricing(0)
     let response = null
-    try{
+    try {
       switch (priceOptions.type) {
         case 'dynamic': {
           setStepCreatePricing(2)
-          response=await ocean.pool.createDTPool(
+          response = await ocean.pool.createDTPool(
             accountId,
             dataTokenAddress,
             priceOptions.dtAmount.toString(),
@@ -96,7 +96,7 @@ function usePricing(): UsePricing {
             return null
           }
           setStepCreatePricing(2)
-          response=await ocean.fixedRateExchange.create(
+          response = await ocean.fixedRateExchange.create(
             dataTokenAddress,
             priceOptions.price.toString(),
             accountId
@@ -112,20 +112,19 @@ function usePricing(): UsePricing {
           return response
         }
       }
-    }
-    catch (error) {
+    } catch (error) {
       setPricingError(error.message)
       Logger.error(error)
     } finally {
       setPricingStep(undefined)
       setPricingStepText(undefined)
       setIsLoading(false)
+    }
   }
-}
 
   async function buyDT(
     dataTokenAddress: string,
-    dtAmount: number | string,
+    dtAmount: number | string
   ): Promise<TransactionReceipt | null> {
     if (!ocean || !account || !accountId) return
 
@@ -140,7 +139,12 @@ function usePricing(): UsePricing {
           const price = new Decimal(bestPrice.value).times(1.05).toString()
           const maxPrice = new Decimal(bestPrice.value).times(2).toString()
           setStepBuyDT(1)
-          Logger.log('Buying token from pool', bestPrice, account.getId(), price)
+          Logger.log(
+            'Buying token from pool',
+            bestPrice,
+            account.getId(),
+            price
+          )
           const buyResponse = await ocean.pool.buyDT(
             account.getId(),
             bestPrice.address,
@@ -191,7 +195,7 @@ function usePricing(): UsePricing {
 
   async function sellDT(
     dataTokenAddress: string,
-    dtAmount: number | string,
+    dtAmount: number | string
   ): Promise<TransactionReceipt | null> {
     if (!ocean || !account || !accountId) return
 
@@ -200,16 +204,16 @@ function usePricing(): UsePricing {
     setStepSellDT(0)
 
     try {
-      const pool=await getFirstPool(ocean, dataTokenAddress)
+      const pool = await getFirstPool(ocean, dataTokenAddress)
       const price = new Decimal(pool.value).times(0.95).toString()
       setStepSellDT(1)
       Logger.log('Selling token to pool', pool, account.getId(), price)
       const sellResponse = await ocean.pool.sellDT(
-            account.getId(),
-            pool.address,
-            String(dtAmount),
-            price
-          )
+        account.getId(),
+        pool.address,
+        String(dtAmount),
+        price
+      )
       setStepSellDT(2)
       Logger.log('DT sell response', sellResponse)
       return sellResponse
@@ -222,7 +226,7 @@ function usePricing(): UsePricing {
       setIsLoading(false)
     }
   }
-  
+
   return {
     createPricing,
     buyDT,
