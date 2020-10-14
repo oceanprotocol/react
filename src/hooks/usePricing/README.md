@@ -30,10 +30,10 @@ export default function MyComponent() {
   }
 
   async function handleBuyDT() {
-    await buyDT(dataTokenAddress, 1)
+    await buyDT(dataTokenAddress, '1')
   }
   async function handleSellDT() {
-    await sellDT(dataTokenAddress, 1)
+    await sellDT(dataTokenAddress, '1')
   }
 
   return (
