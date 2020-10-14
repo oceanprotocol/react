@@ -5,18 +5,16 @@ import {
   ServiceType
 } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Service'
 import { useState } from 'react'
-import { DataTokenOptions } from '.'
+import { DataTokenOptions } from './DataTokenOptions'
 import { useOcean } from 'providers'
 import ProviderStatus from 'providers/OceanProvider/ProviderStatus'
 import { publishFeedback } from 'utils'
-import { PriceOptions } from './PriceOptions'
 
 interface UsePublish {
   publish: (
     asset: Metadata,
-    priceOptions: PriceOptions,
     serviceConfigs: ServiceType,
-    dataTokenOptions?: DataTokenOptions,
+    dataTokenOptions: DataTokenOptions,
     providerUri?: string
   ) => Promise<DDO | undefined | null>
   mint: (tokenAddress: string, tokensToMint: string) => void
@@ -43,44 +41,6 @@ function usePublish(): UsePublish {
     await ocean.datatokens.mint(tokenAddress, accountId, tokensToMint)
   }
 
-  async function createPricing(
-    priceOptions: PriceOptions,
-    dataTokenAddress: string,
-    mintedTokens: string
-  ): Promise<void | null> {
-    switch (priceOptions.type) {
-      case 'dynamic': {
-        await ocean.pool.createDTPool(
-          accountId,
-          dataTokenAddress,
-          priceOptions.tokensToMint.toString(),
-          priceOptions.weightOnDataToken,
-          priceOptions.swapFee
-        )
-        break
-      }
-      case 'fixed': {
-        if (!config.fixedRateExchangeAddress) {
-          Logger.error(`'fixedRateExchangeAddress' not set in ccnfig.`)
-          return null
-        }
-
-        await ocean.fixedRateExchange.create(
-          dataTokenAddress,
-          priceOptions.price.toString(),
-          accountId
-        )
-        await ocean.datatokens.approve(
-          dataTokenAddress,
-          config.fixedRateExchangeAddress,
-          mintedTokens,
-          accountId
-        )
-        break
-      }
-    }
-  }
-
   /**
    * Publish an asset.It also creates the datatoken, mints tokens and gives the market allowance
    * @param  {Metadata} asset The metadata of the asset.
@@ -91,9 +51,8 @@ function usePublish(): UsePublish {
    */
   async function publish(
     asset: Metadata,
-    priceOptions: PriceOptions,
     serviceType: ServiceType,
-    dataTokenOptions?: DataTokenOptions,
+    dataTokenOptions: DataTokenOptions,
     providerUri?: string
   ): Promise<DDO | undefined | null> {
     if (status !== ProviderStatus.CONNECTED || !ocean || !account) return null
@@ -102,7 +61,7 @@ function usePublish(): UsePublish {
     setPublishError(undefined)
 
     try {
-      const tokensToMint = priceOptions.tokensToMint.toString()
+      const tokensToMint = dataTokenOptions.tokensToMint.toString()
 
       const publishedDate =
         new Date(Date.now()).toISOString().split('.')[0] + 'Z'
@@ -189,8 +148,8 @@ function usePublish(): UsePublish {
       await mint(ddo.dataToken, tokensToMint)
       Logger.log(`minted ${tokensToMint} tokens`)
 
-      await createPricing(priceOptions, ddo.dataToken, tokensToMint)
-      setStep(8)
+      // await createPricing(priceOptions, ddo.dataToken, tokensToMint)
+      // setStep(8)
       return ddo
     } catch (error) {
       setPublishError(error.message)

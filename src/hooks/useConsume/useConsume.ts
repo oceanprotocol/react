@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useOcean } from 'providers'
 import { feedback } from 'utils'
 import { DID, Logger, ServiceType } from '@oceanprotocol/lib'
-import { checkAndBuyDT } from 'utils/dtUtils'
 
 interface UseConsume {
   consume: (
@@ -49,38 +48,33 @@ function useConsume(): UseConsume {
 
     try {
       setStep(0)
-      await checkAndBuyDT(ocean, dataTokenAddress, account, config)
-
-      setStep(1)
-      const tokenTransfer = await ocean.assets.order(
-        did as string,
-        serviceType,
-        accountId,
-        undefined,
-        marketFeeAddress
-      )
-      Logger.log('order created', tokenTransfer)
-      setStep(2)
-      // const res = JSON.parse(order)
-      // Logger.log('order parsed', res)
-      // Logger.log('ocean.datatokens before transfer', ocean.datatokens)
-      // const tokenTransfer = await ocean.datatokens.transferWei(
-      //   res.dataToken,
-      //   res.to,
-      //   String(res.numTokens),
-      //   res.from
-      // )
-      // Logger.log('token transfered', tokenTransfer)
-      setStep(3)
-      await ocean.assets.download(
-        did as string,
-        tokenTransfer,
+      const userOwnedTokens = await ocean.accounts.getTokenBalance(
         dataTokenAddress,
-        account,
-        ''
+        account
       )
-
-      setStep(4)
+      if (parseFloat(userOwnedTokens) < 1) {
+        setConsumeError('Not enough datatokens')
+      } else {
+        setStep(1)
+        const tokenTransfer = await ocean.assets.order(
+          did as string,
+          serviceType,
+          accountId,
+          undefined,
+          marketFeeAddress
+        )
+        Logger.log('order created', tokenTransfer)
+        setStep(2)
+        setStep(3)
+        await ocean.assets.download(
+          did as string,
+          tokenTransfer,
+          dataTokenAddress,
+          account,
+          ''
+        )
+        setStep(4)
+      }
     } catch (error) {
       setConsumeError(error.message)
       Logger.error(error)

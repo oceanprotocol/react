@@ -1,6 +1,6 @@
 # `usePublish`
 
-Publish data sets, and create data tokens and liquidity pools for them.
+Create data tokens, Mint and Publish data sets
 
 ## Usage
 
@@ -24,16 +24,12 @@ export default function MyComponent() {
     }
   }
 
-  const priceOptions = {
-    price: 10,
-    tokensToMint: 10,
-    type: 'fixed',
-    weightOnDataToken: '',
-    swapFee: ''
+  const dataTokenOptions = {
+    tokensToMint: 10
   }
 
   async function handlePublish() {
-    const ddo = await publish(metadata, priceOptions, 'access')
+    const ddo = await publish(metadata, 'access', dataTokenOptions)
   }
 
   return (

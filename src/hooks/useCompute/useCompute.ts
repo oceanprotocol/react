@@ -4,7 +4,6 @@ import { ComputeValue } from './ComputeOptions'
 import { Logger, ServiceCompute } from '@oceanprotocol/lib'
 import { MetadataAlgorithm } from '@oceanprotocol/lib/dist/node/ddo/interfaces/MetadataAlgorithm'
 import { ComputeJob } from '@oceanprotocol/lib/dist/node/ocean/interfaces/ComputeJob'
-import { checkAndBuyDT } from 'utils/dtUtils'
 
 interface UseCompute {
   compute: (
@@ -13,7 +12,7 @@ interface UseCompute {
     dataTokenAddress: string,
     algorithmRawCode: string,
     computeContainer: ComputeValue,
-    marketFeeAddress: string
+    marketFeeAddress?: string
   ) => Promise<ComputeJob | void>
   computeStep?: number
   computeStepText?: string
@@ -62,7 +61,7 @@ function useCompute(): UseCompute {
     dataTokenAddress: string,
     algorithmRawCode: string,
     computeContainer: ComputeValue,
-    marketFeeAddress: string
+    marketFeeAddress?: string
   ): Promise<ComputeJob | void> {
     if (!ocean || !account) return
 
@@ -72,50 +71,47 @@ function useCompute(): UseCompute {
       setIsLoading(true)
       setStep(0)
 
-      await checkAndBuyDT(ocean, dataTokenAddress, account, config)
-      rawAlgorithmMeta.container = computeContainer
-      rawAlgorithmMeta.rawcode = algorithmRawCode
-
-      const output = {}
-      Logger.log(
-        'compute order',
-        accountId,
-        did,
-        computeService,
-        rawAlgorithmMeta,
-        marketFeeAddress
-      )
-      const tokenTransfer = await ocean.compute.order(
-        accountId,
-        did,
-        computeService.index,
-        undefined,
-        rawAlgorithmMeta,
-        marketFeeAddress
-      )
-
-      setStep(1)
-      // const computeOrder = JSON.parse(order)
-      // Logger.log('compute order', computeOrder)
-      // const tokenTransfer = await ocean.datatokens.transferWei(
-      //   computeOrder.dataToken,
-      //   computeOrder.to,
-      //   String(computeOrder.numTokens),
-      //   computeOrder.from
-      // )
-      setStep(2)
-      const response = await ocean.compute.start(
-        did,
-        tokenTransfer,
+      const userOwnedTokens = await ocean.accounts.getTokenBalance(
         dataTokenAddress,
-        account,
-        undefined,
-        rawAlgorithmMeta,
-        output,
-        `${computeService.index}`,
-        computeService.type
+        account
       )
-      return response
+      if (parseFloat(userOwnedTokens) < 1) {
+        setComputeError('Not enough datatokens')
+      } else {
+        rawAlgorithmMeta.container = computeContainer
+        rawAlgorithmMeta.rawcode = algorithmRawCode
+        const output = {}
+        Logger.log(
+          'compute order',
+          accountId,
+          did,
+          computeService,
+          rawAlgorithmMeta,
+          marketFeeAddress
+        )
+        const tokenTransfer = await ocean.compute.order(
+          accountId,
+          did,
+          computeService.index,
+          undefined,
+          rawAlgorithmMeta,
+          marketFeeAddress
+        )
+        setStep(1)
+        setStep(2)
+        const response = await ocean.compute.start(
+          did,
+          tokenTransfer,
+          dataTokenAddress,
+          account,
+          undefined,
+          rawAlgorithmMeta,
+          output,
+          `${computeService.index}`,
+          computeService.type
+        )
+        return response
+      }
     } catch (error) {
       Logger.error(error)
       setComputeError(error.message)
