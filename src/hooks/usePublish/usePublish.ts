@@ -15,6 +15,7 @@ interface UsePublish {
     asset: Metadata,
     serviceConfigs: ServiceType,
     dataTokenOptions: DataTokenOptions,
+    timeout?: number,
     providerUri?: string
   ) => Promise<DDO | undefined | null>
   mint: (tokenAddress: string, tokensToMint: string) => void
@@ -53,10 +54,10 @@ function usePublish(): UsePublish {
     asset: Metadata,
     serviceType: ServiceType,
     dataTokenOptions: DataTokenOptions,
+    timeout?: number,
     providerUri?: string
   ): Promise<DDO | undefined | null> {
     if (status !== ProviderStatus.CONNECTED || !ocean || !account) return null
-
     setIsLoading(true)
     setPublishError(undefined)
 
@@ -71,6 +72,7 @@ function usePublish(): UsePublish {
       const price = '1'
       switch (serviceType) {
         case 'access': {
+          if (!timeout) timeout = 0
           const accessService = await ocean.assets.createAccessServiceAttributes(
             account,
             price,
@@ -83,7 +85,7 @@ function usePublish(): UsePublish {
           break
         }
         case 'compute': {
-          timeout = 3600
+          if (!timeout) timeout = 3600
           const cluster = ocean.compute.createClusterAttributes(
             'Kubernetes',
             'http://10.0.0.17/xxx'
