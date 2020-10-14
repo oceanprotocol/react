@@ -13,7 +13,7 @@ import { Metadata } from '@oceanprotocol/lib'
 
 export default function MyComponent() {
   const { accountId } = useOcean()
-
+  const dataTokenAddress = '0x00000'
   // Publish helpers
   const { createPricing, buyDT, sellDT } = usePricing()
   
@@ -26,14 +26,14 @@ export default function MyComponent() {
   }
 
   async function handleCreatePricing() {
-    const ddo = await createPricing(dataTokenAddress, priceOptions)
+    await createPricing(dataTokenAddress, priceOptions)
   }
 
   async function handleBuyDT() {
-    const ddo = await buyDT(dataTokenAddress, 1)
+    await buyDT(dataTokenAddress, 1)
   }
   async function handleSellDT() {
-    const ddo = await sellDT(dataTokenAddress, 1)
+    await sellDT(dataTokenAddress, 1)
   }
 
   return (
