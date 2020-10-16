@@ -8,7 +8,7 @@ Sell DT
 
 ```tsx
 import React from 'react'
-import { useOcean, usePostforSale } from '@oceanprotocol/react'
+import { useOcean, usePricing } from '@oceanprotocol/react'
 import { Metadata } from '@oceanprotocol/lib'
 
 export default function MyComponent() {
