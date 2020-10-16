@@ -47,7 +47,7 @@ export function Publish() {
     setDdo(ddo)
   }
 
-  const PostForSale = async () => {
+  const handlePostForSale = async () => {
     if(ddo){
       const priceOptions = {
         price: 7,
@@ -74,7 +74,7 @@ export function Publish() {
       </div>
       <div>DID: {ddo && ddo.id} </div>
       <div>
-        <button onClick={PostForSale}>Post for sale</button>
+        <button onClick={handlePostForSale}>Post for sale</button>
       </div>
       <div>
         IsLoading: {pricingIsLoading.toString()} || pricingStatus: {pricingStepText}
