@@ -7,7 +7,7 @@ import { Metadata } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Metadata'
 
 export function Publish() {
   const { publish, publishStepText, isLoading } = usePublish()
-  const { createPricing, buyDT, sellDT, pricingStep, pricingStepText, isLoading: pricingIsLoading, pricingError} = usePricing()
+  const { createPricing, buyDT, sellDT, pricingStep, pricingStepText, pricingIsLoading, pricingError} = usePricing()
   const [ddo, setDdo] = useState<DDO | undefined | null>()
 
   const asset = {

@@ -22,7 +22,7 @@ interface UsePricing {
   pricingStep?: number
   pricingStepText?: string
   pricingError?: string
-  isLoading: boolean
+  pricingIsLoading: boolean
 }
 
 export const buyDTFeedback: { [key in number]: string } = {
@@ -45,22 +45,40 @@ export const createPricingFeedback: { [key in number]: string } = {
 
 function usePricing(): UsePricing {
   const { ocean, status, account, accountId, config } = useOcean()
-  const [isLoading, setIsLoading] = useState(false)
+  const [pricingIsLoading, setPricingIsLoading] = useState(false)
   const [pricingStep, setPricingStep] = useState<number | undefined>()
   const [pricingStepText, setPricingStepText] = useState<string | undefined>()
   const [pricingError, setPricingError] = useState<string | undefined>()
 
-  function setStepBuyDT(index?: number) {
+  function setStepBuyDT(index?: number, datatokenName?: string) {
     setPricingStep(index)
-    index && setPricingStepText(buyDTFeedback[index])
+    let message
+    if (index) {
+      if (datatokenName)
+        message = buyDTFeedback[index].replace(/DT/g, datatokenName)
+      else message = buyDTFeedback[index]
+      setPricingStepText(message)
+    }
   }
-  function setStepSellDT(index?: number) {
+  function setStepSellDT(index?: number, datatokenName?: string) {
     setPricingStep(index)
-    index && setPricingStepText(sellDTFeedback[index])
+    let message
+    if (index) {
+      if (datatokenName)
+        message = sellDTFeedback[index].replace(/DT/g, datatokenName)
+      else message = sellDTFeedback[index]
+      setPricingStepText(message)
+    }
   }
-  function setStepCreatePricing(index?: number) {
+  function setStepCreatePricing(index?: number, datatokenName?: string) {
     setPricingStep(index)
-    index && setPricingStepText(createPricingFeedback[index])
+    let message
+    if (index) {
+      if (datatokenName)
+        message = createPricingFeedback[index].replace(/DT/g, datatokenName)
+      else message = createPricingFeedback[index]
+      setPricingStepText(message)
+    }
   }
 
   async function createPricing(
@@ -68,9 +86,13 @@ function usePricing(): UsePricing {
     priceOptions: PriceOptions
   ): Promise<TransactionReceipt | string | null> {
     if (!ocean || !account || !accountId) return null
-    setStepCreatePricing(0)
+
     let response = null
     try {
+      setPricingIsLoading(true)
+      setPricingError(undefined)
+      const datatokenName = await ocean.datatokens.getName(dataTokenAddress)
+      setStepCreatePricing(0, datatokenName)
       switch (priceOptions.type) {
         case 'dynamic': {
           setStepCreatePricing(2)
@@ -112,7 +134,7 @@ function usePricing(): UsePricing {
     } finally {
       setPricingStep(undefined)
       setPricingStepText(undefined)
-      setIsLoading(false)
+      setPricingIsLoading(false)
     }
     return null
   }
@@ -123,17 +145,17 @@ function usePricing(): UsePricing {
   ): Promise<TransactionReceipt | null> {
     if (!ocean || !account || !accountId) return null
 
-    setIsLoading(true)
-    setPricingError(undefined)
-    setStepBuyDT(0)
-
     try {
+      const datatokenName = await ocean.datatokens.getName(dataTokenAddress)
+      setPricingIsLoading(true)
+      setPricingError(undefined)
+      setStepBuyDT(0)
       const bestPrice = await getBestDataTokenPrice(ocean, dataTokenAddress)
       switch (bestPrice?.type) {
         case 'pool': {
           const price = new Decimal(bestPrice.value).times(1.05).toString()
           const maxPrice = new Decimal(bestPrice.value).times(2).toString()
-          setStepBuyDT(1)
+          setStepBuyDT(1, datatokenName)
           Logger.log(
             'Buying token from pool',
             bestPrice,
@@ -167,7 +189,7 @@ function usePricing(): UsePricing {
             bestPrice.value.toString(),
             account.getId()
           )
-          setStepBuyDT(1)
+          setStepBuyDT(1, datatokenName)
           const exchange = await ocean.fixedRateExchange.buyDT(
             bestPrice.address,
             String(dtAmount),
@@ -184,7 +206,7 @@ function usePricing(): UsePricing {
     } finally {
       setPricingStep(undefined)
       setPricingStepText(undefined)
-      setIsLoading(false)
+      setPricingIsLoading(false)
     }
     return null
   }
@@ -198,15 +220,15 @@ function usePricing(): UsePricing {
       Logger.error(`'oceanTokenAddress' not set in config`)
       return null
     }
-    setIsLoading(true)
-    setPricingError(undefined)
-    setStepSellDT(0)
-
     try {
+      const datatokenName = await ocean.datatokens.getName(dataTokenAddress)
+      setPricingIsLoading(true)
+      setPricingError(undefined)
+      setStepSellDT(0, datatokenName)
       const pool = await getFirstPool(ocean, dataTokenAddress)
       if (!pool || pool.price === 0) return null
       const price = new Decimal(pool.price).times(0.95).toString()
-      setStepSellDT(1)
+      setStepSellDT(1, datatokenName)
       Logger.log('Selling token to pool', pool, account.getId(), price)
       const sellResponse = await ocean.pool.sellDT(
         account.getId(),
@@ -223,7 +245,7 @@ function usePricing(): UsePricing {
     } finally {
       setStepSellDT(undefined)
       setPricingStepText(undefined)
-      setIsLoading(false)
+      setPricingIsLoading(false)
     }
     return null
   }
@@ -234,7 +256,7 @@ function usePricing(): UsePricing {
     sellDT,
     pricingStep,
     pricingStepText,
-    isLoading,
+    pricingIsLoading,
     pricingError
   }
 }
