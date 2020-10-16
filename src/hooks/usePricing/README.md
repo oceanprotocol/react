@@ -1,8 +1,6 @@
 # `usePricing`
 
-Post asset for sale by creating liquidity pools or fixed rate exchange
-Buy DT
-Sell DT
+Hook with helper utilities to create fixed price exchanges or liquidity pools for your data set and buy/sell datatokens
 
 ## Usage
 
