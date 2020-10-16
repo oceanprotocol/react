@@ -1,5 +1,5 @@
 import React from 'react'
-import { useOcean, usePricing } from '@oceanprotocol/react'
+import { useOcean, useTrade } from '@oceanprotocol/react'
 // import { useOcean, usePublish } from '@oceanprotocol/react'
 import { DDO } from '@oceanprotocol/lib'
 import { useState } from 'react'
@@ -7,7 +7,7 @@ import { Metadata } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Metadata'
 
 export function Trade() {
   const { ocean, accountId } = useOcean()
-  const { createPricing, buyDT, sellDT, pricingStep, pricingStepText, isLoading: pricingIsLoading, pricingError} = usePricing()
+  const { buyDT, sellDT, tradeStep, tradeStepText, tradeIsLoading, tradeError} = useTrade()
   const [did, setDid] = useState<string | undefined>()
   const handleBuy = async () => {
     if (!did) { console.error("No DID"); return}
@@ -47,7 +47,7 @@ export function Trade() {
         <button onClick={handleSell}>Sell 1 DT</button>
       </div>
       <div>
-        IsLoading: {pricingIsLoading.toString()} || Status: {pricingStepText}
+        IsLoading: {tradeIsLoading.toString()} || Status: {tradeStepText}
       </div>
       
     </>

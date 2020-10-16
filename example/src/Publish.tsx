@@ -1,5 +1,5 @@
 import React from 'react'
-import { usePublish, usePricing } from '@oceanprotocol/react'
+import { usePublish, useCreatePricing } from '@oceanprotocol/react'
 // import { useOcean, usePublish } from '@oceanprotocol/react'
 import { DDO } from '@oceanprotocol/lib'
 import { useState } from 'react'
@@ -7,7 +7,7 @@ import { Metadata } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Metadata'
 
 export function Publish() {
   const { publish, publishStepText, isLoading } = usePublish()
-  const { createPricing, buyDT, sellDT, pricingStep, pricingStepText, pricingIsLoading, pricingError} = usePricing()
+  const { createPricing, pricingStep, pricingStepText, pricingIsLoading, pricingError} = useCreatePricing()
   const [ddo, setDdo] = useState<DDO | undefined | null>()
 
   const asset = {
