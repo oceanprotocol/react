@@ -10,7 +10,7 @@ export function Trade() {
   const { createPricing, buyDT, sellDT, pricingStep, pricingStepText, isLoading: pricingIsLoading, pricingError} = usePricing()
   const [did, setDid] = useState<string | undefined>()
   const ActionBuy = async () => {
-    if (!did) return
+    if (!did) { console.error("No DID"); return}
     const ddo = await ocean.assets.resolve(did)
     if(ddo){
       const tx = await buyDT(ddo.dataToken,'1')
@@ -21,7 +21,7 @@ export function Trade() {
     }
   }
   const ActionSell = async () => {
-    if (!did) return
+    if (!did) { console.error("No DID"); return}
     const ddo = await ocean.assets.resolve(did)
     if(ddo){
       const tx = await buyDT(ddo.dataToken,'1')
@@ -31,9 +31,15 @@ export function Trade() {
       console.error("Publish the asset first and create a pricing")
     }
   }
+  const handleChange = (e: any) => {
+    setDid(e.target.value)
+  }
   return (
     <>
       <div>Trade Datatoken</div>
+      <div>
+        DID <input onChange={handleChange}></input>
+      </div>
       <div>
         <button onClick={ActionBuy}>Buy 1 DT</button>
       </div>
