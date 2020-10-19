@@ -1,5 +1,5 @@
-import { Logger } from '@oceanprotocol/lib'
-import { useState } from 'react'
+import { DDO, Logger } from '@oceanprotocol/lib'
+import { useEffect, useState } from 'react'
 import { useOcean } from 'providers'
 import { PriceOptions } from './PriceOptions'
 import { TransactionReceipt } from 'web3-core'
@@ -8,18 +8,11 @@ import { Decimal } from 'decimal.js'
 
 interface UsePricing {
   createPricing: (
-    dataTokenAddress: string,
     priceOptions: PriceOptions
   ) => Promise<TransactionReceipt | string | null>
-  buyDT: (
-    dataTokenAddress: string,
-    dtAmount: number | string
-  ) => Promise<TransactionReceipt | null>
-  sellDT: (
-    dataTokenAddress: string,
-    dtAmount: number | string
-  ) => Promise<TransactionReceipt | null>
-  mint: (tokenAddress: string, tokensToMint: string) => void
+  buyDT: (dtAmount: number | string) => Promise<TransactionReceipt | null>
+  sellDT: (dtAmount: number | string) => Promise<TransactionReceipt | null>
+  mint: (tokensToMint: string) => void
   pricingStep?: number
   pricingStepText?: string
   pricingError?: string
@@ -32,70 +25,87 @@ export const createPricingFeedback: { [key in number]: string } = {
   2: '3/4 Creating ....',
   3: '4/4 Pricing created'
 }
+
 export const buyDTFeedback: { [key in number]: string } = {
   0: '1/3 Approving OCEAN ...',
   1: '2/3 Buying DT ...',
   2: '3/3 DT Bought'
 }
+
 export const sellDTFeedback: { [key in number]: string } = {
   0: '1/3 Approving DT ...',
   1: '2/3 Selling DT ...',
   2: '3/3 DT sold'
 }
-function usePricing(): UsePricing {
-  const { ocean, status, account, accountId, config } = useOcean()
+
+function usePricing(ddo: DDO): UsePricing {
+  const { ocean, account, accountId, config } = useOcean()
   const [pricingIsLoading, setPricingIsLoading] = useState(false)
-  const [pricingStep, setPricingStep] = useState<number | undefined>()
-  const [pricingStepText, setPricingStepText] = useState<string | undefined>()
-  const [pricingError, setPricingError] = useState<string | undefined>()
+  const [pricingStep, setPricingStep] = useState<number>()
+  const [pricingStepText, setPricingStepText] = useState<string>()
+  const [pricingError, setPricingError] = useState<string>()
   const [dtSymbol, setDtSymbol] = useState<string>()
+
+  const { dataToken, dataTokenInfo } = ddo
+
+  // Get Datatoken symbol, from DDO first, then from chain
+  useEffect(() => {
+    if (!dataToken) return
+
+    async function init() {
+      const dtSymbol =
+        dataTokenInfo?.symbol || (await ocean?.datatokens.getSymbol(dataToken))
+      setDtSymbol(dtSymbol)
+    }
+    init()
+  }, [ocean, dataToken, dataTokenInfo?.symbol])
 
   function setStepCreatePricing(index?: number) {
     setPricingStep(index)
-    let message
-    if (index) {
-      if (dtSymbol)
-        message = createPricingFeedback[index].replace(/DT/g, dtSymbol)
-      else message = createPricingFeedback[index]
-      setPricingStepText(message)
-    }
+    if (!index) return
+
+    const message = dtSymbol
+      ? createPricingFeedback[index].replace(/DT/g, dtSymbol)
+      : createPricingFeedback[index]
+    setPricingStepText(message)
   }
 
   function setStepBuyDT(index?: number) {
     setPricingStep(index)
-    let message
-    if (index) {
-      if (dtSymbol) message = buyDTFeedback[index].replace(/DT/g, dtSymbol)
-      else message = buyDTFeedback[index]
-      setPricingStepText(message)
-    }
+    if (!index) return
+
+    const message = dtSymbol
+      ? buyDTFeedback[index].replace(/DT/g, dtSymbol)
+      : buyDTFeedback[index]
+    setPricingStepText(message)
   }
   function setStepSellDT(index?: number) {
     setPricingStep(index)
-    let message
-    if (index) {
-      if (dtSymbol) message = sellDTFeedback[index].replace(/DT/g, dtSymbol)
-      else message = sellDTFeedback[index]
-      setPricingStepText(message)
-    }
+    if (!index) return
+
+    const message = dtSymbol
+      ? sellDTFeedback[index].replace(/DT/g, dtSymbol)
+      : sellDTFeedback[index]
+    setPricingStepText(message)
   }
 
-  async function mint(tokenAddress: string, tokensToMint: string) {
-    Logger.log('mint function', tokenAddress, accountId)
-    await ocean.datatokens.mint(tokenAddress, accountId, tokensToMint)
+  async function mint(tokensToMint: string) {
+    Logger.log('mint function', dataToken, accountId)
+    await ocean.datatokens.mint(dataToken, accountId, tokensToMint)
   }
+
   async function buyDT(
-    dataTokenAddress: string,
     dtAmount: number | string
   ): Promise<TransactionReceipt | null> {
     if (!ocean || !account || !accountId) return null
 
     try {
-      setDtSymbol(await ocean.datatokens.getSymbol(dataTokenAddress))
+      setDtSymbol(await ocean.datatokens.getSymbol(dataToken))
       setPricingIsLoading(true)
       setPricingError(undefined)
       setStepBuyDT(0)
-      const bestPrice = await getBestDataTokenPrice(ocean, dataTokenAddress)
+      const bestPrice = await getBestDataTokenPrice(ocean, dataToken)
+
       switch (bestPrice?.type) {
         case 'pool': {
           const price = new Decimal(bestPrice.value).times(1.05).toString()
@@ -157,20 +167,21 @@ function usePricing(): UsePricing {
   }
 
   async function sellDT(
-    dataTokenAddress: string,
     dtAmount: number | string
   ): Promise<TransactionReceipt | null> {
     if (!ocean || !account || !accountId) return null
+
     if (!config.oceanTokenAddress) {
       Logger.error(`'oceanTokenAddress' not set in config`)
       return null
     }
+
     try {
-      setDtSymbol(await ocean.datatokens.getSymbol(dataTokenAddress))
+      setDtSymbol(await ocean.datatokens.getSymbol(dataToken))
       setPricingIsLoading(true)
       setPricingError(undefined)
       setStepSellDT(0)
-      const pool = await getFirstPool(ocean, dataTokenAddress)
+      const pool = await getFirstPool(ocean, dataToken)
       if (!pool || pool.price === 0) return null
       const price = new Decimal(pool.price).times(0.95).toString()
       setStepSellDT(1)
@@ -196,7 +207,6 @@ function usePricing(): UsePricing {
   }
 
   async function createPricing(
-    dataTokenAddress: string,
     priceOptions: PriceOptions
   ): Promise<TransactionReceipt | string | null> {
     if (!ocean || !account || !accountId) return null
@@ -205,14 +215,15 @@ function usePricing(): UsePricing {
     try {
       setPricingIsLoading(true)
       setPricingError(undefined)
-      setDtSymbol(await ocean.datatokens.getSymbol(dataTokenAddress))
+      setDtSymbol(await ocean.datatokens.getSymbol(dataToken))
       setStepCreatePricing(0)
+
       switch (priceOptions.type) {
         case 'dynamic': {
           setStepCreatePricing(2)
           response = await ocean.pool.createDTPool(
             accountId,
-            dataTokenAddress,
+            dataToken,
             priceOptions.dtAmount.toString(),
             priceOptions.weightOnDataToken,
             priceOptions.swapFee
@@ -227,13 +238,13 @@ function usePricing(): UsePricing {
           }
           setStepCreatePricing(2)
           response = await ocean.fixedRateExchange.create(
-            dataTokenAddress,
+            dataToken,
             priceOptions.price.toString(),
             accountId
           )
           setStepCreatePricing(1)
           await ocean.datatokens.approve(
-            dataTokenAddress,
+            dataToken,
             config.fixedRateExchangeAddress,
             String(priceOptions.dtAmount),
             accountId
