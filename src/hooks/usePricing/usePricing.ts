@@ -7,8 +7,8 @@ import { getBestDataTokenPrice, getFirstPool } from 'utils/dtUtils'
 import { Decimal } from 'decimal.js'
 
 interface UsePricing {
-  dtSymbol: string | undefined
-  dtName: string | undefined
+  dtSymbol?: string
+  dtName?: string
   createPricing: (
     priceOptions: PriceOptions
   ) => Promise<TransactionReceipt | string | null>
@@ -109,7 +109,6 @@ function usePricing(ddo: DDO): UsePricing {
     if (!ocean || !account || !accountId) return null
 
     try {
-      setDtSymbol(await ocean.datatokens.getSymbol(dataToken))
       setPricingIsLoading(true)
       setPricingError(undefined)
       setStepBuyDT(0)
@@ -186,7 +185,6 @@ function usePricing(ddo: DDO): UsePricing {
     }
 
     try {
-      setDtSymbol(await ocean.datatokens.getSymbol(dataToken))
       setPricingIsLoading(true)
       setPricingError(undefined)
       setStepSellDT(0)
@@ -224,7 +222,6 @@ function usePricing(ddo: DDO): UsePricing {
     try {
       setPricingIsLoading(true)
       setPricingError(undefined)
-      setDtSymbol(await ocean.datatokens.getSymbol(dataToken))
       setStepCreatePricing(0)
 
       switch (priceOptions.type) {
