@@ -1,20 +1,20 @@
 # `usePricing`
 
-Hook with helper utilities to create fixed price exchanges or liquidity pools for your data set, mint datatokens , buy and sell datatokens
+Hook with helper utilities to create fixed price exchanges or liquidity pools for your data set, mint datatokens, and buy and sell datatokens.
 
 ## Usage
 
 ```tsx
 import React from 'react'
 import { useOcean, useCreatePricing } from '@oceanprotocol/react'
-import { Metadata } from '@oceanprotocol/lib'
+import { Metadata, DDO } from '@oceanprotocol/lib'
 
-export default function MyComponent() {
+export default function MyComponent({ ddo }: { ddo: DDO }) {
   const { accountId } = useOcean()
-  const dataTokenAddress = '0x00000'
+
   // Publish helpers
-  const { createPricing } = usePricing()
-  
+  const { createPricing } = usePricing(ddo)
+
   const priceOptions = {
     price: 10,
     dtAmount: 10,
@@ -24,19 +24,19 @@ export default function MyComponent() {
   }
 
   async function handleCreatePricing() {
-    await createPricing(dataTokenAddress, priceOptions)
+    await createPricing(priceOptions)
   }
 
   async function handleMint() {
-    await mint(dataTokenAddress, '1')
+    await mint('1')
   }
   async function handleBuyDT() {
-    await buyDT(dataTokenAddress, '1')
+    await buyDT('1')
   }
   async function handleSellDT() {
-    await sellDT(dataTokenAddress, '1')
+    await sellDT('1')
   }
-  
+
   return (
     <div>
       <h1>Post for sale</h1>
@@ -44,7 +44,7 @@ export default function MyComponent() {
       <p>Your account: {accountId}</p>
       <button onClick={handleMint}>Mint DT</button>
       <button onClick={handleCreatePricing}>Post for sale</button>
-       <button onClick={handleBuyDT}>Buy DT</button>
+      <button onClick={handleBuyDT}>Buy DT</button>
       <button onClick={handleSellDT}>Sell DT</button>
     </div>
   )
