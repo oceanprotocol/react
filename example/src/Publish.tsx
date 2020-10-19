@@ -1,13 +1,12 @@
 import React from 'react'
-import { usePublish, useCreatePricing } from '@oceanprotocol/react'
-// import { useOcean, usePublish } from '@oceanprotocol/react'
+import { usePublish } from '@oceanprotocol/react'
 import { DDO } from '@oceanprotocol/lib'
 import { useState } from 'react'
 import { Metadata } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Metadata'
 
 export function Publish() {
   const { publish, publishStepText, isLoading } = usePublish()
-  const { createPricing, pricingStep, pricingStepText, pricingIsLoading, pricingError} = useCreatePricing()
+  const { createPricing, pricingStep, pricingStepText, pricingIsLoading, pricingError} = usePricing()
   const [ddo, setDdo] = useState<DDO | undefined | null>()
 
   const asset = {
@@ -32,37 +31,16 @@ export function Publish() {
   }
 
   const publishAsset = async () => {
-    const priceOptions = {
-      price: 7,
-      dtAmount: 10,
-      type: 'fixed',
-      weightOnDataToken: '',
-      swapFee: ''
-    }
+    
     const datatokenOptions = {
-      tokensToMint:10
+      
     }
     const ddo = await publish(asset as Metadata, 'access', datatokenOptions)
     console.log(ddo)
     setDdo(ddo)
   }
 
-  const handlePostForSale = async () => {
-    if(ddo){
-      const priceOptions = {
-        price: 7,
-        dtAmount: 10,
-        type: 'fixed',
-        weightOnDataToken: '',
-        swapFee: ''
-      }
-      const tx = await createPricing(ddo.dataToken,priceOptions)
-      console.log(tx)
-    }
-    else{
-      console.error("Publish the asset first")
-    }
-  }
+  
   return (
     <>
       <div>Publish</div>
@@ -73,13 +51,7 @@ export function Publish() {
         IsLoading: {isLoading.toString()} || Status: {publishStepText}
       </div>
       <div>DID: {ddo && ddo.id} </div>
-      <div>
-        <button onClick={handlePostForSale}>Post for sale</button>
-      </div>
-      <div>
-        IsLoading: {pricingIsLoading.toString()} || pricingStatus: {pricingStepText}
-      </div>
-
+      
     </>
   )
 }

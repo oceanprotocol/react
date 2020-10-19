@@ -8,7 +8,7 @@ import { AllDdos } from './AllDdos'
 import { ConsumeDdo } from './ConsumeDdo'
 import { NetworkMonitor } from './NetworkMonitor'
 import { LogLevel } from '@oceanprotocol/lib/dist/node/utils'
-import { Trade } from './Trade'
+import { Pricing } from './Pricing'
 
 const configRinkeby = new ConfigHelper().getConfig('rinkeby')
 const providerOptions = {}
@@ -41,7 +41,7 @@ function App() {
           <Publish />
         </div>
         <div>
-          <Trade />
+          <Pricing />
         </div>
         <div>
           <ConsumeDdo />

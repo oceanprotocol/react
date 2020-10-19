@@ -18,7 +18,6 @@ interface UsePublish {
     timeout?: number,
     providerUri?: string
   ) => Promise<DDO | undefined | null>
-  mint: (tokenAddress: string, tokensToMint: string) => void
   publishStep?: number
   publishStepText?: string
   publishError?: string
@@ -36,12 +35,6 @@ function usePublish(): UsePublish {
     setPublishStep(index)
     index && setPublishStepText(publishFeedback[index])
   }
-
-  async function mint(tokenAddress: string, tokensToMint: string) {
-    Logger.log('mint function', tokenAddress, accountId)
-    await ocean.datatokens.mint(tokenAddress, accountId, tokensToMint)
-  }
-
   /**
    * Publish an asset.It also creates the datatoken, mints tokens and gives the market allowance
    * @param  {Metadata} asset The metadata of the asset.
@@ -62,8 +55,6 @@ function usePublish(): UsePublish {
     setPublishError(undefined)
 
     try {
-      const tokensToMint = dataTokenOptions.tokensToMint.toString()
-
       const publishedDate =
         new Date(Date.now()).toISOString().split('.')[0] + 'Z'
       let timeout = 0
@@ -151,9 +142,6 @@ function usePublish(): UsePublish {
         .next(setStep)
       Logger.log('ddo created', ddo)
       setStep(7)
-      await mint(ddo.dataToken, tokensToMint)
-      Logger.log(`minted ${tokensToMint} tokens`)
-
       // await createPricing(priceOptions, ddo.dataToken, tokensToMint)
       // setStep(8)
       return ddo
@@ -168,7 +156,6 @@ function usePublish(): UsePublish {
 
   return {
     publish,
-    mint,
     publishStep,
     publishStepText,
     isLoading,

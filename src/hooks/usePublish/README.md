@@ -1,6 +1,6 @@
 # `usePublish`
 
-Create data tokens, Mint and Publish data sets
+Create datatoken and publish data sets
 
 ## Usage
 
@@ -25,7 +25,7 @@ export default function MyComponent() {
   }
 
   const dataTokenOptions = {
-    tokensToMint: 10
+
   }
 
   async function handlePublish() {
