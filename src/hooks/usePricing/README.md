@@ -12,8 +12,14 @@ import { Metadata, DDO } from '@oceanprotocol/lib'
 export default function MyComponent({ ddo }: { ddo: DDO }) {
   const { accountId } = useOcean()
 
-  // Publish helpers
-  const { createPricing } = usePricing(ddo)
+  // Pricing helpers
+  const {
+    createPricing,
+    buyDT,
+    sellDT,
+    pricingStepText,
+    pricingError
+  } = usePricing(ddo)
 
   const priceOptions = {
     price: 10,

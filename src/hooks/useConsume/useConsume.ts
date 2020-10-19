@@ -25,7 +25,7 @@ export const consumeFeedback: { [key in number]: string } = {
 }
 
 function useConsume(): UseConsume {
-  const { ocean, account, accountId, config } = useOcean()
+  const { ocean, account, accountId } = useOcean()
   const [isLoading, setIsLoading] = useState(false)
   const [consumeStep, setConsumeStep] = useState<number | undefined>()
   const [consumeStepText, setConsumeStepText] = useState<string | undefined>()
@@ -43,6 +43,7 @@ function useConsume(): UseConsume {
     marketFeeAddress: string
   ): Promise<void> {
     if (!ocean || !account || !accountId) return
+
     setIsLoading(true)
     setConsumeError(undefined)
 
