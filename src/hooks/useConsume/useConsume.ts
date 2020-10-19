@@ -57,6 +57,7 @@ function useConsume(): UseConsume {
         setConsumeError('Not enough datatokens')
       } else {
         setStep(1)
+        ocean.datatokens.generateDtName()
         const tokenTransfer = await ocean.assets.order(
           did as string,
           serviceType,

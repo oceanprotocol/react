@@ -14,7 +14,7 @@ interface UsePublish {
   publish: (
     asset: Metadata,
     serviceConfigs: ServiceType,
-    dataTokenOptions: DataTokenOptions,
+    dataTokenOptions?: DataTokenOptions,
     timeout?: number,
     providerUri?: string
   ) => Promise<DDO | undefined | null>
@@ -25,7 +25,7 @@ interface UsePublish {
 }
 
 function usePublish(): UsePublish {
-  const { ocean, status, account, accountId, config } = useOcean()
+  const { ocean, status, account } = useOcean()
   const [isLoading, setIsLoading] = useState(false)
   const [publishStep, setPublishStep] = useState<number | undefined>()
   const [publishStepText, setPublishStepText] = useState<string | undefined>()
@@ -46,7 +46,7 @@ function usePublish(): UsePublish {
   async function publish(
     asset: Metadata,
     serviceType: ServiceType,
-    dataTokenOptions: DataTokenOptions,
+    dataTokenOptions?: DataTokenOptions,
     timeout?: number,
     providerUri?: string
   ): Promise<DDO | undefined | null> {
@@ -57,10 +57,9 @@ function usePublish(): UsePublish {
     try {
       const publishedDate =
         new Date(Date.now()).toISOString().split('.')[0] + 'Z'
-      let timeout = 0
       const services: Service[] = []
-
       const price = '1'
+
       switch (serviceType) {
         case 'access': {
           if (!timeout) timeout = 0
@@ -142,8 +141,6 @@ function usePublish(): UsePublish {
         .next(setStep)
       Logger.log('ddo created', ddo)
       setStep(7)
-      // await createPricing(priceOptions, ddo.dataToken, tokensToMint)
-      // setStep(8)
       return ddo
     } catch (error) {
       setPublishError(error.message)
