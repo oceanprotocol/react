@@ -7,6 +7,8 @@ import { getBestDataTokenPrice, getFirstPool } from 'utils/dtUtils'
 import { Decimal } from 'decimal.js'
 
 interface UsePricing {
+  dtSymbol: string | undefined
+  dtName: string | undefined
   createPricing: (
     priceOptions: PriceOptions
   ) => Promise<TransactionReceipt | string | null>
@@ -45,20 +47,27 @@ function usePricing(ddo: DDO): UsePricing {
   const [pricingStepText, setPricingStepText] = useState<string>()
   const [pricingError, setPricingError] = useState<string>()
   const [dtSymbol, setDtSymbol] = useState<string>()
+  const [dtName, setDtName] = useState<string>()
 
   const { dataToken, dataTokenInfo } = ddo
 
-  // Get Datatoken symbol, from DDO first, then from chain
+  // Get Datatoken info, from DDO first, then from chain
   useEffect(() => {
     if (!dataToken) return
 
     async function init() {
-      const dtSymbol =
-        dataTokenInfo?.symbol || (await ocean?.datatokens.getSymbol(dataToken))
+      const dtSymbol = dataTokenInfo
+        ? dataTokenInfo.symbol
+        : await ocean?.datatokens.getSymbol(dataToken)
       setDtSymbol(dtSymbol)
+
+      const dtName = dataTokenInfo
+        ? dataTokenInfo.name
+        : await ocean?.datatokens.getName(dataToken)
+      setDtName(dtName)
     }
     init()
-  }, [ocean, dataToken, dataTokenInfo?.symbol])
+  }, [ocean, dataToken, dataTokenInfo])
 
   function setStepCreatePricing(index?: number) {
     setPricingStep(index)
@@ -265,6 +274,8 @@ function usePricing(ddo: DDO): UsePricing {
   }
 
   return {
+    dtSymbol,
+    dtName,
     createPricing,
     buyDT,
     sellDT,
