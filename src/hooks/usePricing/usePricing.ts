@@ -11,10 +11,10 @@ interface UsePricing {
   dtName?: string
   createPricing: (
     priceOptions: PriceOptions
-  ) => Promise<TransactionReceipt | string | null>
-  buyDT: (dtAmount: number | string) => Promise<TransactionReceipt | null>
-  sellDT: (dtAmount: number | string) => Promise<TransactionReceipt | null>
-  mint: (tokensToMint: string) => void
+  ) => Promise<TransactionReceipt | string | void>
+  buyDT: (dtAmount: number | string) => Promise<TransactionReceipt | void>
+  sellDT: (dtAmount: number | string) => Promise<TransactionReceipt | void>
+  mint: (tokensToMint: string) => Promise<TransactionReceipt>
   pricingStep?: number
   pricingStepText?: string
   pricingError?: string
@@ -22,10 +22,11 @@ interface UsePricing {
 }
 
 export const createPricingFeedback: { [key in number]: string } = {
-  0: '1/4 Approving DT ...',
-  1: '2/4 Approving Ocean ...',
-  2: '3/4 Creating ....',
-  3: '4/4 Pricing created'
+  0: 'Minting DT ...',
+  1: 'Approving DT ...',
+  2: 'Approving Ocean ...',
+  3: 'Creating ...',
+  4: 'Pricing created.'
 }
 
 export const buyDTFeedback: { [key in number]: string } = {
@@ -98,15 +99,16 @@ function usePricing(ddo: DDO): UsePricing {
     setPricingStepText(message)
   }
 
-  async function mint(tokensToMint: string) {
+  async function mint(tokensToMint: string): Promise<TransactionReceipt> {
     Logger.log('mint function', dataToken, accountId)
-    await ocean.datatokens.mint(dataToken, accountId, tokensToMint)
+    const tx = await ocean.datatokens.mint(dataToken, accountId, tokensToMint)
+    return tx
   }
 
   async function buyDT(
     dtAmount: number | string
-  ): Promise<TransactionReceipt | null> {
-    if (!ocean || !account || !accountId) return null
+  ): Promise<TransactionReceipt | void> {
+    if (!ocean || !account || !accountId) return
 
     try {
       setPricingIsLoading(true)
@@ -139,11 +141,11 @@ function usePricing(ddo: DDO): UsePricing {
         case 'exchange': {
           if (!config.oceanTokenAddress) {
             Logger.error(`'oceanTokenAddress' not set in config`)
-            return null
+            return
           }
           if (!config.fixedRateExchangeAddress) {
             Logger.error(`'fixedRateExchangeAddress' not set in config`)
-            return null
+            return
           }
           Logger.log('Buying token from exchange', bestPrice, account.getId())
           await ocean.datatokens.approve(
@@ -171,17 +173,16 @@ function usePricing(ddo: DDO): UsePricing {
       setPricingStepText(undefined)
       setPricingIsLoading(false)
     }
-    return null
   }
 
   async function sellDT(
     dtAmount: number | string
-  ): Promise<TransactionReceipt | null> {
-    if (!ocean || !account || !accountId) return null
+  ): Promise<TransactionReceipt | void> {
+    if (!ocean || !account || !accountId) return
 
     if (!config.oceanTokenAddress) {
       Logger.error(`'oceanTokenAddress' not set in config`)
-      return null
+      return
     }
 
     try {
@@ -189,7 +190,7 @@ function usePricing(ddo: DDO): UsePricing {
       setPricingError(undefined)
       setStepSellDT(0)
       const pool = await getFirstPool(ocean, dataToken)
-      if (!pool || pool.price === 0) return null
+      if (!pool || pool.price === 0) return
       const price = new Decimal(pool.price).times(0.95).toString()
       setStepSellDT(1)
       Logger.log('Selling token to pool', pool, account.getId(), price)
@@ -210,55 +211,55 @@ function usePricing(ddo: DDO): UsePricing {
       setPricingStepText(undefined)
       setPricingIsLoading(false)
     }
-    return null
   }
 
   async function createPricing(
     priceOptions: PriceOptions
-  ): Promise<TransactionReceipt | string | null> {
-    if (!ocean || !account || !accountId) return null
+  ): Promise<TransactionReceipt | string | void> {
+    if (!ocean || !account || !accountId) return
 
-    let response = null
+    const { type, dtAmount, price, weightOnDataToken, swapFee } = priceOptions
+    const isPool = type === 'dynamic'
+
+    if (!isPool && !config.fixedRateExchangeAddress) {
+      Logger.error(`'fixedRateExchangeAddress' not set in ccnfig.`)
+      return
+    }
+
     try {
       setPricingIsLoading(true)
       setPricingError(undefined)
-      setStepCreatePricing(0)
 
-      switch (priceOptions.type) {
-        case 'dynamic': {
-          setStepCreatePricing(2)
-          response = await ocean.pool.createDTPool(
+      setStepCreatePricing(0)
+      await mint(`${dtAmount}`)
+
+      setStepCreatePricing(3)
+      const response = isPool
+        ? // TODO: in ocean.js: ocean.pool.createDTPool should be ocean.pool.create
+          // And if it involves mutliple wallet interacts the method itself should emit step events.
+          await ocean.pool.createDTPool(
             accountId,
             dataToken,
-            priceOptions.dtAmount.toString(),
-            priceOptions.weightOnDataToken,
-            priceOptions.swapFee
+            `${dtAmount}`,
+            weightOnDataToken,
+            swapFee
           )
-          setStepCreatePricing(3)
-          return response
-        }
-        case 'fixed': {
-          if (!config.fixedRateExchangeAddress) {
-            Logger.error(`'fixedRateExchangeAddress' not set in ccnfig.`)
-            return null
-          }
-          setStepCreatePricing(2)
-          response = await ocean.fixedRateExchange.create(
-            dataToken,
-            priceOptions.price.toString(),
-            accountId
-          )
-          setStepCreatePricing(1)
-          await ocean.datatokens.approve(
-            dataToken,
-            config.fixedRateExchangeAddress,
-            String(priceOptions.dtAmount),
-            accountId
-          )
-          setStepCreatePricing(3)
-          return response
-        }
+        : // TODO: in ocean.js: ocean.fixedRateExchange.create should return tx receipt
+          await ocean.fixedRateExchange.create(dataToken, `${price}`, accountId)
+
+      // TODO: why is approve after the creation?
+      if (!isPool && config.fixedRateExchangeAddress) {
+        setStepCreatePricing(1)
+        await ocean.datatokens.approve(
+          dataToken,
+          config.fixedRateExchangeAddress,
+          `${dtAmount}`,
+          accountId
+        )
       }
+
+      setStepCreatePricing(4)
+      return response
     } catch (error) {
       setPricingError(error.message)
       Logger.error(error)
@@ -267,7 +268,6 @@ function usePricing(ddo: DDO): UsePricing {
       setPricingStepText(undefined)
       setPricingIsLoading(false)
     }
-    return null
   }
 
   return {
