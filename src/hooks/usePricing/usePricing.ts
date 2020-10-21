@@ -196,7 +196,7 @@ function usePricing(ddo: DDO): UsePricing {
 
   async function createPricing(
     priceOptions: PriceOptions
-  ): Promise<TransactionReceipt | string | void> {
+  ): Promise<TransactionReceipt | void> {
     if (!ocean || !accountId || !dtSymbol) return
 
     const { type, dtAmount, price, weightOnDataToken, swapFee } = priceOptions
@@ -210,38 +210,25 @@ function usePricing(ddo: DDO): UsePricing {
     setPricingIsLoading(true)
     setPricingError(undefined)
 
-    let tx
+    setStep(99, 'pool')
 
     try {
-      setStep(9, 'pool')
       await mint(`${dtAmount}`)
 
-      if (isPool) {
-        setStep(1, 'pool')
-        tx = await ocean.pool
-          .create(
-            accountId,
-            dataToken,
-            `${dtAmount}`,
-            weightOnDataToken,
-            swapFee
-          )
-          .next((step: number) => setStep(step, 'pool'))
-      } else {
-        setStep(1, 'exchange')
-        tx = await ocean.fixedRateExchange
-          .create(dataToken, `${price}`, accountId)
-          .next((step: number) => setStep(step, 'exchange'))
-
-        setStep(1, 'exchange')
-        config.fixedRateExchangeAddress &&
-          (await ocean.datatokens.approve(
-            dataToken,
-            config.fixedRateExchangeAddress,
-            `${dtAmount}`,
-            accountId
-          ))
-      }
+      const tx = isPool
+        ? await ocean.pool
+            .create(
+              accountId,
+              dataToken,
+              `${dtAmount}`,
+              weightOnDataToken,
+              swapFee
+            )
+            .next((step: number) => setStep(step, 'pool'))
+        : await ocean.fixedRateExchange
+            .create(dataToken, `${price}`, accountId)
+            .next((step: number) => setStep(step, 'exchange'))
+      return tx
     } catch (error) {
       setPricingError(error.message)
       Logger.error(error)
@@ -250,8 +237,6 @@ function usePricing(ddo: DDO): UsePricing {
       setPricingStepText(undefined)
       setPricingIsLoading(false)
     }
-
-    return tx
   }
 
   return {

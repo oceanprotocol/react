@@ -3,11 +3,11 @@ export function getCreatePricingPoolFeedback(
 ): { [key: number]: string } {
   return {
     99: `Minting ${dtSymbol} ...`,
-    1: 'Creating pool ...',
-    2: `Approving ${dtSymbol} ...`,
-    3: 'Approving OCEAN ...',
-    4: 'Creating ...',
-    5: 'Pool created.'
+    0: 'Creating pool ...',
+    1: `Approving ${dtSymbol} ...`,
+    2: 'Approving OCEAN ...',
+    3: 'Setup pool ...',
+    4: 'Pool created.'
   }
 }
 
@@ -16,10 +16,9 @@ export function getCreatePricingExchangeFeedback(
 ): { [key: number]: string } {
   return {
     99: `Minting ${dtSymbol} ...`,
+    0: 'Creating exchange ...',
     1: `Approving ${dtSymbol} ...`,
-    2: 'Approving OCEAN ...',
-    3: 'Creating ...',
-    4: 'Fixed exchange created.'
+    2: 'Fixed exchange created.'
   }
 }
 
