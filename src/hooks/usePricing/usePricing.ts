@@ -5,6 +5,12 @@ import { PriceOptions } from './PriceOptions'
 import { TransactionReceipt } from 'web3-core'
 import { getBestDataTokenPrice, getFirstPool } from 'utils/dtUtils'
 import { Decimal } from 'decimal.js'
+import {
+  getCreatePricingPoolFeedback,
+  getCreatePricingExchangeFeedback,
+  getBuyDTFeedback,
+  getSellDTFeedback
+} from './utils'
 
 interface UsePricing {
   dtSymbol?: string
@@ -19,32 +25,6 @@ interface UsePricing {
   pricingStepText?: string
   pricingError?: string
   pricingIsLoading: boolean
-}
-
-function getCreatePricingFeedback(dtSymbol: string): { [key: number]: string } {
-  return {
-    1: `Minting ${dtSymbol} ...`,
-    2: `Approving ${dtSymbol} ...`,
-    3: 'Approving OCEAN ...',
-    4: 'Creating ...',
-    5: 'Pricing created.'
-  }
-}
-
-function getBuyDTFeedback(dtSymbol: string): { [key: number]: string } {
-  return {
-    1: '1/3 Approving OCEAN ...',
-    2: `2/3 Buying ${dtSymbol} ...`,
-    3: `3/3 ${dtSymbol} bought.`
-  }
-}
-
-function getSellDTFeedback(dtSymbol: string): { [key: number]: string } {
-  return {
-    1: '1/3 Approving OCEAN ...',
-    2: `2/3 Selling ${dtSymbol} ...`,
-    3: `3/3 ${dtSymbol} sold.`
-  }
 }
 
 function usePricing(ddo: DDO): UsePricing {
@@ -76,24 +56,28 @@ function usePricing(ddo: DDO): UsePricing {
     init()
   }, [ocean, dataToken, dataTokenInfo])
 
-  function setStepCreatePricing(index: number) {
+  // Helper for setting steps & feedback for all flows
+  function setStep(index: number, type: 'pool' | 'exchange' | 'buy' | 'sell') {
     setPricingStep(index)
     if (!dtSymbol) return
-    const messages = getCreatePricingFeedback(dtSymbol)
-    setPricingStepText(messages[index])
-  }
 
-  function setStepBuyDT(index: number) {
-    setPricingStep(index)
-    if (!dtSymbol) return
-    const messages = getBuyDTFeedback(dtSymbol)
-    setPricingStepText(messages[index])
-  }
+    let messages
 
-  function setStepSellDT(index: number) {
-    setPricingStep(index)
-    if (!dtSymbol) return
-    const messages = getSellDTFeedback(dtSymbol)
+    switch (type) {
+      case 'pool':
+        messages = getCreatePricingPoolFeedback(dtSymbol)
+        break
+      case 'exchange':
+        messages = getCreatePricingExchangeFeedback(dtSymbol)
+        break
+      case 'buy':
+        messages = getBuyDTFeedback(dtSymbol)
+        break
+      case 'sell':
+        messages = getSellDTFeedback(dtSymbol)
+        break
+    }
+
     setPricingStepText(messages[index])
   }
 
@@ -111,14 +95,14 @@ function usePricing(ddo: DDO): UsePricing {
     try {
       setPricingIsLoading(true)
       setPricingError(undefined)
-      setStepBuyDT(1)
+      setStep(1, 'buy')
       const bestPrice = await getBestDataTokenPrice(ocean, dataToken)
 
       switch (bestPrice?.type) {
         case 'pool': {
           const price = new Decimal(bestPrice.value).times(1.05).toString()
           const maxPrice = new Decimal(bestPrice.value).times(2).toString()
-          setStepBuyDT(2)
+          setStep(2, 'buy')
           Logger.log(
             'Buying token from pool',
             bestPrice,
@@ -132,7 +116,7 @@ function usePricing(ddo: DDO): UsePricing {
             price,
             maxPrice
           )
-          setStepBuyDT(3)
+          setStep(3, 'buy')
           Logger.log('DT buy response', buyResponse)
           return buyResponse
         }
@@ -152,13 +136,13 @@ function usePricing(ddo: DDO): UsePricing {
             bestPrice.value.toString(),
             account.getId()
           )
-          setStepBuyDT(2)
+          setStep(2, 'buy')
           const exchange = await ocean.fixedRateExchange.buyDT(
             bestPrice.address,
             String(dtAmount),
             account.getId()
           )
-          setStepBuyDT(3)
+          setStep(3, 'buy')
           Logger.log('DT exchange buy response', exchange)
           return exchange
         }
@@ -167,7 +151,7 @@ function usePricing(ddo: DDO): UsePricing {
       setPricingError(error.message)
       Logger.error(error)
     } finally {
-      setStepBuyDT(0)
+      setStep(0, 'buy')
       setPricingStepText(undefined)
       setPricingIsLoading(false)
     }
@@ -186,11 +170,11 @@ function usePricing(ddo: DDO): UsePricing {
     try {
       setPricingIsLoading(true)
       setPricingError(undefined)
-      setStepSellDT(1)
+      setStep(1, 'sell')
       const pool = await getFirstPool(ocean, dataToken)
       if (!pool || pool.price === 0) return
       const price = new Decimal(pool.price).times(0.95).toString()
-      setStepSellDT(2)
+      setStep(2, 'sell')
       Logger.log('Selling token to pool', pool, account.getId(), price)
       const sellResponse = await ocean.pool.sellDT(
         account.getId(),
@@ -198,14 +182,14 @@ function usePricing(ddo: DDO): UsePricing {
         String(dtAmount),
         price
       )
-      setStepSellDT(3)
+      setStep(3, 'sell')
       Logger.log('DT sell response', sellResponse)
       return sellResponse
     } catch (error) {
       setPricingError(error.message)
       Logger.error(error)
     } finally {
-      setStepSellDT(0)
+      setStep(0, 'sell')
       setPricingStepText(undefined)
       setPricingIsLoading(false)
     }
@@ -226,38 +210,39 @@ function usePricing(ddo: DDO): UsePricing {
 
     setPricingIsLoading(true)
     setPricingError(undefined)
-    setStepCreatePricing(1)
+
+    let tx
 
     try {
+      setStep(9, 'pool')
       await mint(`${dtAmount}`)
 
-      setStepCreatePricing(3)
-      const response = isPool
-        ? // TODO: in ocean.js: ocean.pool.createDTPool should be ocean.pool.create
-          // And if it involves mutliple wallet interacts the method itself should emit step events.
-          await ocean.pool.createDTPool(
+      if (isPool) {
+        setStep(1, 'pool')
+        tx = await ocean.pool
+          .create(
             accountId,
             dataToken,
             `${dtAmount}`,
             weightOnDataToken,
             swapFee
           )
-        : // TODO: in ocean.js: ocean.fixedRateExchange.create should return tx receipt
-          await ocean.fixedRateExchange.create(dataToken, `${price}`, accountId)
+          .next((step: number) => setStep(step, 'pool'))
+      } else {
+        setStep(1, 'exchange')
+        tx = await ocean.fixedRateExchange
+          .create(dataToken, `${price}`, accountId)
+          .next((step: number) => setStep(step, 'exchange'))
 
-      // TODO: why is approve after the creation?
-      if (!isPool && config.fixedRateExchangeAddress) {
-        setStepCreatePricing(1)
-        await ocean.datatokens.approve(
-          dataToken,
-          config.fixedRateExchangeAddress,
-          `${dtAmount}`,
-          accountId
-        )
+        setStep(1, 'exchange')
+        config.fixedRateExchangeAddress &&
+          (await ocean.datatokens.approve(
+            dataToken,
+            config.fixedRateExchangeAddress,
+            `${dtAmount}`,
+            accountId
+          ))
       }
-
-      setStepCreatePricing(4)
-      return response
     } catch (error) {
       setPricingError(error.message)
       Logger.error(error)
@@ -266,6 +251,8 @@ function usePricing(ddo: DDO): UsePricing {
       setPricingStepText(undefined)
       setPricingIsLoading(false)
     }
+
+    return tx
   }
 
   return {
