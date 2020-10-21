@@ -39,3 +39,9 @@ export const publishFeedback: { [key in number]: string } = {
 }
 
 export * from './web3'
+
+export function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
+}

@@ -8,7 +8,7 @@ import { useState } from 'react'
 import { DataTokenOptions } from './DataTokenOptions'
 import { useOcean } from 'providers'
 import ProviderStatus from 'providers/OceanProvider/ProviderStatus'
-import { publishFeedback } from 'utils'
+import { publishFeedback, sleep } from 'utils'
 
 interface UsePublish {
   publish: (
@@ -141,6 +141,7 @@ function usePublish(): UsePublish {
         )
         .next(setStep)
       Logger.log('ddo created', ddo)
+      await sleep(15000)
       setStep(7)
       return ddo
     } catch (error) {
