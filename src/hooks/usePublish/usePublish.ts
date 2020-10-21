@@ -8,7 +8,7 @@ import { useState } from 'react'
 import { DataTokenOptions } from './DataTokenOptions'
 import { useOcean } from 'providers'
 import ProviderStatus from 'providers/OceanProvider/ProviderStatus'
-import { publishFeedback , sleep } from 'utils'
+import { publishFeedback, sleep } from 'utils'
 
 interface UsePublish {
   publish: (
