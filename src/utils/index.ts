@@ -31,12 +31,11 @@ export const feedback: { [key in number]: string } = {
 }
 
 export const publishFeedback: { [key in number]: string } = {
-  0: '1/6 Creating datatoken ...',
-  2: '2/6 Encrypting files ...',
-  4: '3/6 Generating proof ...',
-  6: '4/6 Storing ddo ...',
-  7: '5/6 Minting tokens ...',
-  8: '6/6 Asset published succesfully'
+  0: '1/5 Creating datatoken ...',
+  2: '2/5 Encrypting files ...',
+  4: '3/5 Storing ddo ...',
+  6: '4/5 Minting tokens ...',
+  8: '5/5 Asset published succesfully'
 }
 
 export * from './web3'

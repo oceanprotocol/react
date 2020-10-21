@@ -5,21 +5,19 @@ import {
   ServiceType
 } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Service'
 import { useState } from 'react'
-import { DataTokenOptions } from '.'
+import { DataTokenOptions } from './DataTokenOptions'
 import { useOcean } from 'providers'
 import ProviderStatus from 'providers/OceanProvider/ProviderStatus'
 import { publishFeedback } from 'utils'
-import { PriceOptions } from './PriceOptions'
 
 interface UsePublish {
   publish: (
     asset: Metadata,
-    priceOptions: PriceOptions,
     serviceConfigs: ServiceType,
     dataTokenOptions?: DataTokenOptions,
+    timeout?: number,
     providerUri?: string
   ) => Promise<DDO | undefined | null>
-  mint: (tokenAddress: string, tokensToMint: string) => void
   publishStep?: number
   publishStepText?: string
   publishError?: string
@@ -27,7 +25,7 @@ interface UsePublish {
 }
 
 function usePublish(): UsePublish {
-  const { ocean, status, account, accountId, config } = useOcean()
+  const { ocean, status, account } = useOcean()
   const [isLoading, setIsLoading] = useState(false)
   const [publishStep, setPublishStep] = useState<number | undefined>()
   const [publishStepText, setPublishStepText] = useState<string | undefined>()
@@ -37,50 +35,6 @@ function usePublish(): UsePublish {
     setPublishStep(index)
     index && setPublishStepText(publishFeedback[index])
   }
-
-  async function mint(tokenAddress: string, tokensToMint: string) {
-    Logger.log('mint function', tokenAddress, accountId)
-    await ocean.datatokens.mint(tokenAddress, accountId, tokensToMint)
-  }
-
-  async function createPricing(
-    priceOptions: PriceOptions,
-    dataTokenAddress: string,
-    mintedTokens: string
-  ): Promise<void | null> {
-    switch (priceOptions.type) {
-      case 'dynamic': {
-        await ocean.pool.createDTPool(
-          accountId,
-          dataTokenAddress,
-          priceOptions.tokensToMint.toString(),
-          priceOptions.weightOnDataToken,
-          priceOptions.swapFee
-        )
-        break
-      }
-      case 'fixed': {
-        if (!config.fixedRateExchangeAddress) {
-          Logger.error(`'fixedRateExchangeAddress' not set in ccnfig.`)
-          return null
-        }
-
-        await ocean.fixedRateExchange.create(
-          dataTokenAddress,
-          priceOptions.price.toString(),
-          accountId
-        )
-        await ocean.datatokens.approve(
-          dataTokenAddress,
-          config.fixedRateExchangeAddress,
-          mintedTokens,
-          accountId
-        )
-        break
-      }
-    }
-  }
-
   /**
    * Publish an asset.It also creates the datatoken, mints tokens and gives the market allowance
    * @param  {Metadata} asset The metadata of the asset.
@@ -91,38 +45,37 @@ function usePublish(): UsePublish {
    */
   async function publish(
     asset: Metadata,
-    priceOptions: PriceOptions,
     serviceType: ServiceType,
     dataTokenOptions?: DataTokenOptions,
+    timeout?: number,
     providerUri?: string
   ): Promise<DDO | undefined | null> {
     if (status !== ProviderStatus.CONNECTED || !ocean || !account) return null
-
     setIsLoading(true)
     setPublishError(undefined)
 
     try {
-      const tokensToMint = priceOptions.tokensToMint.toString()
-
       const publishedDate =
         new Date(Date.now()).toISOString().split('.')[0] + 'Z'
-      const timeout = 0
       const services: Service[] = []
-
       const price = '1'
+
       switch (serviceType) {
         case 'access': {
+          if (!timeout) timeout = 0
           const accessService = await ocean.assets.createAccessServiceAttributes(
             account,
             price,
             publishedDate,
-            timeout
+            timeout,
+            providerUri
           )
           Logger.log('access service created', accessService)
           services.push(accessService)
           break
         }
         case 'compute': {
+          if (!timeout) timeout = 3600
           const cluster = ocean.compute.createClusterAttributes(
             'Kubernetes',
             'http://10.0.0.17/xxx'
@@ -163,7 +116,9 @@ function usePublish(): UsePublish {
             price,
             publishedDate,
             provider,
-            origComputePrivacy as ServiceComputePrivacy
+            origComputePrivacy as ServiceComputePrivacy,
+            timeout,
+            providerUri
           )
           services.push(computeService)
           break
@@ -186,11 +141,6 @@ function usePublish(): UsePublish {
         .next(setStep)
       Logger.log('ddo created', ddo)
       setStep(7)
-      await mint(ddo.dataToken, tokensToMint)
-      Logger.log(`minted ${tokensToMint} tokens`)
-
-      await createPricing(priceOptions, ddo.dataToken, tokensToMint)
-      setStep(8)
       return ddo
     } catch (error) {
       setPublishError(error.message)
@@ -203,7 +153,6 @@ function usePublish(): UsePublish {
 
   return {
     publish,
-    mint,
     publishStep,
     publishStepText,
     isLoading,

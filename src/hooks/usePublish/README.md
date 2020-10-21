@@ -1,6 +1,6 @@
 # `usePublish`
 
-Publish data sets, and create data tokens and liquidity pools for them.
+Publish data sets and create datatokens for them.
 
 ## Usage
 
@@ -10,7 +10,7 @@ import { useOcean, usePublish } from '@oceanprotocol/react'
 import { Metadata } from '@oceanprotocol/lib'
 
 export default function MyComponent() {
-  const { accountId } = useOcean()
+  const { ocean, accountId } = useOcean()
 
   // Publish helpers
   const { publish, publishStep } = usePublish()
@@ -24,16 +24,10 @@ export default function MyComponent() {
     }
   }
 
-  const priceOptions = {
-    price: 10,
-    tokensToMint: 10,
-    type: 'fixed',
-    weightOnDataToken: '',
-    swapFee: ''
-  }
-
   async function handlePublish() {
-    const ddo = await publish(metadata, priceOptions, 'access')
+    const ddo = await publish(metadata, 'access')
+    // Heads Up! You should now create pricing for your data set
+    // with the `usePricing()` hook in another step.
   }
 
   return (

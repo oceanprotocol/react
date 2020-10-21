@@ -1,12 +1,12 @@
 import React from 'react'
 import { usePublish } from '@oceanprotocol/react'
-// import { useOcean, usePublish } from '@oceanprotocol/react'
 import { DDO } from '@oceanprotocol/lib'
 import { useState } from 'react'
 import { Metadata } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Metadata'
 
 export function Publish() {
   const { publish, publishStepText, isLoading } = usePublish()
+  const { createPricing, pricingStep, pricingStepText, pricingIsLoading, pricingError} = usePricing()
   const [ddo, setDdo] = useState<DDO | undefined | null>()
 
   const asset = {
@@ -31,18 +31,16 @@ export function Publish() {
   }
 
   const publishAsset = async () => {
-    const priceOptions = {
-      price: 7,
-      tokensToMint: 10,
-      type: 'fixed',
-      weightOnDataToken: '',
-      swapFee: ''
+    
+    const datatokenOptions = {
+      
     }
-
-    const ddo = await publish(asset as Metadata, priceOptions, 'access')
+    const ddo = await publish(asset as Metadata, 'access', datatokenOptions)
     console.log(ddo)
     setDdo(ddo)
   }
+
+  
   return (
     <>
       <div>Publish</div>
@@ -53,6 +51,7 @@ export function Publish() {
         IsLoading: {isLoading.toString()} || Status: {publishStepText}
       </div>
       <div>DID: {ddo && ddo.id} </div>
+      
     </>
   )
 }
