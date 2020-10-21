@@ -21,24 +21,30 @@ interface UsePricing {
   pricingIsLoading: boolean
 }
 
-export const createPricingFeedback: { [key in number]: string } = {
-  0: 'Minting DT ...',
-  1: 'Approving DT ...',
-  2: 'Approving Ocean ...',
-  3: 'Creating ...',
-  4: 'Pricing created.'
+function getCreatePricingFeedback(dtSymbol: string): { [key: number]: string } {
+  return {
+    1: `Minting ${dtSymbol} ...`,
+    2: `Approving ${dtSymbol} ...`,
+    3: 'Approving OCEAN ...',
+    4: 'Creating ...',
+    5: 'Pricing created.'
+  }
 }
 
-export const buyDTFeedback: { [key in number]: string } = {
-  0: '1/3 Approving OCEAN ...',
-  1: '2/3 Buying DT ...',
-  2: '3/3 DT Bought'
+function getBuyDTFeedback(dtSymbol: string): { [key: number]: string } {
+  return {
+    1: '1/3 Approving OCEAN ...',
+    2: `2/3 Buying ${dtSymbol} ...`,
+    3: `3/3 ${dtSymbol} bought.`
+  }
 }
 
-export const sellDTFeedback: { [key in number]: string } = {
-  0: '1/3 Approving DT ...',
-  1: '2/3 Selling DT ...',
-  2: '3/3 DT sold'
+function getSellDTFeedback(dtSymbol: string): { [key: number]: string } {
+  return {
+    1: '1/3 Approving OCEAN ...',
+    2: `2/3 Selling ${dtSymbol} ...`,
+    3: `3/3 ${dtSymbol} sold.`
+  }
 }
 
 function usePricing(ddo: DDO): UsePricing {
@@ -70,33 +76,25 @@ function usePricing(ddo: DDO): UsePricing {
     init()
   }, [ocean, dataToken, dataTokenInfo])
 
-  function setStepCreatePricing(index?: number) {
+  function setStepCreatePricing(index: number) {
     setPricingStep(index)
-    if (!index) return
-
-    const message = dtSymbol
-      ? createPricingFeedback[index].replace(/DT/g, dtSymbol)
-      : createPricingFeedback[index]
-    setPricingStepText(message)
+    if (!dtSymbol) return
+    const messages = getCreatePricingFeedback(dtSymbol)
+    setPricingStepText(messages[index])
   }
 
-  function setStepBuyDT(index?: number) {
+  function setStepBuyDT(index: number) {
     setPricingStep(index)
-    if (!index) return
-
-    const message = dtSymbol
-      ? buyDTFeedback[index].replace(/DT/g, dtSymbol)
-      : buyDTFeedback[index]
-    setPricingStepText(message)
+    if (!dtSymbol) return
+    const messages = getBuyDTFeedback(dtSymbol)
+    setPricingStepText(messages[index])
   }
-  function setStepSellDT(index?: number) {
-    setPricingStep(index)
-    if (!index) return
 
-    const message = dtSymbol
-      ? sellDTFeedback[index].replace(/DT/g, dtSymbol)
-      : sellDTFeedback[index]
-    setPricingStepText(message)
+  function setStepSellDT(index: number) {
+    setPricingStep(index)
+    if (!dtSymbol) return
+    const messages = getSellDTFeedback(dtSymbol)
+    setPricingStepText(messages[index])
   }
 
   async function mint(tokensToMint: string): Promise<TransactionReceipt> {
@@ -113,14 +111,14 @@ function usePricing(ddo: DDO): UsePricing {
     try {
       setPricingIsLoading(true)
       setPricingError(undefined)
-      setStepBuyDT(0)
+      setStepBuyDT(1)
       const bestPrice = await getBestDataTokenPrice(ocean, dataToken)
 
       switch (bestPrice?.type) {
         case 'pool': {
           const price = new Decimal(bestPrice.value).times(1.05).toString()
           const maxPrice = new Decimal(bestPrice.value).times(2).toString()
-          setStepBuyDT(1)
+          setStepBuyDT(2)
           Logger.log(
             'Buying token from pool',
             bestPrice,
@@ -134,7 +132,7 @@ function usePricing(ddo: DDO): UsePricing {
             price,
             maxPrice
           )
-          setStepBuyDT(2)
+          setStepBuyDT(3)
           Logger.log('DT buy response', buyResponse)
           return buyResponse
         }
@@ -154,13 +152,13 @@ function usePricing(ddo: DDO): UsePricing {
             bestPrice.value.toString(),
             account.getId()
           )
-          setStepBuyDT(1)
+          setStepBuyDT(2)
           const exchange = await ocean.fixedRateExchange.buyDT(
             bestPrice.address,
             String(dtAmount),
             account.getId()
           )
-          setStepBuyDT(2)
+          setStepBuyDT(3)
           Logger.log('DT exchange buy response', exchange)
           return exchange
         }
@@ -169,7 +167,7 @@ function usePricing(ddo: DDO): UsePricing {
       setPricingError(error.message)
       Logger.error(error)
     } finally {
-      setStepBuyDT(undefined)
+      setStepBuyDT(0)
       setPricingStepText(undefined)
       setPricingIsLoading(false)
     }
@@ -188,11 +186,11 @@ function usePricing(ddo: DDO): UsePricing {
     try {
       setPricingIsLoading(true)
       setPricingError(undefined)
-      setStepSellDT(0)
+      setStepSellDT(1)
       const pool = await getFirstPool(ocean, dataToken)
       if (!pool || pool.price === 0) return
       const price = new Decimal(pool.price).times(0.95).toString()
-      setStepSellDT(1)
+      setStepSellDT(2)
       Logger.log('Selling token to pool', pool, account.getId(), price)
       const sellResponse = await ocean.pool.sellDT(
         account.getId(),
@@ -200,14 +198,14 @@ function usePricing(ddo: DDO): UsePricing {
         String(dtAmount),
         price
       )
-      setStepSellDT(2)
+      setStepSellDT(3)
       Logger.log('DT sell response', sellResponse)
       return sellResponse
     } catch (error) {
       setPricingError(error.message)
       Logger.error(error)
     } finally {
-      setStepSellDT(undefined)
+      setStepSellDT(0)
       setPricingStepText(undefined)
       setPricingIsLoading(false)
     }
@@ -216,7 +214,7 @@ function usePricing(ddo: DDO): UsePricing {
   async function createPricing(
     priceOptions: PriceOptions
   ): Promise<TransactionReceipt | string | void> {
-    if (!ocean || !account || !accountId) return
+    if (!ocean || !account || !accountId || !dtSymbol) return
 
     const { type, dtAmount, price, weightOnDataToken, swapFee } = priceOptions
     const isPool = type === 'dynamic'
@@ -226,11 +224,11 @@ function usePricing(ddo: DDO): UsePricing {
       return
     }
 
-    try {
-      setPricingIsLoading(true)
-      setPricingError(undefined)
+    setPricingIsLoading(true)
+    setPricingError(undefined)
+    setStepCreatePricing(1)
 
-      setStepCreatePricing(0)
+    try {
       await mint(`${dtAmount}`)
 
       setStepCreatePricing(3)
@@ -264,7 +262,7 @@ function usePricing(ddo: DDO): UsePricing {
       setPricingError(error.message)
       Logger.error(error)
     } finally {
-      setPricingStep(undefined)
+      setPricingStep(0)
       setPricingStepText(undefined)
       setPricingIsLoading(false)
     }
