@@ -28,7 +28,7 @@ interface UsePricing {
 }
 
 function usePricing(ddo: DDO): UsePricing {
-  const { ocean, account, accountId, config } = useOcean()
+  const { ocean, accountId, config } = useOcean()
   const [pricingIsLoading, setPricingIsLoading] = useState(false)
   const [pricingStep, setPricingStep] = useState<number>()
   const [pricingStepText, setPricingStepText] = useState<string>()
@@ -90,7 +90,9 @@ function usePricing(ddo: DDO): UsePricing {
   async function buyDT(
     dtAmount: number | string
   ): Promise<TransactionReceipt | void> {
-    if (!ocean || !account || !accountId) return
+    if (!ocean || !accountId) return
+
+    let tx
 
     try {
       setPricingIsLoading(true)
@@ -103,22 +105,17 @@ function usePricing(ddo: DDO): UsePricing {
           const price = new Decimal(bestPrice.value).times(1.05).toString()
           const maxPrice = new Decimal(bestPrice.value).times(2).toString()
           setStep(2, 'buy')
-          Logger.log(
-            'Buying token from pool',
-            bestPrice,
-            account.getId(),
-            price
-          )
-          const buyResponse = await ocean.pool.buyDT(
-            account.getId(),
+          Logger.log('Buying token from pool', bestPrice, accountId, price)
+          tx = await ocean.pool.buyDT(
+            accountId,
             bestPrice.address,
             String(dtAmount),
             price,
             maxPrice
           )
           setStep(3, 'buy')
-          Logger.log('DT buy response', buyResponse)
-          return buyResponse
+          Logger.log('DT buy response', tx)
+          break
         }
         case 'exchange': {
           if (!config.oceanTokenAddress) {
@@ -129,22 +126,22 @@ function usePricing(ddo: DDO): UsePricing {
             Logger.error(`'fixedRateExchangeAddress' not set in config`)
             return
           }
-          Logger.log('Buying token from exchange', bestPrice, account.getId())
+          Logger.log('Buying token from exchange', bestPrice, accountId)
           await ocean.datatokens.approve(
             config.oceanTokenAddress,
             config.fixedRateExchangeAddress,
-            bestPrice.value.toString(),
-            account.getId()
+            `${bestPrice.value}`,
+            accountId
           )
           setStep(2, 'buy')
-          const exchange = await ocean.fixedRateExchange.buyDT(
+          tx = await ocean.fixedRateExchange.buyDT(
             bestPrice.address,
-            String(dtAmount),
-            account.getId()
+            `${dtAmount}`,
+            accountId
           )
           setStep(3, 'buy')
-          Logger.log('DT exchange buy response', exchange)
-          return exchange
+          Logger.log('DT exchange buy response', tx)
+          break
         }
       }
     } catch (error) {
@@ -155,12 +152,14 @@ function usePricing(ddo: DDO): UsePricing {
       setPricingStepText(undefined)
       setPricingIsLoading(false)
     }
+
+    return tx
   }
 
   async function sellDT(
     dtAmount: number | string
   ): Promise<TransactionReceipt | void> {
-    if (!ocean || !account || !accountId) return
+    if (!ocean || !accountId) return
 
     if (!config.oceanTokenAddress) {
       Logger.error(`'oceanTokenAddress' not set in config`)
@@ -175,16 +174,16 @@ function usePricing(ddo: DDO): UsePricing {
       if (!pool || pool.price === 0) return
       const price = new Decimal(pool.price).times(0.95).toString()
       setStep(2, 'sell')
-      Logger.log('Selling token to pool', pool, account.getId(), price)
-      const sellResponse = await ocean.pool.sellDT(
-        account.getId(),
+      Logger.log('Selling token to pool', pool, accountId, price)
+      const tx = await ocean.pool.sellDT(
+        accountId,
         pool.address,
-        String(dtAmount),
+        `${dtAmount}`,
         price
       )
       setStep(3, 'sell')
-      Logger.log('DT sell response', sellResponse)
-      return sellResponse
+      Logger.log('DT sell response', tx)
+      return tx
     } catch (error) {
       setPricingError(error.message)
       Logger.error(error)
@@ -198,7 +197,7 @@ function usePricing(ddo: DDO): UsePricing {
   async function createPricing(
     priceOptions: PriceOptions
   ): Promise<TransactionReceipt | string | void> {
-    if (!ocean || !account || !accountId || !dtSymbol) return
+    if (!ocean || !accountId || !dtSymbol) return
 
     const { type, dtAmount, price, weightOnDataToken, swapFee } = priceOptions
     const isPool = type === 'dynamic'

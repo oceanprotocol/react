@@ -1,5 +1,4 @@
-import { Logger, Ocean, Account, Config, BestPrice } from '@oceanprotocol/lib'
-import { TransactionReceipt } from 'web3-core'
+import { Logger, Ocean, BestPrice } from '@oceanprotocol/lib'
 import { Decimal } from 'decimal.js'
 import Pool from 'hooks/useMetadata/Pool'
 import Web3 from 'web3'
@@ -144,64 +143,5 @@ export async function getBestDataTokenPrice(
       address: cheapestExchange?.address,
       value: Number(cheapestExchange?.price)
     } as BestPrice
-  }
-}
-
-export async function checkAndBuyDT(
-  ocean: Ocean,
-  dataTokenAddress: string,
-  account: Account,
-  config: Config
-): Promise<TransactionReceipt | undefined> {
-  const userOwnedTokens = await ocean.accounts.getTokenBalance(
-    dataTokenAddress,
-    account
-  )
-  Logger.log(`User has ${userOwnedTokens} tokens`)
-  if (userOwnedTokens === '0') {
-    const bestPrice = await getBestDataTokenPrice(ocean, dataTokenAddress)
-
-    switch (bestPrice?.type) {
-      case 'pool': {
-        const price = new Decimal(bestPrice.value).times(1.05).toString()
-        const maxPrice = new Decimal(bestPrice.value).times(2).toString()
-        Logger.log('Buying token from pool', bestPrice, account.getId(), price)
-        const buyResponse = await ocean.pool.buyDT(
-          account.getId(),
-          bestPrice.address,
-          '1',
-          price,
-          maxPrice
-        )
-        Logger.log('DT buy response', buyResponse)
-        return buyResponse
-      }
-      case 'exchange': {
-        if (!config.oceanTokenAddress) {
-          Logger.error(`'oceanTokenAddress' not set in config`)
-          return
-        }
-
-        if (!config.fixedRateExchangeAddress) {
-          Logger.error(`'fixedRateExchangeAddress' not set in config`)
-          return
-        }
-
-        Logger.log('Buying token from exchange', bestPrice, account.getId())
-        await ocean.datatokens.approve(
-          config.oceanTokenAddress,
-          config.fixedRateExchangeAddress,
-          bestPrice.value.toString(),
-          account.getId()
-        )
-        const exchange = await ocean.fixedRateExchange.buyDT(
-          bestPrice.address,
-          '1',
-          account.getId()
-        )
-        Logger.log('DT exchange buy response', exchange)
-        return exchange
-      }
-    }
   }
 }
