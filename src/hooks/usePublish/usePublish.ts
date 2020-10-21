@@ -8,7 +8,7 @@ import { useState } from 'react'
 import { DataTokenOptions } from './DataTokenOptions'
 import { useOcean } from 'providers'
 import ProviderStatus from 'providers/OceanProvider/ProviderStatus'
-import { publishFeedback } from 'utils'
+import { publishFeedback , sleep } from 'utils'
 
 interface UsePublish {
   publish: (
@@ -34,11 +34,6 @@ function usePublish(): UsePublish {
   function setStep(index?: number) {
     setPublishStep(index)
     index && setPublishStepText(publishFeedback[index])
-  }
-  function sleep(ms: number) {
-    return new Promise((resolve) => {
-      setTimeout(resolve, ms)
-    })
   }
   /**
    * Publish an asset.It also creates the datatoken, mints tokens and gives the market allowance
@@ -146,7 +141,7 @@ function usePublish(): UsePublish {
         )
         .next(setStep)
       Logger.log('ddo created', ddo)
-      await sleep(20000)
+      await sleep(15000)
       setStep(7)
       return ddo
     } catch (error) {
