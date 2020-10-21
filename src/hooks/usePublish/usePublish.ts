@@ -53,6 +53,7 @@ function usePublish(): UsePublish {
     if (status !== ProviderStatus.CONNECTED || !ocean || !account) return null
     setIsLoading(true)
     setPublishError(undefined)
+    setStep(0)
 
     try {
       const publishedDate =
