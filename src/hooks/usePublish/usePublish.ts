@@ -35,6 +35,11 @@ function usePublish(): UsePublish {
     setPublishStep(index)
     index && setPublishStepText(publishFeedback[index])
   }
+  function sleep(ms: number) {
+    return new Promise((resolve) => {
+      setTimeout(resolve, ms)
+    })
+  }
   /**
    * Publish an asset.It also creates the datatoken, mints tokens and gives the market allowance
    * @param  {Metadata} asset The metadata of the asset.
@@ -141,6 +146,7 @@ function usePublish(): UsePublish {
         )
         .next(setStep)
       Logger.log('ddo created', ddo)
+      await sleep(20000)
       setStep(7)
       return ddo
     } catch (error) {
