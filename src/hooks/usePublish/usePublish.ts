@@ -141,7 +141,7 @@ function usePublish(): UsePublish {
         )
         .next(setStep)
       Logger.log('ddo created', ddo)
-      await sleep(15000)
+      await sleep(20000)
       setStep(7)
       return ddo
     } catch (error) {
