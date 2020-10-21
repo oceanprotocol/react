@@ -11,6 +11,7 @@ import {
   getBuyDTFeedback,
   getSellDTFeedback
 } from './utils'
+import { sleep } from 'utils'
 
 interface UsePricing {
   dtSymbol?: string
@@ -228,6 +229,7 @@ function usePricing(ddo: DDO): UsePricing {
         : await ocean.fixedRateExchange
             .create(dataToken, `${price}`, accountId)
             .next((step: number) => setStep(step, 'exchange'))
+      await sleep(20000)
       return tx
     } catch (error) {
       setPricingError(error.message)
