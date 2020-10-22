@@ -107,17 +107,17 @@ function usePublish(): UsePublish {
             containers,
             servers
           )
-          const origComputePrivacy = {
+          const origComputePrivacy: ServiceComputePrivacy = {
             allowRawAlgorithm: true,
             allowNetworkAccess: false,
-            trustedAlgorithms: [] as any
+            trustedAlgorithms: []
           }
           const computeService = ocean.compute.createComputeService(
             account,
             price,
             publishedDate,
             provider,
-            origComputePrivacy as ServiceComputePrivacy,
+            origComputePrivacy,
             timeout,
             providerUri
           )
