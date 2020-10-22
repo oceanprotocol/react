@@ -6,9 +6,7 @@ import Web3 from 'web3'
 export async function getCheapestPool(
   ocean: Ocean,
   dataTokenAddress: string
-): Promise<Pool | null> {
-  if (!ocean || !dataTokenAddress) return null
-
+): Promise<Pool> {
   const tokenPools = await ocean.pool.searchPoolforDT(dataTokenAddress)
 
   if (tokenPools === undefined || tokenPools.length === 0) {
@@ -46,7 +44,7 @@ export async function getCheapestPool(
 export async function getCheapestExchange(
   ocean: Ocean,
   dataTokenAddress: string
-): Promise<Pool | undefined> {
+): Promise<Pool> {
   try {
     const tokenExchanges = await ocean.fixedRateExchange.searchforDT(
       dataTokenAddress,
@@ -88,9 +86,7 @@ export async function getCheapestExchange(
 export async function getFirstPool(
   ocean: Ocean,
   dataTokenAddress: string
-): Promise<Pool | null> {
-  if (!ocean || !dataTokenAddress) return null
-
+): Promise<Pool> {
   const tokenPools = await ocean.pool.searchPoolforDT(dataTokenAddress)
 
   if (tokenPools === undefined || tokenPools.length === 0) {

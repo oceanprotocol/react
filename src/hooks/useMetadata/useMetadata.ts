@@ -8,8 +8,7 @@ import {
   MetadataCache
 } from '@oceanprotocol/lib'
 import { useOcean } from 'providers'
-import { getBestDataTokenPrice } from 'utils/dtUtils'
-import { isDDO } from 'utils'
+import { isDDO, getBestDataTokenPrice } from 'utils'
 import { ConfigHelperConfig } from '@oceanprotocol/lib/dist/node/utils/ConfigHelper'
 
 interface UseMetadata {

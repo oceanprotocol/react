@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useOcean } from 'providers'
-import { feedback } from 'utils'
+import { consumeFeedback } from 'utils'
 import { DID, Logger, ServiceType } from '@oceanprotocol/lib'
 
 interface UseConsume {
@@ -14,14 +14,6 @@ interface UseConsume {
   consumeStepText?: string
   consumeError?: string
   isLoading: boolean
-}
-
-// TODO: do something with this object,
-// consumeStep should probably return one of those strings
-// instead of just a number
-export const consumeFeedback: { [key in number]: string } = {
-  ...feedback,
-  3: '3/3 Access granted. Consuming file...'
 }
 
 function useConsume(): UseConsume {

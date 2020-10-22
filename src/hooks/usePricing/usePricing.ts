@@ -3,15 +3,16 @@ import { useEffect, useState } from 'react'
 import { useOcean } from 'providers'
 import { PriceOptions } from './PriceOptions'
 import { TransactionReceipt } from 'web3-core'
-import { getBestDataTokenPrice, getFirstPool } from 'utils/dtUtils'
 import { Decimal } from 'decimal.js'
 import {
+  getBestDataTokenPrice,
+  getFirstPool,
   getCreatePricingPoolFeedback,
   getCreatePricingExchangeFeedback,
   getBuyDTFeedback,
-  getSellDTFeedback
-} from './utils'
-import { sleep } from 'utils'
+  getSellDTFeedback,
+  sleep
+} from 'utils'
 
 interface UsePricing {
   dtSymbol?: string
