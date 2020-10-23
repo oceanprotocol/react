@@ -32,7 +32,8 @@ function useConsume(): UseConsume {
     did: DID | string,
     dataTokenAddress: string,
     serviceType: ServiceType = 'access',
-    marketFeeAddress: string
+    marketFeeAddress: string,
+    orderId?: string
   ): Promise<void> {
     if (!ocean || !account || !accountId) return
 
@@ -41,34 +42,37 @@ function useConsume(): UseConsume {
 
     try {
       setStep(0)
-      const userOwnedTokens = await ocean.accounts.getTokenBalance(
-        dataTokenAddress,
-        account
-      )
-      if (parseFloat(userOwnedTokens) < 1) {
-        setConsumeError('Not enough datatokens')
-      } else {
-        setStep(1)
-        ocean.datatokens.generateDtName()
-        const tokenTransfer = await ocean.assets.order(
-          did as string,
-          serviceType,
-          accountId,
-          undefined,
-          marketFeeAddress
+      if (!orderId) {
+        // if we don't have a previous valid order, get one
+        const userOwnedTokens = await ocean.accounts.getTokenBalance(
+          dataTokenAddress,
+          account
         )
-        Logger.log('order created', tokenTransfer)
-        setStep(2)
-        setStep(3)
+        if (parseFloat(userOwnedTokens) < 1) {
+          setConsumeError('Not enough datatokens')
+        } else {
+          setStep(1)
+          orderId = await ocean.assets.order(
+            did as string,
+            serviceType,
+            accountId,
+            undefined,
+            marketFeeAddress
+          )
+          Logger.log('order created', orderId)
+          setStep(2)
+        }
+      }
+      setStep(3)
+      if (orderId)
         await ocean.assets.download(
           did as string,
-          tokenTransfer,
+          orderId,
           dataTokenAddress,
           account,
           ''
         )
-        setStep(4)
-      }
+      setStep(4)
     } catch (error) {
       setConsumeError(error.message)
       Logger.error(error)
