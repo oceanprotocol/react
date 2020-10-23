@@ -13,7 +13,8 @@ interface UseCompute {
     dataTokenAddress: string,
     algorithmRawCode: string,
     computeContainer: ComputeValue,
-    marketFeeAddress?: string
+    marketFeeAddress?: string,
+    orderId?: string
   ) => Promise<ComputeJob | void>
   computeStep?: number
   computeStepText?: string

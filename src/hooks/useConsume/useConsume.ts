@@ -8,7 +8,8 @@ interface UseConsume {
     did: DID | string,
     dataTokenAddress: string,
     serviceType: ServiceType,
-    marketFeeAddress: string
+    marketFeeAddress: string,
+    orderId?: string
   ) => Promise<void>
   consumeStep?: number
   consumeStepText?: string
