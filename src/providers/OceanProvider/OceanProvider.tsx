@@ -13,6 +13,7 @@ import { Ocean, Logger, Account, Config } from '@oceanprotocol/lib'
 import Web3Modal, { ICoreOptions } from 'web3modal'
 import { getDefaultProviders } from './getDefaultProviders'
 import { getAccountId, getBalance } from 'utils'
+import { ConfigHelperConfig } from '@oceanprotocol/lib/dist/node/utils/ConfigHelper'
 
 interface Balance {
   eth: string | undefined
@@ -24,7 +25,7 @@ interface OceanProviderValue {
   web3Provider: any
   web3Modal: Web3Modal
   ocean: Ocean
-  config: Config
+  config: Config | ConfigHelperConfig
   account: Account
   accountId: string
   balance: Balance
@@ -42,7 +43,7 @@ function OceanProvider({
   web3ModalOpts,
   children
 }: {
-  initialConfig: Config
+  initialConfig: Config | ConfigHelperConfig
   web3ModalOpts?: Partial<ICoreOptions>
   children: ReactNode
 }): ReactElement {
@@ -53,7 +54,9 @@ function OceanProvider({
   const [networkId, setNetworkId] = useState<number | undefined>()
   const [account, setAccount] = useState<Account | undefined>()
   const [accountId, setAccountId] = useState<string | undefined>()
-  const [config, setConfig] = useState<Config>(initialConfig)
+  const [config, setConfig] = useState<Config | ConfigHelperConfig>(
+    initialConfig
+  )
   const [balance, setBalance] = useState<Balance | undefined>({
     eth: undefined,
     ocean: undefined
@@ -78,7 +81,7 @@ function OceanProvider({
   }, [web3ModalOpts])
 
   const connect = useCallback(
-    async (newConfig?: Config) => {
+    async (newConfig?: Config | ConfigHelperConfig) => {
       try {
         Logger.log('Connecting ...', newConfig)
 
@@ -188,5 +191,5 @@ function OceanProvider({
 // Helper hook to access the provider values
 const useOcean = (): OceanProviderValue => useContext(OceanContext)
 
-export { OceanProvider, useOcean, OceanProviderValue, Balance }
+export { OceanProvider, useOcean, OceanProviderValue, Balance, OceanContext }
 export default OceanProvider
