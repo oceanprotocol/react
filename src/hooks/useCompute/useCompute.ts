@@ -56,47 +56,49 @@ function useCompute(): UseCompute {
     dataTokenAddress: string,
     algorithmRawCode: string,
     computeContainer: ComputeValue,
-    marketFeeAddress?: string
+    marketFeeAddress?: string,
+    orderId?: string
   ): Promise<ComputeJob | void> {
     if (!ocean || !account) return
-
     setComputeError(undefined)
-
     try {
       setIsLoading(true)
       setStep(0)
-
-      const userOwnedTokens = await ocean.accounts.getTokenBalance(
-        dataTokenAddress,
-        account
-      )
-      if (parseFloat(userOwnedTokens) < 1) {
-        setComputeError('Not enough datatokens')
-      } else {
-        rawAlgorithmMeta.container = computeContainer
-        rawAlgorithmMeta.rawcode = algorithmRawCode
-        const output = {}
-        Logger.log(
-          'compute order',
-          accountId,
-          did,
-          computeService,
-          rawAlgorithmMeta,
-          marketFeeAddress
+      rawAlgorithmMeta.container = computeContainer
+      rawAlgorithmMeta.rawcode = algorithmRawCode
+      const output = {}
+      if (!orderId) {
+        const userOwnedTokens = await ocean.accounts.getTokenBalance(
+          dataTokenAddress,
+          account
         )
-        const tokenTransfer = await ocean.compute.order(
-          accountId,
-          did,
-          computeService.index,
-          undefined,
-          rawAlgorithmMeta,
-          marketFeeAddress
-        )
-        setStep(1)
-        setStep(2)
+        if (parseFloat(userOwnedTokens) < 1) {
+          setComputeError('Not enough datatokens')
+        } else {
+          Logger.log(
+            'compute order',
+            accountId,
+            did,
+            computeService,
+            rawAlgorithmMeta,
+            marketFeeAddress
+          )
+          orderId = await ocean.compute.order(
+            accountId,
+            did,
+            computeService.index,
+            undefined,
+            rawAlgorithmMeta,
+            marketFeeAddress
+          )
+          setStep(1)
+        }
+      }
+      setStep(2)
+      if (orderId) {
         const response = await ocean.compute.start(
           did,
-          tokenTransfer,
+          orderId,
           dataTokenAddress,
           account,
           undefined,
