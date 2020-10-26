@@ -201,7 +201,7 @@ function usePricing(ddo: DDO): UsePricing {
   ): Promise<TransactionReceipt | void> {
     if (!ocean || !accountId || !dtSymbol) return
 
-    const { type, dtAmount, price, weightOnDataToken, swapFee } = priceOptions
+    const { type, dtAmount,oceanAmount, price, weightOnDataToken, swapFee } = priceOptions
     const isPool = type === 'dynamic'
 
     if (!isPool && !config.fixedRateExchangeAddress) {
@@ -224,6 +224,7 @@ function usePricing(ddo: DDO): UsePricing {
               dataToken,
               `${dtAmount}`,
               weightOnDataToken,
+              `${oceanAmount}`,
               swapFee
             )
             .next((step: number) => setStep(step, 'pool'))
