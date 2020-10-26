@@ -6,7 +6,13 @@ import { Metadata } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Metadata'
 
 export function Publish() {
   const { publish, publishStepText, isLoading } = usePublish()
-  const { createPricing, pricingStep, pricingStepText, pricingIsLoading, pricingError} = usePricing()
+  const {
+    createPricing,
+    pricingStep,
+    pricingStepText,
+    pricingIsLoading,
+    pricingError
+  } = usePricing()
   const [ddo, setDdo] = useState<DDO | undefined | null>()
 
   const asset = {
@@ -31,16 +37,12 @@ export function Publish() {
   }
 
   const publishAsset = async () => {
-    
-    const datatokenOptions = {
-      
-    }
+    const datatokenOptions = {}
     const ddo = await publish(asset as Metadata, 'access', datatokenOptions)
     console.log(ddo)
     setDdo(ddo)
   }
 
-  
   return (
     <>
       <div>Publish</div>
@@ -51,7 +53,6 @@ export function Publish() {
         IsLoading: {isLoading.toString()} || Status: {publishStepText}
       </div>
       <div>DID: {ddo && ddo.id} </div>
-      
     </>
   )
 }
