@@ -103,21 +103,21 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
     }
     init()
 
-    const interval = setInterval(async () => {
-      if (
-        !internalDdo ||
-        status !== 1 ||
-        networkId !== (config as ConfigHelperConfig).networkId
-      )
-        return
+    // const interval = setInterval(async () => {
+    //   if (
+    //     !internalDdo ||
+    //     status !== 1 ||
+    //     networkId !== (config as ConfigHelperConfig).networkId
+    //   )
+    //     return
 
-      const priceLive = await getPrice(internalDdo.dataToken)
-      priceLive && setPrice(priceLive)
-    }, 10000)
+    //   const priceLive = await getPrice(internalDdo.dataToken)
+    //   priceLive && setPrice(priceLive)
+    // }, 10000)
 
-    return () => {
-      clearInterval(interval)
-    }
+    // return () => {
+    //   clearInterval(interval)
+    // }
   }, [status, networkId, config, internalDdo, getMetadata, getPrice])
 
   return {
