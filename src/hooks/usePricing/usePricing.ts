@@ -253,7 +253,7 @@ function usePricing(ddo: DDO): UsePricing {
             )
             .next((step: number) => setStep(step, 'pool'))
         : await ocean.fixedRateExchange
-            .create(dataToken, `${price}`, accountId, '${dtAmount}')
+            .create(dataToken, `${price}`, accountId, `${dtAmount}`)
             .next((step: number) => setStep(step, 'exchange'))
       await sleep(20000)
       return tx
