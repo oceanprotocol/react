@@ -15,7 +15,7 @@
 
 ![iu](https://user-images.githubusercontent.com/90316/80356686-1650c080-887a-11ea-854e-bdc2bbdb0c20.jpeg)
 
-**WE ARE IN HARDWARE MODE. This project is in a conceptual phase and most stuff changes weekly. More importantly, it only works against bleeding edge v3 components of Ocean Protocol which are not completely public yet.**
+**WE ARE IN HARDWARE MODE. This project is in a conceptual phase and most stuff changes weekly. More importantly, it only works against bleeding edge v3 components of Ocean.**
 
 ---
 
