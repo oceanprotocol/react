@@ -216,16 +216,17 @@ function usePricing(ddo: DDO): UsePricing {
 
     const {
       type,
-      dtAmount,
       oceanAmount,
       price,
       weightOnDataToken,
       swapFee
     } = priceOptions
+
+    let { dtAmount } = priceOptions
     const isPool = type === 'dynamic'
 
     if (!isPool && !config.fixedRateExchangeAddress) {
-      Logger.error(`'fixedRateExchangeAddress' not set in ccnfig.`)
+      Logger.error(`'fixedRateExchangeAddress' not set in config.`)
       return
     }
 
@@ -235,8 +236,11 @@ function usePricing(ddo: DDO): UsePricing {
     setStep(99, 'pool')
 
     try {
+      // if fixedPrice set dt to max amount
+      if (!isPool) dtAmount = 1000
       await mint(`${dtAmount}`)
 
+      // dtAmount for fixed price is set to max
       const tx = isPool
         ? await ocean.pool
             .create(
