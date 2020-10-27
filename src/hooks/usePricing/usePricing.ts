@@ -91,7 +91,7 @@ function usePricing(ddo: DDO): UsePricing {
       await ocean.datatokens.balance(dataToken, accountId)
     )
     const tokens = new Decimal(tokensToMint)
-    if (tokens > balance) {
+    if (tokens.greaterThan(balance)) {
       const mintAmount = tokens.minus(balance)
       const tx = await ocean.datatokens.mint(
         dataToken,
