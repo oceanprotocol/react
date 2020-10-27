@@ -224,6 +224,7 @@ function usePricing(ddo: DDO): UsePricing {
     try {
       await mint(`${dtAmount}`)
 
+      // dtAmount for fixed price is set to max
       const tx = isPool
         ? await ocean.pool
             .create(
@@ -236,7 +237,7 @@ function usePricing(ddo: DDO): UsePricing {
             )
             .next((step: number) => setStep(step, 'pool'))
         : await ocean.fixedRateExchange
-            .create(dataToken, `${price}`, accountId, `${dtAmount}`)
+            .create(dataToken, `${price}`, accountId, `1000`)
             .next((step: number) => setStep(step, 'exchange'))
       await sleep(20000)
       return tx
