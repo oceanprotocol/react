@@ -221,7 +221,8 @@ function usePricing(ddo: DDO): UsePricing {
       weightOnDataToken,
       swapFee
     } = priceOptions
-    let dtAmount = priceOptions.dtAmount
+
+    let { dtAmount } = priceOptions
     const isPool = type === 'dynamic'
 
     if (!isPool && !config.fixedRateExchangeAddress) {
@@ -235,7 +236,7 @@ function usePricing(ddo: DDO): UsePricing {
     setStep(99, 'pool')
 
     try {
-      //if fixedPrice set dt to max amount
+      // if fixedPrice set dt to max amount
       if (!isPool) dtAmount = 1000
       await mint(`${dtAmount}`)
 
