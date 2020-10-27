@@ -83,10 +83,16 @@ function usePricing(ddo: DDO): UsePricing {
     setPricingStepText(messages[index])
   }
 
-  async function mint(tokensToMint: string): Promise<TransactionReceipt> {
+  async function mint(
+    tokensToMint: string
+  ): Promise<TransactionReceipt | void> {
     Logger.log('mint function', dataToken, accountId)
-    const tx = await ocean.datatokens.mint(dataToken, accountId, tokensToMint)
-    return tx
+    const balance = await ocean.datatokens.balance(dataToken, accountId)
+    if (parseFloat(tokensToMint) > parseFloat(balance)) {
+      tokensToMint = String(parseFloat(tokensToMint) - parseFloat(balance))
+      const tx = await ocean.datatokens.mint(dataToken, accountId, tokensToMint)
+      return tx
+    }
   }
 
   async function buyDT(
