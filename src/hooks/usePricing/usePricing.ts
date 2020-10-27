@@ -22,7 +22,7 @@ interface UsePricing {
   ) => Promise<TransactionReceipt | string | void>
   buyDT: (dtAmount: number | string) => Promise<TransactionReceipt | void>
   sellDT: (dtAmount: number | string) => Promise<TransactionReceipt | void>
-  mint: (tokensToMint: string) => Promise<TransactionReceipt>
+  mint: (tokensToMint: string) => Promise<TransactionReceipt | void>
   pricingStep?: number
   pricingStepText?: string
   pricingError?: string
