@@ -22,7 +22,7 @@ interface UsePricing {
   ) => Promise<TransactionReceipt | string | void>
   buyDT: (dtAmount: number | string) => Promise<TransactionReceipt | void>
   sellDT: (dtAmount: number | string) => Promise<TransactionReceipt | void>
-  mint: (tokensToMint: string) => Promise<TransactionReceipt>
+  mint: (tokensToMint: string) => Promise<TransactionReceipt | void>
   pricingStep?: number
   pricingStepText?: string
   pricingError?: string
@@ -83,10 +83,23 @@ function usePricing(ddo: DDO): UsePricing {
     setPricingStepText(messages[index])
   }
 
-  async function mint(tokensToMint: string): Promise<TransactionReceipt> {
+  async function mint(
+    tokensToMint: string
+  ): Promise<TransactionReceipt | void> {
     Logger.log('mint function', dataToken, accountId)
-    const tx = await ocean.datatokens.mint(dataToken, accountId, tokensToMint)
-    return tx
+    const balance = new Decimal(
+      await ocean.datatokens.balance(dataToken, accountId)
+    )
+    const tokens = new Decimal(tokensToMint)
+    if (tokens.greaterThan(balance)) {
+      const mintAmount = tokens.minus(balance)
+      const tx = await ocean.datatokens.mint(
+        dataToken,
+        accountId,
+        mintAmount.toString()
+      )
+      return tx
+    }
   }
 
   async function buyDT(
