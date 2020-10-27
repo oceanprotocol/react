@@ -87,10 +87,17 @@ function usePricing(ddo: DDO): UsePricing {
     tokensToMint: string
   ): Promise<TransactionReceipt | void> {
     Logger.log('mint function', dataToken, accountId)
-    const balance = await ocean.datatokens.balance(dataToken, accountId)
-    if (parseFloat(tokensToMint) > parseFloat(balance)) {
-      tokensToMint = String(parseFloat(tokensToMint) - parseFloat(balance))
-      const tx = await ocean.datatokens.mint(dataToken, accountId, tokensToMint)
+    const balance = new Decimal(
+      await ocean.datatokens.balance(dataToken, accountId)
+    )
+    const tokens = new Decimal(tokensToMint)
+    if (tokens > balance) {
+      const mintAmount = tokens.minus(balance)
+      const tx = await ocean.datatokens.mint(
+        dataToken,
+        accountId,
+        mintAmount.toString()
+      )
       return tx
     }
   }
