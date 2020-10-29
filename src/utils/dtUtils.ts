@@ -98,7 +98,7 @@ export async function getFirstPool(
         price: 0
       }
     }
-    firstPoolAddress = tokenPools[0]
+    ;[firstPoolAddress] = tokenPools
   }
   if (!firstPoolAddress) {
     return {
