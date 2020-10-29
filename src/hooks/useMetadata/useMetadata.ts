@@ -19,6 +19,7 @@ interface UseMetadata {
   price: BestPrice | undefined
   isLoaded: boolean
   getPrice: (dataTokenAddress: string) => Promise<BestPrice | void>
+  refreshPrice: () => void
 }
 
 function useMetadata(asset?: DID | string | DDO): UseMetadata {
@@ -42,8 +43,15 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
   )
 
   const getPrice = useCallback(
-    async (dataTokenAddress: string): Promise<BestPrice> => {
-      const price = await getBestDataTokenPrice(ocean, dataTokenAddress)
+    async (
+      dataTokenAddress: string,
+      poolAddress?: string
+    ): Promise<BestPrice> => {
+      const price = await getBestDataTokenPrice(
+        ocean,
+        dataTokenAddress,
+        poolAddress
+      )
       return price
     },
     [ocean]
@@ -74,7 +82,14 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
     }
     init()
   }, [asset, getDDO])
-
+  async function refreshPrice(): Promise<void> {
+    if (!internalDdo) return
+    const livePrice = await getPrice(
+      internalDdo.dataToken,
+      internalDdo.price.pools[0]
+    )
+    setPrice(livePrice)
+  }
   //
   // Get metadata & price for stored DDO
   //
@@ -98,7 +113,10 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
         return
 
       // Set price again, but from chain
-      const priceLive = await getPrice(internalDdo.dataToken)
+      const priceLive = await getPrice(
+        internalDdo.dataToken,
+        internalDdo.price.pools[0]
+      )
       priceLive && internalDdo.price !== priceLive && setPrice(priceLive)
     }
     init()
@@ -111,8 +129,8 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
     //   )
     //     return
 
-    //   const priceLive = await getPrice(internalDdo.dataToken)
-    //   priceLive && setPrice(priceLive)
+    //  await refreshPrice
+
     // }, 10000)
 
     // return () => {
@@ -127,7 +145,8 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
     title,
     price,
     isLoaded,
-    getPrice
+    getPrice,
+    refreshPrice
   }
 }
 
