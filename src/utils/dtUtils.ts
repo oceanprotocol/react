@@ -107,17 +107,62 @@ export async function getFirstPool(
     }
   }
 
-  const firstPoolPrice = await ocean.pool.getOceanNeeded(firstPoolAddress, '1')
+  let firstPoolPrice = await ocean.pool.getOceanNeeded(firstPoolAddress, '1')
 
   const oceanReserve = await ocean.pool.getOceanReserve(firstPoolAddress)
 
   const dtReserve = await ocean.pool.getDTReserve(firstPoolAddress)
+
+  if (firstPoolPrice) {
+    const priceChars = firstPoolPrice.split('.')
+    const numberOfCharsOfPrice = priceChars[0].length
+
+    if (numberOfCharsOfPrice > 8) firstPoolPrice = '0'
+  }
 
   return {
     address: firstPoolAddress,
     price: Number(firstPoolPrice),
     ocean: Number(oceanReserve),
     datatoken: Number(dtReserve)
+  }
+}
+
+export async function getDataTokenPrice(
+  ocean: Ocean,
+  dataTokenAddress: string,
+  type?: string,
+  poolAddress?: string
+) {
+  switch (type) {
+    case 'pool': {
+      const cheapestPool = await getFirstPool(
+        ocean,
+        dataTokenAddress,
+        poolAddress
+      )
+      return {
+        type: 'pool',
+        address: cheapestPool?.address,
+        value: cheapestPool?.price,
+        ocean: cheapestPool?.ocean,
+        datatoken: cheapestPool?.datatoken
+      } as BestPrice
+    }
+    case 'exchange': {
+      const cheapestExchange = await getCheapestExchange(
+        ocean,
+        dataTokenAddress
+      )
+      return {
+        type: 'exchange',
+        address: cheapestExchange?.address,
+        value: Number(cheapestExchange?.price)
+      } as BestPrice
+    }
+    default: {
+      return await getBestDataTokenPrice(ocean, dataTokenAddress, poolAddress)
+    }
   }
 }
 

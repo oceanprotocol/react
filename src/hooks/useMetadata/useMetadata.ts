@@ -8,7 +8,7 @@ import {
   MetadataCache
 } from '@oceanprotocol/lib'
 import { useOcean } from 'providers'
-import { isDDO, getBestDataTokenPrice } from 'utils'
+import { isDDO, getBestDataTokenPrice, getDataTokenPrice } from 'utils'
 import { ConfigHelperConfig } from '@oceanprotocol/lib/dist/node/utils/ConfigHelper'
 
 interface UseMetadata {
@@ -18,7 +18,6 @@ interface UseMetadata {
   title: string | undefined
   price: BestPrice | undefined
   isLoaded: boolean
-  getPrice: (dataTokenAddress: string) => Promise<BestPrice | void>
   refreshPrice: () => void
 }
 
@@ -42,20 +41,24 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
     [config.metadataCacheUri]
   )
 
-  const getPrice = useCallback(
-    async (
-      dataTokenAddress: string,
-      poolAddress?: string
-    ): Promise<BestPrice> => {
-      const price = await getBestDataTokenPrice(
-        ocean,
-        dataTokenAddress,
-        poolAddress
-      )
-      return price
-    },
-    [ocean]
-  )
+  const getPrice = useCallback(async (): Promise<BestPrice> => {
+    if (!internalDdo)
+      return {
+        type: '',
+        address: '',
+        value: 0,
+        ocean: 0,
+        datatoken: 0
+      } as BestPrice
+
+    const price = await getDataTokenPrice(
+      ocean,
+      internalDdo.dataToken,
+      internalDdo?.price?.type,
+      internalDdo.price.pools[0]
+    )
+    return price
+  }, [ocean, internalDdo])
 
   const getMetadata = useCallback(async (ddo: DDO): Promise<Metadata> => {
     const metadata = ddo.findServiceByType('metadata')
@@ -83,11 +86,7 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
     init()
   }, [asset, getDDO])
   async function refreshPrice(): Promise<void> {
-    if (!internalDdo) return
-    const livePrice = await getPrice(
-      internalDdo.dataToken,
-      internalDdo.price.pools[0]
-    )
+    const livePrice = await getPrice()
     setPrice(livePrice)
   }
   //
@@ -113,10 +112,7 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
         return
 
       // Set price again, but from chain
-      const priceLive = await getPrice(
-        internalDdo.dataToken,
-        internalDdo.price.pools[0]
-      )
+      const priceLive = await getPrice()
       priceLive && internalDdo.price !== priceLive && setPrice(priceLive)
     }
     init()
@@ -145,7 +141,6 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
     title,
     price,
     isLoaded,
-    getPrice,
     refreshPrice
   }
 }
