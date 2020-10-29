@@ -128,6 +128,41 @@ export async function getFirstPool(
   }
 }
 
+export async function getBestDataTokenPrice(
+  ocean: Ocean,
+  dataTokenAddress: string,
+  poolAddress?: string
+): Promise<BestPrice> {
+  const cheapestPool = await getFirstPool(ocean, dataTokenAddress, poolAddress)
+  const cheapestExchange = await getCheapestExchange(ocean, dataTokenAddress)
+  Decimal.set({ precision: 5 })
+
+  const cheapestPoolPrice = new Decimal(
+    cheapestPool && cheapestPool.price !== 0 ? cheapestPool.price : 999999999999
+  )
+  const cheapestExchangePrice = new Decimal(
+    cheapestExchange && cheapestExchange?.price !== 0
+      ? cheapestExchange.price
+      : 999999999999
+  )
+
+  if (cheapestPoolPrice < cheapestExchangePrice) {
+    return {
+      type: 'pool',
+      address: cheapestPool?.address,
+      value: cheapestPool?.price,
+      ocean: cheapestPool?.ocean,
+      datatoken: cheapestPool?.datatoken
+    } as BestPrice
+  } else {
+    return {
+      type: 'exchange',
+      address: cheapestExchange?.address,
+      value: Number(cheapestExchange?.price)
+    } as BestPrice
+  }
+}
+
 export async function getDataTokenPrice(
   ocean: Ocean,
   dataTokenAddress: string,
@@ -163,40 +198,5 @@ export async function getDataTokenPrice(
     default: {
       return await getBestDataTokenPrice(ocean, dataTokenAddress, poolAddress)
     }
-  }
-}
-
-export async function getBestDataTokenPrice(
-  ocean: Ocean,
-  dataTokenAddress: string,
-  poolAddress?: string
-): Promise<BestPrice> {
-  const cheapestPool = await getFirstPool(ocean, dataTokenAddress, poolAddress)
-  const cheapestExchange = await getCheapestExchange(ocean, dataTokenAddress)
-  Decimal.set({ precision: 5 })
-
-  const cheapestPoolPrice = new Decimal(
-    cheapestPool && cheapestPool.price !== 0 ? cheapestPool.price : 999999999999
-  )
-  const cheapestExchangePrice = new Decimal(
-    cheapestExchange && cheapestExchange?.price !== 0
-      ? cheapestExchange.price
-      : 999999999999
-  )
-
-  if (cheapestPoolPrice < cheapestExchangePrice) {
-    return {
-      type: 'pool',
-      address: cheapestPool?.address,
-      value: cheapestPool?.price,
-      ocean: cheapestPool?.ocean,
-      datatoken: cheapestPool?.datatoken
-    } as BestPrice
-  } else {
-    return {
-      type: 'exchange',
-      address: cheapestExchange?.address,
-      value: Number(cheapestExchange?.price)
-    } as BestPrice
   }
 }
