@@ -1,7 +1,6 @@
-import { Logger, Ocean, BestPrice } from '@oceanprotocol/lib'
+import { Ocean, BestPrice, Logger } from '@oceanprotocol/lib'
 import { Decimal } from 'decimal.js'
 import Pool from 'hooks/useMetadata/Pool'
-import Web3 from 'web3'
 
 export async function getCheapestPool(
   ocean: Ocean,
@@ -60,9 +59,7 @@ export async function getCheapestExchange(
     let cheapestExchangePrice = new Decimal(tokenExchanges[0].fixedRate)
 
     for (let i = 0; i < tokenExchanges.length; i++) {
-      const decimalExchangePrice = new Decimal(
-        Web3.utils.fromWei(tokenExchanges[i].fixedRate)
-      )
+      const decimalExchangePrice = new Decimal(tokenExchanges[i].fixedRate)
 
       if (decimalExchangePrice < cheapestExchangePrice) {
         cheapestExchangePrice = decimalExchangePrice
@@ -73,6 +70,34 @@ export async function getCheapestExchange(
     return {
       address: cheapestExchangeAddress || '',
       price: Number(cheapestExchangePrice)
+    }
+  } catch (err) {
+    Logger.log(err)
+    return {
+      address: '',
+      price: 0
+    }
+  }
+}
+
+export async function getFirstExchange(ocean: Ocean, dataTokenAddress: string) {
+  try {
+    const tokenExchanges = await ocean.fixedRateExchange.searchforDT(
+      dataTokenAddress,
+      '1'
+    )
+    Logger.log('Found exchanges', tokenExchanges)
+    if (tokenExchanges === undefined || tokenExchanges.length === 0) {
+      return {
+        address: '',
+        price: 0
+      }
+    }
+    const [tokenExchange] = tokenExchanges
+
+    return {
+      address: tokenExchange.exchangeID || '',
+      price: Number(tokenExchange.fixedRate)
     }
   } catch (err) {
     Logger.log(err)
@@ -185,10 +210,7 @@ export async function getDataTokenPrice(
       } as BestPrice
     }
     case 'exchange': {
-      const cheapestExchange = await getCheapestExchange(
-        ocean,
-        dataTokenAddress
-      )
+      const cheapestExchange = await getFirstExchange(ocean, dataTokenAddress)
       return {
         type: 'exchange',
         address: cheapestExchange?.address,

@@ -8,7 +8,7 @@ import {
   MetadataCache
 } from '@oceanprotocol/lib'
 import { useOcean } from 'providers'
-import { isDDO, getBestDataTokenPrice, getDataTokenPrice } from 'utils'
+import { isDDO, getDataTokenPrice } from 'utils'
 import { ConfigHelperConfig } from '@oceanprotocol/lib/dist/node/utils/ConfigHelper'
 
 interface UseMetadata {
@@ -16,6 +16,7 @@ interface UseMetadata {
   did: DID | string | undefined
   metadata: Metadata | undefined
   title: string | undefined
+  owner: string | undefined
   price: BestPrice | undefined
   isLoaded: boolean
   refreshPrice: () => void
@@ -29,6 +30,7 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
   const [title, setTitle] = useState<string>()
   const [isLoaded, setIsLoaded] = useState(false)
   const [price, setPrice] = useState<BestPrice>()
+  const [owner, setOwner] = useState<string>()
 
   const getDDO = useCallback(
     async (did: DID | string): Promise<DDO | undefined> => {
@@ -102,6 +104,7 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
       const metadata = await getMetadata(internalDdo)
       setMetadata(metadata)
       setTitle(metadata.main.name)
+      setOwner(internalDdo.publicKey[0].owner)
       setIsLoaded(true)
 
       // Stop here and do not start fetching from chain, when not connected properly.
@@ -139,6 +142,7 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
     did: internalDid,
     metadata,
     title,
+    owner,
     price,
     isLoaded,
     refreshPrice
