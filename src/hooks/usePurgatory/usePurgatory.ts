@@ -1,23 +1,36 @@
-import { DDO, DID } from "@oceanprotocol/lib";
-import { useState } from 'react';
-import { listAssets, listAccounts } from '@oceanprotocol/list-purgatory'
-
+import { DDO, PurgatoryData } from '@oceanprotocol/lib'
+import { useCallback, useEffect, useState } from 'react'
+import getAssetData from './getAssetData'
 
 interface UsePurgatory {
-    isAccountInPurgatory: boolean
-    isAssetInPurgatory: boolean
+  isInPurgatory: boolean
+  purgatoryData?: PurgatoryData
+}
 
-  }
+function usePurgatory(did: string): UsePurgatory {
+  const [isInPurgatory, setIsInPurgatory] = useState(false)
+  const [purgatoryData, setPurgatoryData] = useState<PurgatoryData>()
 
-function usePurgatory(asset?: DID | string | DDO): UsePurgatory {
-
-    const [ isAccountInPurgatory, setIsAccountInPurgatory] = useState(false)
-    const [ isAssetInPurgatory, setIsAssetInPurgatory] = useState(false)
-
-    return {
-        isAccountInPurgatory,
-        isAssetInPurgatory
+  const getData = useCallback(async (): Promise<void> => {
+    if (!did) return
+    const result = await getAssetData(did)
+    if (result.did !== undefined) {
+      setIsInPurgatory(true)
+      setPurgatoryData(result)
+    } else {
+      setIsInPurgatory(false)
     }
+    setPurgatoryData(result)
+  }, [did])
+
+  useEffect(() => {
+    getData()
+  }, [did])
+
+  return {
+    isInPurgatory,
+    purgatoryData
+  }
 }
 
 export { usePurgatory, UsePurgatory }
