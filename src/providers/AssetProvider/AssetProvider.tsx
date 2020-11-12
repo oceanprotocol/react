@@ -23,6 +23,7 @@ interface AssetProviderValue {
   title: string | undefined
   owner: string | undefined
   price: BestPrice | undefined
+  refreshPrice: () => void
 }
 
 const AssetContext = createContext({} as AssetProviderValue)
@@ -116,6 +117,10 @@ function AssetProvider({
     setPurgatoryData(result)
   }, [internalDid])
 
+  async function refreshPrice(): Promise<void> {
+    const livePrice = await getPrice()
+    setPrice(livePrice)
+  }
   return (
     <AssetContext.Provider
       value={
@@ -127,7 +132,8 @@ function AssetProvider({
           owner,
           price,
           isInPurgatory,
-          purgatoryData
+          purgatoryData,
+          refreshPrice
         } as AssetProviderValue
       }
     >
