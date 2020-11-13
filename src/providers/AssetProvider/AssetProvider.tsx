@@ -133,12 +133,12 @@ function AssetProvider({
     // Set price again, but from chain
     const priceLive = await getPrice()
     setPrice(priceLive)
-  }, [internalDdo, getPrice])
+  }, [asset, getPrice])
 
   useEffect(() => {
-    if (!internalDdo || !ocean || status !== ProviderStatus.CONNECTED) return
+    if (!asset) return
     initMetadata()
-  }, [status, internalDdo, initMetadata])
+  }, [status, asset, initMetadata])
 
   async function refreshPrice(): Promise<void> {
     const livePrice = await getPrice()
