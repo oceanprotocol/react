@@ -9,11 +9,21 @@ import React, {
 } from 'react'
 import Web3 from 'web3'
 import ProviderStatus from './ProviderStatus'
-import { Ocean, Logger, Account, Config } from '@oceanprotocol/lib'
+import {
+  Ocean,
+  Logger,
+  Account,
+  Config,
+  PurgatoryData
+} from '@oceanprotocol/lib'
 import Web3Modal, { ICoreOptions } from 'web3modal'
 import { getDefaultProviders } from './getDefaultProviders'
 import { getAccountId, getBalance } from 'utils'
 import { ConfigHelperConfig } from '@oceanprotocol/lib/dist/node/utils/ConfigHelper'
+import {
+  AccountPurgatoryData,
+  getAccountPurgatoryData
+} from 'utils/getPurgatoryData'
 
 interface Balance {
   eth: string | undefined
@@ -27,6 +37,8 @@ interface OceanProviderValue {
   ocean: Ocean
   config: Config | ConfigHelperConfig
   account: Account
+  isInPurgatory: boolean
+  purgatoryData: AccountPurgatoryData
   accountId: string
   balance: Balance
   networkId: number | undefined
@@ -54,6 +66,8 @@ function OceanProvider({
   const [networkId, setNetworkId] = useState<number | undefined>()
   const [account, setAccount] = useState<Account | undefined>()
   const [accountId, setAccountId] = useState<string | undefined>()
+  const [isInPurgatory, setIsInPurgatory] = useState(false)
+  const [purgatoryData, setPurgatoryData] = useState<AccountPurgatoryData>()
   const [config, setConfig] = useState<Config | ConfigHelperConfig>(
     initialConfig
   )
@@ -64,6 +78,23 @@ function OceanProvider({
   const [status, setStatus] = useState<ProviderStatus>(
     ProviderStatus.NOT_AVAILABLE
   )
+
+  const setPurgatory = useCallback(async (accountId: string): Promise<void> => {
+    if (!accountId) return
+    try {
+      const result = await getAccountPurgatoryData(accountId)
+
+      if (result.address !== undefined) {
+        setIsInPurgatory(true)
+        setPurgatoryData(result)
+      } else {
+        setIsInPurgatory(false)
+      }
+      setPurgatoryData(result)
+    } catch (error) {
+      Logger.error(error)
+    }
+  }, [])
 
   const init = useCallback(async () => {
     Logger.log('Ocean Provider init')
@@ -116,6 +147,8 @@ function OceanProvider({
         const balance = await getBalance(account)
         setBalance(balance)
         Logger.log('balance', JSON.stringify(balance))
+
+        await setPurgatory(accountId)
       } catch (error) {
         Logger.error(error)
       }
@@ -173,6 +206,8 @@ function OceanProvider({
           ocean,
           account,
           accountId,
+          isInPurgatory,
+          purgatoryData,
           balance,
           networkId,
           status,

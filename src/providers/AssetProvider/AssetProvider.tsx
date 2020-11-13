@@ -7,12 +7,19 @@ import React, {
   useCallback,
   ReactNode
 } from 'react'
-import { Logger, DDO, Metadata, BestPrice } from '@oceanprotocol/lib'
+import {
+  Logger,
+  DDO,
+  Metadata,
+  BestPrice,
+  MetadataCache
+} from '@oceanprotocol/lib'
 import { PurgatoryData } from '@oceanprotocol/lib/dist/node/ddo/interfaces/PurgatoryData'
 import { useOcean } from '../index'
 import { isDDO, getDataTokenPrice } from 'utils'
-import getPurgatoryData from './getPurgatoryData'
+import { getAssetPurgatoryData } from '../../utils/getPurgatoryData'
 import ProviderStatus from '../OceanProvider/ProviderStatus'
+import { ConfigHelperConfig } from '@oceanprotocol/lib/dist/node/utils/ConfigHelper'
 
 interface AssetProviderValue {
   isInPurgatory: boolean
@@ -35,7 +42,7 @@ function AssetProvider({
   asset: string | DDO
   children: ReactNode
 }): ReactElement {
-  const { ocean, status } = useOcean()
+  const { ocean, status, config, networkId } = useOcean()
   const [isInPurgatory, setIsInPurgatory] = useState(false)
   const [purgatoryData, setPurgatoryData] = useState<PurgatoryData>()
   const [internalDdo, setDDO] = useState<DDO>()
@@ -47,17 +54,20 @@ function AssetProvider({
 
   const init = useCallback(async () => {
     Logger.log('Asset Provider init')
+    if (!config.metadataCacheUri) return
     if (isDDO(asset as string | DDO)) {
       setDDO(asset as DDO)
       setDID((asset as DDO).id)
     } else {
       // asset is a DID
-      const ddo = await ocean.metadatacache.retrieveDDO(asset as string)
-      Logger.debug('DDO', ddo)
+
+      const metadataCache = new MetadataCache(config.metadataCacheUri, Logger)
+      const ddo = await metadataCache.retrieveDDO(asset as string)
+      Logger.debug('DDO asset', ddo)
       setDDO(ddo)
       setDID(asset as string)
     }
-  }, [asset, ocean])
+  }, [asset, config.metadataCacheUri])
 
   const getPrice = useCallback(async (): Promise<BestPrice> => {
     if (!internalDdo)
@@ -79,12 +89,11 @@ function AssetProvider({
   }, [ocean, internalDdo])
 
   useEffect(() => {
-    if (!ocean || status !== ProviderStatus.CONNECTED) return
     init()
   }, [init, asset, ocean, status])
 
   const initMetadata = useCallback(async (): Promise<void> => {
-    if (!internalDdo) return 
+    if (!internalDdo) return
     // Set price from DDO first
     setPrice(internalDdo.price)
 
@@ -93,7 +102,12 @@ function AssetProvider({
     setTitle(metadata.main.name)
     setOwner(internalDdo.publicKey[0].owner)
 
-    await setPurgatory()
+    setIsInPurgatory(internalDdo.isInPurgatory)
+    setPurgatoryData(internalDdo.purgatoryData)
+    await setPurgatory(internalDdo.id)
+    // Stop here and do not start fetching from chain, when not connected properly.
+    if (status !== 1 || networkId !== (config as ConfigHelperConfig).networkId)
+      return
 
     // Set price again, but from chain
     const priceLive = await getPrice()
@@ -105,17 +119,22 @@ function AssetProvider({
     initMetadata()
   }, [status, internalDdo, initMetadata])
 
-  const setPurgatory = useCallback(async (): Promise<void> => {
-    if (!internalDid) return
-    const result = await getPurgatoryData(internalDid)
-    if (result.did !== undefined) {
-      setIsInPurgatory(true)
+  const setPurgatory = useCallback(async (did: string): Promise<void> => {
+    if (!did) return
+    try {
+      const result = await getAssetPurgatoryData(did)
+
+      if (result.did !== undefined) {
+        setIsInPurgatory(true)
+        setPurgatoryData(result)
+      } else {
+        setIsInPurgatory(false)
+      }
       setPurgatoryData(result)
-    } else {
-      setIsInPurgatory(false)
+    } catch (error) {
+      Logger.error(error)
     }
-    setPurgatoryData(result)
-  }, [internalDid])
+  }, [])
 
   async function refreshPrice(): Promise<void> {
     const livePrice = await getPrice()
@@ -146,4 +165,4 @@ function AssetProvider({
 const useAsset = (): AssetProviderValue => useContext(AssetContext)
 
 export { AssetProvider, useAsset, AssetProviderValue, AssetContext }
-export default OceanProvider
+export default AssetProvider
