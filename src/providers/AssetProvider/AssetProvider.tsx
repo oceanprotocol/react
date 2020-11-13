@@ -15,10 +15,9 @@ import {
   MetadataCache
 } from '@oceanprotocol/lib'
 import { PurgatoryData } from '@oceanprotocol/lib/dist/node/ddo/interfaces/PurgatoryData'
-import { useOcean } from '../index'
+import { useOcean } from '../OceanProvider'
 import { isDDO, getDataTokenPrice } from 'utils'
 import { getAssetPurgatoryData } from '../../utils/getPurgatoryData'
-import ProviderStatus from '../OceanProvider/ProviderStatus'
 import { ConfigHelperConfig } from '@oceanprotocol/lib/dist/node/utils/ConfigHelper'
 
 interface AssetProviderValue {
@@ -98,7 +97,7 @@ function AssetProvider({
     try {
       const result = await getAssetPurgatoryData(did)
 
-      if (result.did !== undefined) {
+      if (result?.did !== undefined) {
         setIsInPurgatory(true)
         setPurgatoryData(result)
       } else {

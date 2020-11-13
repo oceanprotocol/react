@@ -79,12 +79,12 @@ function OceanProvider({
     ProviderStatus.NOT_AVAILABLE
   )
 
-  const setPurgatory = useCallback(async (accountId: string): Promise<void> => {
-    if (!accountId) return
+  const setPurgatory = useCallback(async (address: string): Promise<void> => {
+    if (!address) return
     try {
-      const result = await getAccountPurgatoryData(accountId)
+      const result = await getAccountPurgatoryData(address)
 
-      if (result.address !== undefined) {
+      if (result?.address !== undefined) {
         setIsInPurgatory(true)
         setPurgatoryData(result)
       } else {
@@ -147,8 +147,6 @@ function OceanProvider({
         const balance = await getBalance(account)
         setBalance(balance)
         Logger.log('balance', JSON.stringify(balance))
-
-        await setPurgatory(accountId)
       } catch (error) {
         Logger.error(error)
       }
@@ -177,6 +175,12 @@ function OceanProvider({
   }
 
   // TODO: #68 Refetch balance periodically, or figure out some event to subscribe to
+
+  useEffect(() => {
+    if (!accountId) return
+    console.log('balanc ref', accountId)
+    setPurgatory(accountId)
+  }, [accountId])
 
   useEffect(() => {
     const handleAccountsChanged = async (accounts: string[]) => {

@@ -12,7 +12,7 @@ export async function getAssetPurgatoryData(
 ): Promise<PurgatoryData> {
   const response = await axios(`${purgatoryUrl}asset?did=${did}`)
   const responseJson = await response.data[0]
-  return { did: responseJson.did, reason: responseJson.reason }
+  return { did: responseJson?.did, reason: responseJson?.reason }
 }
 
 export async function getAccountPurgatoryData(
@@ -20,5 +20,5 @@ export async function getAccountPurgatoryData(
 ): Promise<AccountPurgatoryData> {
   const response = await axios(`${purgatoryUrl}account?address=${address}`)
   const responseJson = await response.data[0]
-  return { address: responseJson.address, reason: responseJson.reason }
+  return { address: responseJson?.address, reason: responseJson?.reason }
 }
