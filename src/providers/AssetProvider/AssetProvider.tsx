@@ -89,35 +89,9 @@ function AssetProvider({
   }, [ocean, internalDdo])
 
   useEffect(() => {
-    init()
+    // removed until we can properly test and refactor market
+    // init()
   }, [init, asset, ocean, status])
-
-  const initMetadata = useCallback(async (): Promise<void> => {
-    if (!internalDdo) return
-    // Set price from DDO first
-    setPrice(internalDdo.price)
-
-    const metadata = internalDdo.findServiceByType('metadata').attributes
-    setMetadata(metadata)
-    setTitle(metadata.main.name)
-    setOwner(internalDdo.publicKey[0].owner)
-
-    setIsInPurgatory(internalDdo.isInPurgatory)
-    setPurgatoryData(internalDdo.purgatoryData)
-    await setPurgatory(internalDdo.id)
-    // Stop here and do not start fetching from chain, when not connected properly.
-    if (status !== 1 || networkId !== (config as ConfigHelperConfig).networkId)
-      return
-
-    // Set price again, but from chain
-    const priceLive = await getPrice()
-    priceLive && internalDdo.price !== priceLive && setPrice(priceLive)
-  }, [internalDdo, getPrice])
-
-  useEffect(() => {
-    if (!internalDdo || !ocean || status !== ProviderStatus.CONNECTED) return
-    initMetadata()
-  }, [status, internalDdo, initMetadata])
 
   const setPurgatory = useCallback(async (did: string): Promise<void> => {
     if (!did) return
@@ -135,6 +109,36 @@ function AssetProvider({
       Logger.error(error)
     }
   }, [])
+  const initMetadata = useCallback(async (): Promise<void> => {
+    // remove until we can properly implement this
+    // if (!internalDdo) return
+    // setPrice(internalDdo.price)
+
+    // const metadata = internalDdo.findServiceByType('metadata').attributes
+    // setMetadata(metadata)
+    // setTitle(metadata.main.name)
+    // setOwner(internalDdo.publicKey[0].owner)
+
+    // setIsInPurgatory(internalDdo.isInPurgatory)
+    // setPurgatoryData(internalDdo.purgatoryData)
+    setMetadata(undefined)
+    setTitle('not_implemented')
+    setOwner('not_implemented')
+    if (!asset) return
+    await setPurgatory(asset as string)
+    // Stop here and do not start fetching from chain, when not connected properly.
+    if (status !== 1 || networkId !== (config as ConfigHelperConfig).networkId)
+      return
+
+    // Set price again, but from chain
+    const priceLive = await getPrice()
+    setPrice(priceLive)
+  }, [internalDdo, getPrice])
+
+  useEffect(() => {
+    if (!internalDdo || !ocean || status !== ProviderStatus.CONNECTED) return
+    initMetadata()
+  }, [status, internalDdo, initMetadata])
 
   async function refreshPrice(): Promise<void> {
     const livePrice = await getPrice()
