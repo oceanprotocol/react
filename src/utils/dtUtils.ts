@@ -86,7 +86,6 @@ export async function getFirstExchange(ocean: Ocean, dataTokenAddress: string) {
       dataTokenAddress,
       '1'
     )
-    Logger.log('Found exchanges', tokenExchanges)
     if (tokenExchanges === undefined || tokenExchanges.length === 0) {
       return {
         address: '',
