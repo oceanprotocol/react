@@ -6,13 +6,6 @@ import { Metadata } from '@oceanprotocol/lib/dist/node/ddo/interfaces/Metadata'
 
 export function Publish() {
   const { publish, publishStepText, isLoading } = usePublish()
-  const {
-    createPricing,
-    pricingStep,
-    pricingStepText,
-    pricingIsLoading,
-    pricingError
-  } = usePricing()
   const [ddo, setDdo] = useState<DDO | undefined | null>()
 
   const asset = {

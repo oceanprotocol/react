@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import './App.css'
 import { OceanProvider } from '@oceanprotocol/react'
 import { Wallet } from './Wallet'
@@ -8,7 +8,6 @@ import { AllDdos } from './AllDdos'
 import { ConsumeDdo } from './ConsumeDdo'
 import { NetworkMonitor } from './NetworkMonitor'
 import { LogLevel } from '@oceanprotocol/lib/dist/node/utils'
-import { Pricing } from './Pricing'
 
 const configRinkeby = new ConfigHelper().getConfig('rinkeby')
 const providerOptions = {}
@@ -27,6 +26,8 @@ function App() {
     init()
   }, [])
 
+  const [did, setDid] = useState<string | undefined>()
+
   return (
     <OceanProvider initialConfig={configRinkeby} web3ModalOpts={web3ModalOpts}>
       <div className="container">
@@ -39,9 +40,6 @@ function App() {
         </div>
         <div>
           <Publish />
-        </div>
-        <div>
-          <Pricing />
         </div>
         <div>
           <ConsumeDdo />

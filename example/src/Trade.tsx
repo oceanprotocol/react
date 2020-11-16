@@ -1,5 +1,5 @@
 import React from 'react'
-import { useOcean, usePricing } from '@oceanprotocol/react'
+import { PriceOptions, useOcean, usePricing } from '@oceanprotocol/react'
 // import { useOcean, usePublish } from '@oceanprotocol/react'
 import { DDO } from '@oceanprotocol/lib'
 import { useState } from 'react'
@@ -16,14 +16,16 @@ export function Trade() {
     pricingStepText,
     pricingIsLoading,
     pricingError
-  } = usePricing()
+  } = usePricing(new DDO())
   const [datatoken, setDatatoken] = useState<string | undefined>()
+
+
   const handleBuy = async () => {
-    const tx = await buyDT(datatoken, '1')
+    const tx = await buyDT('1')
     console.log(tx)
   }
   const handleSell = async () => {
-    const tx = await buyDT(datatoken, '1')
+    const tx = await buyDT('1')
     console.log(tx)
   }
   const handleChange = (e: any) => {
@@ -37,8 +39,8 @@ export function Trade() {
         type: 'fixed',
         weightOnDataToken: '',
         swapFee: ''
-      }
-      const tx = await createPricing(datatoken, priceOptions)
+      } as PriceOptions
+      const tx = await createPricing(priceOptions)
       console.log(tx)
     }
   }
