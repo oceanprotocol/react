@@ -19,7 +19,6 @@ export function Trade() {
   } = usePricing(new DDO())
   const [datatoken, setDatatoken] = useState<string | undefined>()
 
-
   const handleBuy = async () => {
     const tx = await buyDT('1')
     console.log(tx)
