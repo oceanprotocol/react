@@ -1,15 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
-import {
-  DID,
-  DDO,
-  Metadata,
-  Logger,
-  BestPrice,
-  MetadataCache
-} from '@oceanprotocol/lib'
+import { DID, DDO, Metadata, Logger, BestPrice } from '@oceanprotocol/lib'
 import { useOcean } from 'providers'
 import { isDDO, getDataTokenPrice } from 'utils'
-import { ConfigHelperConfig } from '@oceanprotocol/lib/dist/node/utils/ConfigHelper'
+import axios, { CancelToken } from 'axios'
 
 interface UseMetadata {
   ddo: DDO | undefined
@@ -18,8 +11,7 @@ interface UseMetadata {
   title: string | undefined
   owner: string | undefined
   price: BestPrice | undefined
-  isLoaded: boolean
-  refreshPrice: () => void
+  getLivePrice: () => Promise<BestPrice>
 }
 
 function useMetadata(asset?: DID | string | DDO): UseMetadata {
@@ -28,22 +20,27 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
   const [internalDid, setDID] = useState<DID | string>()
   const [metadata, setMetadata] = useState<Metadata>()
   const [title, setTitle] = useState<string>()
-  const [isLoaded, setIsLoaded] = useState(false)
   const [price, setPrice] = useState<BestPrice>()
   const [owner, setOwner] = useState<string>()
 
   const getDDO = useCallback(
-    async (did: DID | string): Promise<DDO | undefined> => {
+    async (
+      did: DID | string,
+      cancelToken: CancelToken
+    ): Promise<DDO | undefined> => {
       if (!config.metadataCacheUri) return
 
-      const metadataCache = new MetadataCache(config.metadataCacheUri, Logger)
-      const ddo = await metadataCache.retrieveDDO(did)
+      const request = await axios.get(
+        `${config.metadataCacheUri}/api/v1/aquarius/assets/ddo/${did}`,
+        { cancelToken }
+      )
+      const ddo = request.data as DDO
       return ddo
     },
     [config.metadataCacheUri]
   )
 
-  const getPrice = useCallback(async (): Promise<BestPrice> => {
+  const getLivePrice = useCallback(async (): Promise<BestPrice> => {
     if (!internalDdo)
       return {
         type: '',
@@ -73,24 +70,29 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
   useEffect(() => {
     if (!asset) return
 
+    const source = axios.CancelToken.source()
+    let isMounted = true
+
     async function init(): Promise<void> {
       if (isDDO(asset as string | DDO | DID)) {
         setDDO(asset as DDO)
         setDID((asset as DDO).id)
       } else {
         // asset is a DID
-        const ddo = await getDDO(asset as DID)
+        const ddo = await getDDO(asset as DID, source.token)
+        if (!isMounted) return
         Logger.debug('DDO', ddo)
         setDDO(ddo)
         setDID(asset as DID)
       }
     }
     init()
+    return () => {
+      isMounted = false
+      source.cancel()
+    }
   }, [asset, getDDO])
-  async function refreshPrice(): Promise<void> {
-    const livePrice = await getPrice()
-    setPrice(livePrice)
-  }
+
   //
   // Get metadata & price for stored DDO
   //
@@ -105,37 +107,9 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
       setMetadata(metadata)
       setTitle(metadata.main.name)
       setOwner(internalDdo.publicKey[0].owner)
-      setIsLoaded(true)
-
-      // Stop here and do not start fetching from chain, when not connected properly.
-      if (
-        status !== 1 ||
-        networkId !== (config as ConfigHelperConfig).networkId
-      )
-        return
-
-      // Set price again, but from chain
-      const priceLive = await getPrice()
-      priceLive && internalDdo.price !== priceLive && setPrice(priceLive)
     }
     init()
-
-    // const interval = setInterval(async () => {
-    //   if (
-    //     !internalDdo ||
-    //     status !== 1 ||
-    //     networkId !== (config as ConfigHelperConfig).networkId
-    //   )
-    //     return
-
-    //  await refreshPrice
-
-    // }, 10000)
-
-    // return () => {
-    //   clearInterval(interval)
-    // }
-  }, [status, networkId, config, internalDdo, getMetadata, getPrice])
+  }, [status, networkId, config, internalDdo, getMetadata])
 
   return {
     ddo: internalDdo,
@@ -144,8 +118,7 @@ function useMetadata(asset?: DID | string | DDO): UseMetadata {
     title,
     owner,
     price,
-    isLoaded,
-    refreshPrice
+    getLivePrice
   }
 }
 
