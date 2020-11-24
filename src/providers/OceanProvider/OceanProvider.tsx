@@ -9,13 +9,7 @@ import React, {
 } from 'react'
 import Web3 from 'web3'
 import ProviderStatus from './ProviderStatus'
-import {
-  Ocean,
-  Logger,
-  Account,
-  Config,
-  PurgatoryData
-} from '@oceanprotocol/lib'
+import { Ocean, Logger, Account, Config } from '@oceanprotocol/lib'
 import Web3Modal, { ICoreOptions } from 'web3modal'
 import { getDefaultProviders } from './getDefaultProviders'
 import { getAccountId, getBalance } from 'utils'

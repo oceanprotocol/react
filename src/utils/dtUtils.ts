@@ -184,7 +184,7 @@ export async function getFirstPoolPrice(
     }
   }
 
-  let firstPoolPrice = await ocean.pool.calcInGivenOut(
+  const firstPoolPrice = await ocean.pool.calcInGivenOut(
     firstPoolAddress,
     dataTokenAddress,
     ocean.pool.oceanAddress,
