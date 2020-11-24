@@ -1,17 +1,20 @@
 import { Ocean, BestPrice, Logger } from '@oceanprotocol/lib'
 import { Decimal } from 'decimal.js'
-import Pool from 'hooks/useMetadata/Pool'
 
-export async function getCheapestPool(
+export async function getCheapestPoolPrice(
   ocean: Ocean,
   dataTokenAddress: string
-): Promise<Pool> {
+): Promise<BestPrice> {
   const tokenPools = await ocean.pool.searchPoolforDT(dataTokenAddress)
 
   if (tokenPools === undefined || tokenPools.length === 0) {
     return {
+      type: '',
       address: '',
-      price: 0
+      pools: [],
+      datatoken: 0,
+      value: 0,
+      isConsumable: ''
     }
   }
   let cheapestPoolAddress = tokenPools[0]
@@ -19,7 +22,12 @@ export async function getCheapestPool(
 
   if (tokenPools) {
     for (let i = 0; i < tokenPools.length; i++) {
-      const poolPrice = await ocean.pool.getOceanNeeded(tokenPools[i], '1')
+      const poolPrice = await ocean.pool.calcInGivenOut(
+        tokenPools[i],
+        dataTokenAddress,
+        ocean.pool.oceanAddress,
+        '1'
+      )
       const decimalPoolPrice = new Decimal(poolPrice)
 
       if (decimalPoolPrice < cheapestPoolPrice) {
@@ -29,21 +37,25 @@ export async function getCheapestPool(
     }
   }
 
+  const usePrice = await ocean.pool.getOceanNeeded(cheapestPoolAddress, '1')
   const oceanReserve = await ocean.pool.getOceanReserve(cheapestPoolAddress)
   const dtReserve = await ocean.pool.getDTReserve(cheapestPoolAddress)
 
   return {
+    type: 'pool',
+    pools: [cheapestPoolAddress],
     address: cheapestPoolAddress,
-    price: Number(cheapestPoolPrice),
+    value: Number(cheapestPoolPrice),
     ocean: Number(oceanReserve),
-    datatoken: Number(dtReserve)
+    datatoken: Number(dtReserve),
+    isConsumable: Number(usePrice) > 0 ? 'true' : 'false'
   }
 }
 
-export async function getCheapestExchange(
+export async function getCheapestExchangePrice(
   ocean: Ocean,
   dataTokenAddress: string
-): Promise<Pool> {
+): Promise<BestPrice> {
   try {
     const tokenExchanges = await ocean.fixedRateExchange.searchforDT(
       dataTokenAddress,
@@ -51,8 +63,12 @@ export async function getCheapestExchange(
     )
     if (tokenExchanges === undefined || tokenExchanges.length === 0) {
       return {
+        type: '',
         address: '',
-        price: 0
+        pools: [],
+        datatoken: 0,
+        value: 0,
+        isConsumable: ''
       }
     }
     let cheapestExchangeAddress = tokenExchanges[0].exchangeID
@@ -67,20 +83,35 @@ export async function getCheapestExchange(
       }
     }
 
+    const dtReserve = cheapestExchangeAddress
+      ? await ocean.fixedRateExchange.getSupply(cheapestExchangeAddress)
+      : '0'
     return {
+      type: 'pool',
+      pools: [],
       address: cheapestExchangeAddress || '',
-      price: Number(cheapestExchangePrice)
+      value: Number(cheapestExchangePrice),
+      ocean: 0,
+      datatoken: Number(dtReserve),
+      isConsumable: Number(dtReserve) > 0 ? 'true' : 'false'
     }
   } catch (err) {
     Logger.log(err)
     return {
+      type: '',
       address: '',
-      price: 0
+      pools: [],
+      datatoken: 0,
+      value: 0,
+      isConsumable: ''
     }
   }
 }
 
-export async function getFirstExchange(ocean: Ocean, dataTokenAddress: string) {
+export async function getFirstExchangePrice(
+  ocean: Ocean,
+  dataTokenAddress: string
+): Promise<BestPrice> {
   try {
     const tokenExchanges = await ocean.fixedRateExchange.searchforDT(
       dataTokenAddress,
@@ -88,103 +119,116 @@ export async function getFirstExchange(ocean: Ocean, dataTokenAddress: string) {
     )
     if (tokenExchanges === undefined || tokenExchanges.length === 0) {
       return {
+        type: '',
         address: '',
-        price: 0
+        pools: [],
+        datatoken: 0,
+        value: 0,
+        isConsumable: ''
       }
     }
+
     const [tokenExchange] = tokenExchanges
 
     return {
+      type: 'pool',
+      pools: [],
       address: tokenExchange.exchangeID || '',
-      price: Number(tokenExchange.fixedRate)
+      value: Number(tokenExchange.fixedRate),
+      ocean: 0,
+      datatoken: Number(tokenExchange.supply),
+      isConsumable: Number(tokenExchange.supply) > 0 ? 'true' : 'false'
     }
   } catch (err) {
     Logger.log(err)
     return {
+      type: '',
       address: '',
-      price: 0
+      pools: [],
+      datatoken: 0,
+      value: 0,
+      isConsumable: ''
     }
   }
 }
 
-export async function getFirstPool(
+export async function getFirstPoolPrice(
   ocean: Ocean,
   dataTokenAddress: string,
   poolAddress?: string
-): Promise<Pool> {
+): Promise<BestPrice> {
   let firstPoolAddress = poolAddress
   if (!poolAddress) {
     const tokenPools = await ocean.pool.searchPoolforDT(dataTokenAddress)
 
     if (tokenPools === undefined || tokenPools.length === 0) {
       return {
+        type: '',
         address: '',
-        price: 0
+        pools: [],
+        datatoken: 0,
+        value: 0,
+        isConsumable: ''
       }
     }
     ;[firstPoolAddress] = tokenPools
   }
   if (!firstPoolAddress) {
     return {
+      type: '',
       address: '',
-      price: 0
+      pools: [],
+      datatoken: 0,
+      value: 0,
+      isConsumable: ''
     }
   }
 
-  let firstPoolPrice = await ocean.pool.getOceanNeeded(firstPoolAddress, '1')
-
+  let firstPoolPrice = await ocean.pool.calcInGivenOut(
+    firstPoolAddress,
+    dataTokenAddress,
+    ocean.pool.oceanAddress,
+    '1'
+  )
+  const usePrice = await ocean.pool.getOceanNeeded(firstPoolAddress, '1')
   const oceanReserve = await ocean.pool.getOceanReserve(firstPoolAddress)
 
   const dtReserve = await ocean.pool.getDTReserve(firstPoolAddress)
 
-  if (firstPoolPrice) {
-    const priceChars = firstPoolPrice.split('.')
-    const numberOfCharsOfPrice = priceChars[0].length
-
-    if (numberOfCharsOfPrice > 8) firstPoolPrice = '0'
-  }
-
   return {
+    type: 'pool',
+    pools: [firstPoolAddress],
     address: firstPoolAddress,
-    price: Number(firstPoolPrice),
+    value: Number(firstPoolPrice),
     ocean: Number(oceanReserve),
-    datatoken: Number(dtReserve)
+    datatoken: Number(dtReserve),
+    isConsumable: Number(usePrice) > 0 ? 'true' : 'false'
   }
 }
 
 export async function getBestDataTokenPrice(
   ocean: Ocean,
-  dataTokenAddress: string,
-  poolAddress?: string
+  dataTokenAddress: string
 ): Promise<BestPrice> {
-  const cheapestPool = await getFirstPool(ocean, dataTokenAddress, poolAddress)
-  const cheapestExchange = await getCheapestExchange(ocean, dataTokenAddress)
+  const cheapestPool = await getCheapestPoolPrice(ocean, dataTokenAddress)
+  const cheapestExchange = await getCheapestExchangePrice(
+    ocean,
+    dataTokenAddress
+  )
   Decimal.set({ precision: 5 })
 
   const cheapestPoolPrice = new Decimal(
-    cheapestPool && cheapestPool.price !== 0 ? cheapestPool.price : 999999999999
+    cheapestPool && cheapestPool.value !== 0 ? cheapestPool.value : 999999999999
   )
   const cheapestExchangePrice = new Decimal(
-    cheapestExchange && cheapestExchange?.price !== 0
-      ? cheapestExchange.price
+    cheapestExchange && cheapestExchange?.value !== 0
+      ? cheapestExchange.value
       : 999999999999
   )
 
-  if (cheapestPoolPrice < cheapestExchangePrice) {
-    return {
-      type: 'pool',
-      address: cheapestPool?.address,
-      value: cheapestPool?.price,
-      ocean: cheapestPool?.ocean,
-      datatoken: cheapestPool?.datatoken
-    } as BestPrice
-  } else {
-    return {
-      type: 'exchange',
-      address: cheapestExchange?.address,
-      value: Number(cheapestExchange?.price)
-    } as BestPrice
-  }
+  return cheapestPoolPrice < cheapestExchangePrice
+    ? cheapestPool
+    : cheapestExchange
 }
 
 export async function getDataTokenPrice(
@@ -192,32 +236,16 @@ export async function getDataTokenPrice(
   dataTokenAddress: string,
   type?: string,
   poolAddress?: string
-) {
+): Promise<BestPrice> {
   switch (type) {
     case 'pool': {
-      const cheapestPool = await getFirstPool(
-        ocean,
-        dataTokenAddress,
-        poolAddress
-      )
-      return {
-        type: 'pool',
-        address: cheapestPool?.address,
-        value: cheapestPool?.price,
-        ocean: cheapestPool?.ocean,
-        datatoken: cheapestPool?.datatoken
-      } as BestPrice
+      return await getFirstPoolPrice(ocean, dataTokenAddress, poolAddress)
     }
     case 'exchange': {
-      const cheapestExchange = await getFirstExchange(ocean, dataTokenAddress)
-      return {
-        type: 'exchange',
-        address: cheapestExchange?.address,
-        value: Number(cheapestExchange?.price)
-      } as BestPrice
+      return await getFirstExchangePrice(ocean, dataTokenAddress)
     }
     default: {
-      return await getBestDataTokenPrice(ocean, dataTokenAddress, poolAddress)
+      return await getBestDataTokenPrice(ocean, dataTokenAddress)
     }
   }
 }

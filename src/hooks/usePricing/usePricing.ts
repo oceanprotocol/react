@@ -6,7 +6,7 @@ import { TransactionReceipt } from 'web3-core'
 import { Decimal } from 'decimal.js'
 import {
   getBestDataTokenPrice,
-  getFirstPool,
+  getFirstPoolPrice,
   getCreatePricingPoolFeedback,
   getCreatePricingExchangeFeedback,
   getBuyDTFeedback,
@@ -185,9 +185,9 @@ function usePricing(ddo: DDO): UsePricing {
       setPricingIsLoading(true)
       setPricingError(undefined)
       setStep(1, 'sell')
-      const pool = await getFirstPool(ocean, dataToken)
-      if (!pool || pool.price === 0) return
-      const price = new Decimal(pool.price).times(0.95).toString()
+      const pool = await getFirstPoolPrice(ocean, dataToken)
+      if (!pool || pool.value === 0) return
+      const price = new Decimal(pool.value).times(0.95).toString()
       setStep(2, 'sell')
       Logger.log('Selling token to pool', pool, accountId, price)
       const tx = await ocean.pool.sellDT(
