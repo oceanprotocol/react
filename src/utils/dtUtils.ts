@@ -24,8 +24,8 @@ export async function getCheapestPoolPrice(
     for (let i = 0; i < tokenPools.length; i++) {
       const poolPrice = await ocean.pool.calcInGivenOut(
         tokenPools[i],
-        dataTokenAddress,
         ocean.pool.oceanAddress,
+        dataTokenAddress,
         '1'
       )
       const decimalPoolPrice = new Decimal(poolPrice)
@@ -186,8 +186,8 @@ export async function getFirstPoolPrice(
 
   const firstPoolPrice = await ocean.pool.calcInGivenOut(
     firstPoolAddress,
-    dataTokenAddress,
     ocean.pool.oceanAddress,
+    dataTokenAddress,
     '1'
   )
   const usePrice = await ocean.pool.getOceanNeeded(firstPoolAddress, '1')
