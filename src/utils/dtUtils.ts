@@ -87,7 +87,7 @@ export async function getCheapestExchangePrice(
       ? await ocean.fixedRateExchange.getSupply(cheapestExchangeAddress)
       : '0'
     return {
-      type: 'pool',
+      type: 'exchange',
       pools: [],
       address: cheapestExchangeAddress || '',
       value: Number(cheapestExchangePrice),
@@ -131,7 +131,7 @@ export async function getFirstExchangePrice(
     const [tokenExchange] = tokenExchanges
 
     return {
-      type: 'pool',
+      type: 'exchange',
       pools: [],
       address: tokenExchange.exchangeID || '',
       value: Number(tokenExchange.fixedRate),

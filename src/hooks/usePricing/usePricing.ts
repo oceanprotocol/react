@@ -5,13 +5,14 @@ import { PriceOptions } from './PriceOptions'
 import { TransactionReceipt } from 'web3-core'
 import { Decimal } from 'decimal.js'
 import {
-  getBestDataTokenPrice,
   getFirstPoolPrice,
   getCreatePricingPoolFeedback,
   getCreatePricingExchangeFeedback,
   getBuyDTFeedback,
   getSellDTFeedback,
-  sleep
+  sleep,
+  getDataTokenPrice,
+  getBestDataTokenPrice
 } from 'utils'
 
 interface UsePricing {
@@ -113,8 +114,14 @@ function usePricing(ddo: DDO): UsePricing {
       setPricingIsLoading(true)
       setPricingError(undefined)
       setStep(1, 'buy')
-      const bestPrice = await getBestDataTokenPrice(ocean, dataToken)
 
+      const bestPrice = await await getDataTokenPrice(
+        ocean,
+        ddo.dataToken,
+        ddo?.price?.type,
+        ddo.price.address
+      )
+      Logger.log('Price found for buying', bestPrice)
       switch (bestPrice?.type) {
         case 'pool': {
           const price = new Decimal(bestPrice.value).times(1.05).toString()
