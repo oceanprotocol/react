@@ -28,7 +28,7 @@
     "@oceanprotocol/lib": "^0.9.14",
     "axios": "^0.21.0",
     "decimal.js": "^10.2.1",
-    "web3": "^1.2.11",
+    "web3": "1.2.11",
     "web3modal": "^1.9.1"
   },
   "devDependencies": {
