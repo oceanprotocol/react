@@ -11,8 +11,7 @@ import {
   getBuyDTFeedback,
   getSellDTFeedback,
   sleep,
-  getDataTokenPrice,
-  getBestDataTokenPrice
+  getDataTokenPrice
 } from 'utils'
 
 interface UsePricing {

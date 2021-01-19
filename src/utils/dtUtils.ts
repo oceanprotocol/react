@@ -110,14 +110,11 @@ export async function getCheapestExchangePrice(
 
 export async function getFirstExchangePrice(
   ocean: Ocean,
-  dataTokenAddress: string
+  exchangeId?: string
 ): Promise<BestPrice> {
   try {
-    const tokenExchanges = await ocean.fixedRateExchange.searchforDT(
-      dataTokenAddress,
-      '1'
-    )
-    if (tokenExchanges === undefined || tokenExchanges.length === 0) {
+    if (!exchangeId) {
+      Logger.log('exchangeId is undefined in getFirstExchangePrice')
       return {
         type: '',
         address: '',
@@ -128,7 +125,19 @@ export async function getFirstExchangePrice(
       }
     }
 
-    const [tokenExchange] = tokenExchanges
+    const tokenExchange = await ocean.fixedRateExchange.getExchange(exchangeId)
+
+    if (tokenExchange === undefined) {
+      Logger.log('tokenExchange is undefined in getFirstExchangePrice')
+      return {
+        type: '',
+        address: '',
+        pools: [],
+        datatoken: 0,
+        value: 0,
+        isConsumable: ''
+      }
+    }
 
     return {
       type: 'exchange',
@@ -235,14 +244,14 @@ export async function getDataTokenPrice(
   ocean: Ocean,
   dataTokenAddress: string,
   type?: string,
-  poolAddress?: string
+  address?: string
 ): Promise<BestPrice> {
   switch (type) {
     case 'pool': {
-      return await getFirstPoolPrice(ocean, dataTokenAddress, poolAddress)
+      return await getFirstPoolPrice(ocean, dataTokenAddress, address)
     }
     case 'exchange': {
-      return await getFirstExchangePrice(ocean, dataTokenAddress)
+      return await getFirstExchangePrice(ocean, address)
     }
     default: {
       return await getBestDataTokenPrice(ocean, dataTokenAddress)
