@@ -110,7 +110,7 @@ function usePublish(): UsePublish {
           const origComputePrivacy: ServiceComputePrivacy = {
             allowRawAlgorithm: true,
             allowNetworkAccess: false,
-            trustedAlgorithms: []
+            publisherTrustedAlgorithms: []
           }
           const computeService = ocean.compute.createComputeService(
             account,

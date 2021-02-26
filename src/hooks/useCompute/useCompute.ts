@@ -84,7 +84,7 @@ function useCompute(): UseCompute {
             rawAlgorithmMeta,
             marketFeeAddress
           )
-          orderId = await ocean.compute.order(
+          orderId = await ocean.compute.orderAsset(
             accountId,
             did,
             computeService.index,
