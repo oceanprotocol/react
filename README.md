@@ -5,7 +5,7 @@
 > 🎣 React hooks & components on top of ocean.js
 
 [![npm](https://img.shields.io/npm/v/@oceanprotocol/react.svg)](https://www.npmjs.com/package/@oceanprotocol/react)
-[![Build Status](https://travis-ci.com/oceanprotocol/react.svg?token=3psqw6c8KMDqfdGQ2x6d&branch=main)](https://travis-ci.com/oceanprotocol/react)
+[![Build Status](https://github.com/oceanprotocol/react/workflows/CI/badge.svg)](https://github.com/oceanprotocol/react/actions)
 [![Maintainability](https://api.codeclimate.com/v1/badges/d3150ecf9468f8238310/maintainability)](https://codeclimate.com/github/oceanprotocol/react/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/d3150ecf9468f8238310/test_coverage)](https://codeclimate.com/github/oceanprotocol/react/test_coverage)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-7b1173.svg?style=flat-square)](https://github.com/prettier/prettier)
@@ -153,7 +153,7 @@ Every task does the following:
 - creates a Git tag
 - commits and pushes everything
 - creates a GitHub release with commit messages as description
-- Git tag push will trigger Travis to do a npm release
+- GitHub release will trigger a GitHub Actions workflow to do a npm release
 
 For the GitHub releases steps a GitHub personal access token, exported as `GITHUB_TOKEN` is required. [Setup](https://github.com/release-it/release-it#github-releases)
 
