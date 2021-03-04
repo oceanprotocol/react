@@ -25,7 +25,7 @@
     "dist/"
   ],
   "dependencies": {
-    "@oceanprotocol/lib": "^0.11.0",
+    "@oceanprotocol/lib": "^0.11.2",
     "axios": "^0.21.1",
     "decimal.js": "^10.2.1",
     "web3": "1.3.4",
@@ -38,7 +38,7 @@
     "@typescript-eslint/eslint-plugin": "^4.16.1",
     "@typescript-eslint/parser": "^4.16.1",
     "auto-changelog": "^2.2.1",
-    "eslint": "^7.17.0",
+    "eslint": "^7.21.0",
     "eslint-config-oceanprotocol": "^1.5.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-prettier": "^3.3.1",
@@ -46,9 +46,9 @@
     "eslint-plugin-react-hooks": "^4.2.0",
     "microbundle": "^0.13.0",
     "prettier": "^2.2.1",
-    "release-it": "^14.2.2",
+    "release-it": "^14.4.1",
     "serialize-javascript": "^5.0.1",
-    "typescript": "^4.1.3"
+    "typescript": "^4.2.2"
   },
   "peerDependencies": {
     "react": ">=16.8.0"
