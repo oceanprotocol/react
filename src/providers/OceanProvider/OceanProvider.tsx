@@ -33,26 +33,38 @@ interface OceanProviderValue {
   balance: Balance
   networkId: number | undefined
   status: ProviderStatus
-  connect: (config?: Config) => Promise<void>
+  createOcean: (config?: Config) => Promise<void>
   refreshBalance: () => Promise<void>
 }
 
 const OceanContext = createContext({} as OceanProviderValue)
 
-function OceanProvider({ initialConfig, children }: {
+function OceanProvider({
+  initialConfig,
+  web3Provider,
+  children
+}: {
   initialConfig: Config | ConfigHelperConfig
+  web3Provider: Web3
   children: ReactNode
 }): ReactElement {
   const [ocean, setOcean] = useState<Ocean | undefined>()
   const [account, setAccount] = useState<Account | undefined>()
   const [accountId, setAccountId] = useState<string | undefined>()
   const [networkId, setNetworkId] = useState<number | undefined>()
-  const [balance, setBalance] = useState<Balance | undefined>({ eth: undefined, ocean: undefined });
+  const [balance, setBalance] = useState<Balance | undefined>({
+    eth: undefined,
+    ocean: undefined
+  })
 
   const [isInPurgatory, setIsInPurgatory] = useState(false)
   const [purgatoryData, setPurgatoryData] = useState<AccountPurgatoryData>()
-  const [config, setConfig] = useState<Config | ConfigHelperConfig>(initialConfig)
-  const [status, setStatus] = useState<ProviderStatus>(ProviderStatus.NOT_AVAILABLE)
+  const [config, setConfig] = useState<Config | ConfigHelperConfig>(
+    initialConfig
+  )
+  const [status, setStatus] = useState<ProviderStatus>(
+    ProviderStatus.NOT_AVAILABLE
+  )
 
   const setPurgatory = useCallback(async (address: string): Promise<void> => {
     if (!address) return
@@ -73,43 +85,39 @@ function OceanProvider({ initialConfig, children }: {
     }
   }, [])
 
-  const connect = useCallback(
+  const createOcean = useCallback(
     async (newConfig?: Config | ConfigHelperConfig) => {
       try {
         Logger.log('Connecting ...', newConfig)
-
         newConfig && setConfig(newConfig)
 
         // ========
-        // config.web3Provider = web3
+        config.web3Provider = web3Provider
         const ocean = await Ocean.getInstance(config)
         setOcean(ocean)
         Logger.log('Ocean instance created.', ocean)
         // ========
-        
+
         // NETWORK ID
 
         // const networkId = web3 && (await web3.eth.net.getId())
         // setNetworkId(networkId)
         // Logger.log('network id ', networkId)
 
-        // ACCOUNT
+        // Account
+        const account = (await ocean.accounts.list())[0]
+        setAccount(account)
+        Logger.log('Account ', account)
 
-        // const account = (await ocean.accounts.list())[0]
-        // setAccount(account)
-        // Logger.log('Account ', account)
+        // Account Id
+        const accountId = await getAccountId(web3Provider)
+        setAccountId(accountId)
+        Logger.log('account id', accountId)
 
-        // ACCOUNT ID
-
-        // const accountId = await getAccountId(web3)
-        // setAccountId(accountId)
-        // Logger.log('account id', accountId)
-
-        // BALANCE
-
-        // const balance = await getBalance(account)
-        // setBalance(balance)
-        // Logger.log('balance', JSON.stringify(balance))
+        // Balance
+        const balance = await getBalance(account)
+        setBalance(balance)
+        Logger.log('balance', JSON.stringify(balance))
       } catch (error) {
         Logger.error(error)
       }
@@ -141,7 +149,7 @@ function OceanProvider({ initialConfig, children }: {
           purgatoryData,
           status,
           config,
-          connect,
+          createOcean,
           refreshBalance
         } as OceanProviderValue
       }
