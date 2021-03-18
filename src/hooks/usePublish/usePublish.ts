@@ -25,7 +25,7 @@ interface UsePublish {
 }
 
 function usePublish(): UsePublish {
-  const { ocean, status, account } = useOcean()
+  const { ocean, status, account, accountId } = useOcean()
   const [isLoading, setIsLoading] = useState(false)
   const [publishStep, setPublishStep] = useState<number | undefined>()
   const [publishStepText, setPublishStepText] = useState<string | undefined>()
@@ -140,6 +140,8 @@ function usePublish(): UsePublish {
           providerUri
         )
         .next(setStep)
+
+      await ocean.assets.publishDdo(ddo, accountId)
       Logger.log('ddo created', ddo)
       await sleep(20000)
       setStep(7)
