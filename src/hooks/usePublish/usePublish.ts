@@ -48,7 +48,8 @@ function usePublish(): UsePublish {
     serviceType: ServiceType,
     dataTokenOptions?: DataTokenOptions,
     timeout?: number,
-    providerUri?: string
+    providerUri?: string,
+    encrypt = false
   ): Promise<DDO | undefined | null> {
     if (status !== ProviderStatus.CONNECTED || !ocean || !account) return null
     setIsLoading(true)
@@ -141,7 +142,7 @@ function usePublish(): UsePublish {
         )
         .next(setStep)
 
-      await ocean.assets.publishDdo(ddo, accountId)
+      await ocean.assets.publishDdo(ddo, accountId, encrypt)
       Logger.log('ddo created', ddo)
       await sleep(20000)
       setStep(7)
