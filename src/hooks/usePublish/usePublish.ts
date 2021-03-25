@@ -16,7 +16,8 @@ interface UsePublish {
     serviceConfigs: ServiceType,
     dataTokenOptions?: DataTokenOptions,
     timeout?: number,
-    providerUri?: string
+    providerUri?: string,
+    encrypt?: boolean
   ) => Promise<DDO | undefined | null>
   publishStep?: number
   publishStepText?: string
@@ -41,6 +42,8 @@ function usePublish(): UsePublish {
    * @param  {PriceOptions}  priceOptions : number of tokens to mint, datatoken weight , liquidity fee, type : fixed, dynamic
    * @param  {ServiceType} serviceType Desired service type of the asset access or compute
    * @param  {DataTokenOptions} dataTokenOptions custom name, symbol and cap for datatoken
+   * @param  {number} timeout timeout of the ddo
+   * @param  {boolean} encrypt specify if the ddo should be encrypted
    * @return {Promise<DDO>} Returns the newly published ddo
    */
   async function publish(
@@ -48,7 +51,8 @@ function usePublish(): UsePublish {
     serviceType: ServiceType,
     dataTokenOptions?: DataTokenOptions,
     timeout?: number,
-    providerUri?: string
+    providerUri?: string,
+    encrypt?: boolean
   ): Promise<DDO | undefined | null> {
     if (status !== ProviderStatus.CONNECTED || !ocean || !account) return null
     setIsLoading(true)
@@ -141,7 +145,7 @@ function usePublish(): UsePublish {
         )
         .next(setStep)
 
-      await ocean.assets.publishDdo(ddo, accountId)
+      await ocean.assets.publishDdo(ddo, accountId, encrypt)
       Logger.log('ddo created', ddo)
       await sleep(20000)
       setStep(7)
