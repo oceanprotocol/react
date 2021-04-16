@@ -3,7 +3,7 @@ import { useOcean } from 'providers'
 import { ComputeValue } from './ComputeOptions'
 import { Logger, ServiceCompute } from '@oceanprotocol/lib'
 import { MetadataAlgorithm } from '@oceanprotocol/lib/dist/node/ddo/interfaces/MetadataAlgorithm'
-import { ComputeJob } from '@oceanprotocol/lib/dist/node/ocean/interfaces/ComputeJob'
+import { ComputeJob } from '@oceanprotocol/lib/dist/node/ocean/interfaces/Compute'
 import { computeFeedback } from 'utils'
 
 interface UseCompute {
@@ -88,9 +88,9 @@ function useCompute(): UseCompute {
             accountId,
             did,
             computeService.index,
-            undefined,
-            rawAlgorithmMeta,
-            marketFeeAddress
+            { meta: rawAlgorithmMeta },
+            marketFeeAddress,
+            undefined
           )
           setStep(1)
         }
@@ -102,8 +102,7 @@ function useCompute(): UseCompute {
           orderId,
           dataTokenAddress,
           account,
-          undefined,
-          rawAlgorithmMeta,
+          { meta: rawAlgorithmMeta },
           output,
           `${computeService.index}`,
           computeService.type
