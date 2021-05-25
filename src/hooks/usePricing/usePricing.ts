@@ -220,13 +220,8 @@ function usePricing(ddo: DDO): UsePricing {
   ): Promise<TransactionReceipt | void> {
     if (!ocean || !accountId || !dtSymbol) return
 
-    const {
-      type,
-      oceanAmount,
-      price,
-      weightOnDataToken,
-      swapFee
-    } = priceOptions
+    const { type, oceanAmount, price, weightOnDataToken, swapFee } =
+      priceOptions
 
     let { dtAmount } = priceOptions
     const isPool = type === 'dynamic'
