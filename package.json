@@ -32,12 +32,11 @@
     "web3modal": "^1.9.3"
   },
   "devDependencies": {
-    "@release-it/bumper": "^2.0.0",
     "@types/node-fetch": "^2.5.7",
     "@types/react": "^17.0.0",
     "@typescript-eslint/eslint-plugin": "^4.25.0",
     "@typescript-eslint/parser": "^4.25.0",
-    "auto-changelog": "^2.2.1",
+    "auto-changelog": "^2.3.0",
     "eslint": "^7.27.0",
     "eslint-config-oceanprotocol": "^1.5.0",
     "eslint-config-prettier": "^8.3.0",
@@ -66,14 +65,7 @@
     "hooks": {
       "after:bump": "npm run changelog"
     },
-    "plugins": {
-      "@release-it/bumper": {
-        "out": [
-          "package.json",
-          "package-lock.json"
-        ]
-      }
-    },
+    "plugins": {},
     "git": {
       "tagName": "v${version}"
     },
