@@ -62,9 +62,8 @@ function OceanProvider({
   const [accountId, setAccountId] = useState<string | undefined>()
   const [isInPurgatory, setIsInPurgatory] = useState(false)
   const [purgatoryData, setPurgatoryData] = useState<AccountPurgatoryData>()
-  const [config, setConfig] = useState<Config | ConfigHelperConfig>(
-    initialConfig
-  )
+  const [config, setConfig] =
+    useState<Config | ConfigHelperConfig>(initialConfig)
   const [balance, setBalance] = useState<Balance | undefined>({
     eth: undefined,
     ocean: undefined

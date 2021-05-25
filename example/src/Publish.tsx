@@ -17,8 +17,7 @@ export function Publish() {
       license: 'MIT',
       files: [
         {
-          url:
-            'https://raw.githubusercontent.com/tbertinmahieux/MSongsDB/master/Tasks_Demos/CoverSongs/shs_dataset_test.txt',
+          url: 'https://raw.githubusercontent.com/tbertinmahieux/MSongsDB/master/Tasks_Demos/CoverSongs/shs_dataset_test.txt',
           checksum: 'efb2c764274b745f5fc37f97c6b0e761',
           contentLength: '4535431',
           contentType: 'text/csv',
