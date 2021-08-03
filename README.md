@@ -4,6 +4,12 @@
 
 > 🎣 React hooks & components on top of ocean.js
 
+---
+
+**This repo is deprecated. Use ocean.js directly for most flexibility, and get inspiration for your own React hooks from the [`market` hooks](https://github.com/oceanprotocol/market/tree/main/src/hooks)**
+
+---
+
 [![npm](https://img.shields.io/npm/v/@oceanprotocol/react.svg)](https://www.npmjs.com/package/@oceanprotocol/react)
 [![Build Status](https://github.com/oceanprotocol/react/workflows/CI/badge.svg)](https://github.com/oceanprotocol/react/actions)
 [![Maintainability](https://api.codeclimate.com/v1/badges/d3150ecf9468f8238310/maintainability)](https://codeclimate.com/github/oceanprotocol/react/maintainability)
